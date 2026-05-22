@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pipeline — Incremento Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="admin.css">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+<body>
+
+<div id="login-overlay" style="display:none;position:fixed;inset:0;background:rgba(10,18,25,0.97);z-index:999;align-items:center;justify-content:center">
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:40px;width:100%;max-width:380px;text-align:center">
+    <svg width="36" height="36" viewBox="0 0 32 32" fill="none" style="margin:0 auto 16px"><defs><linearGradient id="lg" x1="0" y1="32" x2="32" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#9EF54A"/><stop offset="100%" stop-color="#5EE7D8"/></linearGradient></defs><rect x="4" y="20" width="5" height="8" rx="2.5" fill="url(#lg)" opacity="0.55"/><rect x="12" y="14" width="5" height="14" rx="2.5" fill="url(#lg)" opacity="0.78"/><rect x="20" y="10" width="5" height="18" rx="2.5" fill="url(#lg)"/><circle cx="22.5" cy="5.5" r="2.25" fill="url(#lg)"/></svg>
+    <p style="font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:600;color:var(--text);margin-bottom:6px">incremento<span style="color:var(--lime)">.</span> admin</p>
+    <p style="font-size:0.78rem;color:var(--text-dim);margin-bottom:24px">Enter your admin key to continue</p>
+    <input id="login-key" type="password" placeholder="Admin key" style="width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;font-family:'Inter',sans-serif;font-size:0.88rem;color:var(--text);outline:none;margin-bottom:12px">
+    <button id="login-btn" class="btn-primary" style="width:100%;justify-content:center">Unlock</button>
+  </div>
+</div>
+
+<aside class="sidebar">
+  <div class="sidebar-top">
+    <div class="sidebar-brand">
+      <svg width="26" height="26" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="sg" x1="0" y1="32" x2="32" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#9EF54A"/><stop offset="100%" stop-color="#5EE7D8"/></linearGradient></defs><rect x="4" y="20" width="5" height="8" rx="2.5" fill="url(#sg)" opacity="0.55"/><rect x="12" y="14" width="5" height="14" rx="2.5" fill="url(#sg)" opacity="0.78"/><rect x="20" y="10" width="5" height="18" rx="2.5" fill="url(#sg)"/><circle cx="22.5" cy="5.5" r="2.25" fill="url(#sg)"/></svg>
+      <span class="sidebar-brand-name">incremento<span class="dot">.</span></span>
+      <a class="sidebar-brand-link" href="https://incremento.co" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <a class="nav-item" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a class="nav-item" href="inbox.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Inbox<span class="nav-badge" id="nav-badge" style="display:none"></span></a>
+    <div class="nav-divider"></div>
+    <a class="nav-item active" href="pipeline.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Pipeline</a>
+    <a class="nav-item" href="contacts.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Contacts</a>
+    <div class="nav-divider"></div>
+    <a class="nav-item" href="analytics.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Analytics</a>
+    <div class="nav-divider"></div>
+    <a class="nav-item" href="settings.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Settings</a>
+  </nav>
+  <div class="sidebar-footer">
+    <a class="nav-item" href="#" onclick="sessionStorage.removeItem('inc_admin_key');location.reload()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sign Out</a>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Pipeline</div>
+      <div class="page-sub" id="pipeline-sub">Loading…</div>
+    </div>
+  </div>
+
+  <!-- Stage funnel -->
+  <div class="pipeline-funnel" id="pipeline-funnel">
+    <div class="funnel-stage" data-stage="" onclick="filterStage('')"><div class="funnel-num" id="f-all">—</div><div class="funnel-label">All</div></div>
+    <div class="funnel-stage" data-stage="new" onclick="filterStage('new')"><div class="funnel-num" id="f-new">—</div><div class="funnel-label">New</div></div>
+    <div class="funnel-stage" data-stage="qualifying" onclick="filterStage('qualifying')"><div class="funnel-num" id="f-qualifying">—</div><div class="funnel-label">Qualifying</div></div>
+    <div class="funnel-stage" data-stage="proposal_sent" onclick="filterStage('proposal_sent')"><div class="funnel-num" id="f-proposal">—</div><div class="funnel-label">Proposal Sent</div></div>
+    <div class="funnel-stage" data-stage="accepted" onclick="filterStage('accepted')"><div class="funnel-num" id="f-accepted">—</div><div class="funnel-label">Accepted</div></div>
+    <div class="funnel-stage" data-stage="in_progress" onclick="filterStage('in_progress')"><div class="funnel-num" id="f-progress">—</div><div class="funnel-label">In Progress</div></div>
+    <div class="funnel-stage" data-stage="on_hold" onclick="filterStage('on_hold')"><div class="funnel-num" id="f-hold">—</div><div class="funnel-label">On Hold</div></div>
+    <div class="funnel-stage" data-stage="cancelled" onclick="filterStage('cancelled')"><div class="funnel-num" id="f-cancelled">—</div><div class="funnel-label">Cancelled</div></div>
+  </div>
+
+  <!-- Revenue KPIs -->
+  <div class="kpi-row kpi-row-3" style="margin-bottom:20px">
+    <div class="kpi-card">
+      <div class="kpi-card-top"><div class="kpi-icon kpi-icon-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div><div class="kpi-label">Potential Revenue</div></div>
+      <div class="kpi-value green" id="rev-potential">—</div>
+      <div class="kpi-sub">Active pipeline value</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-card-top"><div class="kpi-icon kpi-icon-lime"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div><div class="kpi-label">Won Revenue</div></div>
+      <div class="kpi-value lime" id="rev-won">—</div>
+      <div class="kpi-sub">Accepted + in progress + completed</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-card-top"><div class="kpi-icon kpi-icon-amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div><div class="kpi-label">Avg Deal Size</div></div>
+      <div class="kpi-value amber" id="rev-avg">—</div>
+      <div class="kpi-sub">Among deals with value set</div>
+    </div>
+  </div>
+
+  <!-- Deal list -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title" id="list-title">All Enquiries</span>
+      <div class="search-bar" style="max-width:240px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="search-input" placeholder="Search…">
+      </div>
+    </div>
+    <div id="deal-list"><div class="empty-state">Loading…</div></div>
+  </div>
+</main>
+
+<script src="admin.js"></script>
+<script>
+let allEnquiries = [];
+let activeStage  = new URLSearchParams(location.search).get('stage') || '';
+let searchTerm   = '';
+
+function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+async function loadPipeline() {
+  try {
+    const data = await apiFetch('/api/enquiries?limit=500');
+    allEnquiries = data.enquiries || [];
+    updateFunnel();
+    updateRevenue();
+    renderList();
+    if (activeStage) {
+      document.querySelectorAll('.funnel-stage').forEach(el => {
+        el.classList.toggle('active', el.dataset.stage === activeStage);
+      });
+    }
+  } catch(e) {
+    document.getElementById('deal-list').innerHTML = '<div class="empty-state">Failed to load</div>';
+  }
+}
+
+function filterStage(stage) {
+  activeStage = stage;
+  document.querySelectorAll('.funnel-stage').forEach(el => {
+    el.classList.toggle('active', el.dataset.stage === stage);
+  });
+  renderList();
+}
+
+function updateFunnel() {
+  const stages = ['new','qualifying','proposal_sent','accepted','in_progress','on_hold','cancelled'];
+  const counts = {};
+  stages.forEach(s => counts[s] = allEnquiries.filter(e => e.stage === s).length);
+  document.getElementById('f-all').textContent        = allEnquiries.length;
+  document.getElementById('f-new').textContent        = counts.new           || 0;
+  document.getElementById('f-qualifying').textContent = counts.qualifying    || 0;
+  document.getElementById('f-proposal').textContent   = counts.proposal_sent || 0;
+  document.getElementById('f-accepted').textContent   = counts.accepted      || 0;
+  document.getElementById('f-progress').textContent   = counts.in_progress   || 0;
+  document.getElementById('f-hold').textContent       = counts.on_hold       || 0;
+  document.getElementById('f-cancelled').textContent  = counts.cancelled     || 0;
+}
+
+function updateRevenue() {
+  const active = allEnquiries.filter(e => !['cancelled','on_hold'].includes(e.stage));
+  const won    = allEnquiries.filter(e => ['accepted','in_progress','completed'].includes(e.stage));
+  const withVal = allEnquiries.filter(e => e.value > 0);
+
+  const potential = active.reduce((s,e) => s + (e.value||0), 0);
+  const wonRev    = won.reduce((s,e) => s + (e.value||0), 0);
+  const avg       = withVal.length > 0 ? Math.round(withVal.reduce((s,e) => s + e.value, 0) / withVal.length) : 0;
+
+  document.getElementById('rev-potential').textContent = potential > 0 ? '€' + potential.toLocaleString() : '—';
+  document.getElementById('rev-won').textContent       = wonRev > 0    ? '€' + wonRev.toLocaleString()    : '—';
+  document.getElementById('rev-avg').textContent       = avg > 0       ? '€' + avg.toLocaleString()       : '—';
+
+  const active2 = allEnquiries.filter(e => !['completed','cancelled'].includes(e.stage));
+  document.getElementById('pipeline-sub').textContent = active2.length + ' active · €' + potential.toLocaleString() + ' pipeline value';
+}
+
+function renderList() {
+  let list = activeStage ? allEnquiries.filter(e => e.stage === activeStage) : allEnquiries;
+  if (searchTerm) {
+    const q = searchTerm.toLowerCase();
+    list = list.filter(e =>
+      (e.name||'').toLowerCase().includes(q) ||
+      (e.email||'').toLowerCase().includes(q) ||
+      (e.company||'').toLowerCase().includes(q)
+    );
+  }
+
+  const titleMap = {'':'All Enquiries',new:'New',qualifying:'Qualifying',proposal_sent:'Proposal Sent',accepted:'Accepted',in_progress:'In Progress',on_hold:'On Hold',cancelled:'Cancelled'};
+  document.getElementById('list-title').textContent = (titleMap[activeStage] || activeStage) + ` (${list.length})`;
+
+  if (list.length === 0) {
+    document.getElementById('deal-list').innerHTML = '<div class="empty-state">No enquiries in this stage</div>';
+    return;
+  }
+
+  document.getElementById('deal-list').innerHTML = list.map(e => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 20px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.15s" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''" onclick="location.href='inbox.html?id=${e.id}'">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:0.88rem;font-weight:500;color:var(--text);margin-bottom:3px">${escHtml(e.name)}${e.company?` <span style="color:var(--text-dim);font-weight:400">· ${escHtml(e.company)}</span>`:''}</div>
+        <div style="font-size:0.73rem;color:var(--text-dim);display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span>${escHtml(e.email)}</span>
+          <span>·</span>
+          <span>${timeAgo(e.submitted_at)}</span>
+          ${interestPills(e.interests)}
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;flex-shrink:0">
+        ${e.value>0?`<span style="font-size:0.88rem;font-weight:600;color:var(--green)">€${Number(e.value).toLocaleString()}</span>`:''}
+        <select class="stage-select" style="width:auto;padding:5px 8px;font-size:0.75rem" onchange="quickStage(${e.id},this.value)" onclick="event.stopPropagation()">
+          ${['new','qualifying','proposal_sent','accepted','in_progress','completed','on_hold','cancelled'].map(s=>`<option value="${s}"${e.stage===s?' selected':''}>${STAGE_LABELS[s]}</option>`).join('')}
+        </select>
+      </div>
+    </div>`).join('');
+}
+
+async function quickStage(id, stage) {
+  try {
+    await apiFetch('/api/enquiries/' + id, { method:'PATCH', body: JSON.stringify({ stage }) });
+    const e = allEnquiries.find(x => x.id === id);
+    if (e) e.stage = stage;
+    updateFunnel();
+    updateRevenue();
+    renderList();
+  } catch { alert('Failed to update stage'); }
+}
+
+document.getElementById('search-input').addEventListener('input', e => {
+  searchTerm = e.target.value.trim();
+  renderList();
+});
+
+loadPipeline();
+</script>
+</body>
+</html>

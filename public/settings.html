@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings — Incremento Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="admin.css">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+<body>
+
+<div id="login-overlay" style="display:none;position:fixed;inset:0;background:rgba(10,18,25,0.97);z-index:999;align-items:center;justify-content:center">
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:40px;width:100%;max-width:380px;text-align:center">
+    <svg width="36" height="36" viewBox="0 0 32 32" fill="none" style="margin:0 auto 16px"><defs><linearGradient id="lg" x1="0" y1="32" x2="32" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#9EF54A"/><stop offset="100%" stop-color="#5EE7D8"/></linearGradient></defs><rect x="4" y="20" width="5" height="8" rx="2.5" fill="url(#lg)" opacity="0.55"/><rect x="12" y="14" width="5" height="14" rx="2.5" fill="url(#lg)" opacity="0.78"/><rect x="20" y="10" width="5" height="18" rx="2.5" fill="url(#lg)"/><circle cx="22.5" cy="5.5" r="2.25" fill="url(#lg)"/></svg>
+    <p style="font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:600;color:var(--text);margin-bottom:6px">incremento<span style="color:var(--lime)">.</span> admin</p>
+    <p style="font-size:0.78rem;color:var(--text-dim);margin-bottom:24px">Enter your admin key to continue</p>
+    <input id="login-key" type="password" placeholder="Admin key" style="width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;font-family:'Inter',sans-serif;font-size:0.88rem;color:var(--text);outline:none;margin-bottom:12px">
+    <button id="login-btn" class="btn-primary" style="width:100%;justify-content:center">Unlock</button>
+  </div>
+</div>
+
+<aside class="sidebar">
+  <div class="sidebar-top">
+    <div class="sidebar-brand">
+      <svg width="26" height="26" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="sg" x1="0" y1="32" x2="32" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#9EF54A"/><stop offset="100%" stop-color="#5EE7D8"/></linearGradient></defs><rect x="4" y="20" width="5" height="8" rx="2.5" fill="url(#sg)" opacity="0.55"/><rect x="12" y="14" width="5" height="14" rx="2.5" fill="url(#sg)" opacity="0.78"/><rect x="20" y="10" width="5" height="18" rx="2.5" fill="url(#sg)"/><circle cx="22.5" cy="5.5" r="2.25" fill="url(#sg)"/></svg>
+      <span class="sidebar-brand-name">incremento<span class="dot">.</span></span>
+      <a class="sidebar-brand-link" href="https://incremento.co" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <a class="nav-item" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a class="nav-item" href="inbox.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Inbox<span class="nav-badge" id="nav-badge" style="display:none"></span></a>
+    <div class="nav-divider"></div>
+    <a class="nav-item" href="pipeline.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Pipeline</a>
+    <a class="nav-item" href="contacts.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Contacts</a>
+    <div class="nav-divider"></div>
+    <a class="nav-item" href="analytics.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Analytics</a>
+    <div class="nav-divider"></div>
+    <a class="nav-item active" href="settings.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Settings</a>
+  </nav>
+  <div class="sidebar-footer">
+    <a class="nav-item" href="#" onclick="sessionStorage.removeItem('inc_admin_key');location.reload()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sign Out</a>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <div><div class="page-title">Settings</div></div>
+  </div>
+
+  <div style="max-width:640px">
+
+    <!-- Admin Access -->
+    <div class="panel" style="margin-bottom:20px">
+      <div class="panel-header"><span class="panel-title">Admin Access</span></div>
+      <div style="padding:20px">
+        <div class="settings-section">
+          <div class="settings-row">
+            <div>
+              <div class="settings-row-label">Admin Key</div>
+              <div class="settings-row-sub">Used to authenticate API requests from this dashboard</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input type="password" id="key-input" class="settings-input" style="min-width:160px" placeholder="Enter new key">
+              <button class="btn-primary" onclick="saveKey()">Save</button>
+            </div>
+          </div>
+          <div class="settings-row" style="border-bottom:none">
+            <div>
+              <div class="settings-row-label">Current Session</div>
+              <div class="settings-row-sub" id="key-status">Checking…</div>
+            </div>
+            <button class="btn-ghost" onclick="sessionStorage.removeItem('inc_admin_key');location.reload()">Clear &amp; Re-enter</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="panel" style="margin-bottom:20px">
+      <div class="panel-header"><span class="panel-title">Notifications</span></div>
+      <div style="padding:20px">
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Email notifications</div>
+            <div class="settings-row-sub">New enquiries sent to robin@incremento.co via Resend</div>
+          </div>
+          <span style="font-size:0.78rem;color:var(--green);background:var(--green-pale);padding:3px 10px;border-radius:20px;font-weight:500">Active</span>
+        </div>
+        <div class="settings-row" style="border-bottom:none">
+          <div>
+            <div class="settings-row-label">Worker URL</div>
+            <div class="settings-row-sub">Cloudflare Worker handling form submissions + API</div>
+          </div>
+          <span style="font-size:0.72rem;color:var(--text-dim);font-family:monospace">enquiries.incremento.co</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick links -->
+    <div class="panel" style="margin-bottom:20px">
+      <div class="panel-header"><span class="panel-title">Quick Links</span></div>
+      <div style="padding:20px;display:flex;flex-direction:column;gap:10px">
+        <a href="https://incremento.co/contact/" target="_blank" class="btn-ghost" style="display:inline-flex;width:fit-content">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Contact form (live)
+        </a>
+        <a href="https://dash.cloudflare.com/" target="_blank" class="btn-ghost" style="display:inline-flex;width:fit-content">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Cloudflare Dashboard
+        </a>
+        <a href="https://app.resend.com/" target="_blank" class="btn-ghost" style="display:inline-flex;width:fit-content">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Resend (email)
+        </a>
+      </div>
+    </div>
+
+    <!-- About -->
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">About</span></div>
+      <div style="padding:20px">
+        <div class="settings-row">
+          <div class="settings-row-label">Version</div>
+          <span style="font-size:0.8rem;color:var(--text-dim)">1.0.0</span>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-label">Stack</div>
+          <span style="font-size:0.8rem;color:var(--text-dim)">Cloudflare Workers · D1 · Pages</span>
+        </div>
+        <div class="settings-row" style="border-bottom:none">
+          <div class="settings-row-label">Built for</div>
+          <span style="font-size:0.8rem;color:var(--lime)">incremento.co</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script src="admin.js"></script>
+<script>
+function saveKey() {
+  const key = document.getElementById('key-input').value.trim();
+  if (!key) return;
+  sessionStorage.setItem('inc_admin_key', key);
+  document.getElementById('key-status').textContent = 'Key saved for this session';
+  document.getElementById('key-input').value = '';
+}
+
+const stored = sessionStorage.getItem('inc_admin_key');
+document.getElementById('key-status').textContent = stored
+  ? 'Key set (session active — ends when tab closes)'
+  : 'No key — enter one below';
+</script>
+</body>
+</html>

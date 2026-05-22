@@ -1,0 +1,25 @@
+name = "incremento-admin"
+main = "worker/index.js"
+compatibility_date = "2024-09-23"
+
+[[routes]]
+pattern = "enquiries.incremento.co"
+custom_domain = true
+
+[vars]
+TO_EMAIL   = "robin@incremento.co"
+FROM_EMAIL = "enquiries@incremento.co"
+SITE_URL   = "https://incremento.co"
+
+# ── D1 Database ───────────────────────────────────────────────────────
+# SETUP: Run `wrangler d1 create incremento-admin` then paste the ID below
+# Then:  wrangler d1 execute incremento-admin --file worker/schema.sql --remote
+# Then:  wrangler deploy
+[[d1_databases]]
+binding       = "DB"
+database_name = "incremento-admin"
+database_id   = "52531b1e-0b83-4321-b4d7-03a95288a002"
+
+# ── Secrets (run these in terminal, never put values here) ────────────
+# wrangler secret put RESEND_API_KEY
+# wrangler secret put ADMIN_KEY        ← choose any strong secret string
