@@ -798,15 +798,17 @@ async function updateEnquiry(id, request, env, cors) {
   try { body = await request.json(); }
   catch { return json({ error: 'Invalid JSON' }, 400, cors); }
 
-  const { stage, notes, value } = body;
+  const { stage, notes, value, project_title, company } = body;
   const updatedAt = new Date().toISOString();
 
   const setClauses = [];
   const args = [];
 
-  if (stage !== undefined) { setClauses.push('stage = ?');      args.push(stage); }
-  if (notes !== undefined) { setClauses.push('notes = ?');      args.push(notes); }
-  if (value !== undefined) { setClauses.push('value = ?');      args.push(Number(value) || 0); }
+  if (stage !== undefined)         { setClauses.push('stage = ?');         args.push(stage); }
+  if (notes !== undefined)         { setClauses.push('notes = ?');         args.push(notes); }
+  if (value !== undefined)         { setClauses.push('value = ?');         args.push(Number(value) || 0); }
+  if (project_title !== undefined) { setClauses.push('project_title = ?'); args.push(project_title); }
+  if (company !== undefined)       { setClauses.push('company = ?');       args.push(company); }
   setClauses.push('updated_at = ?'); args.push(updatedAt);
 
   if (setClauses.length === 1) {

@@ -3,19 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Enquiry — Incremento Admin</title>
+<title>Deal — Incremento Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="admin.css">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <style>
-.editor-grid{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
-@media(max-width:1000px){.editor-grid{grid-template-columns:1fr}}
-.field-block{margin-bottom:14px}
-.field-block input,.field-block select{width:100%;box-sizing:border-box}
-.msg-box{background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:18px 20px;font-size:0.92rem;line-height:1.7;color:var(--text);white-space:pre-wrap}
-.side-meta{font-size:0.78rem;color:var(--text-dim);display:flex;flex-direction:column;gap:7px;margin-top:14px}
-.side-meta strong{color:var(--text);font-weight:500}
+.deal-title-input{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:600;color:var(--text);background:transparent;border:none;border-bottom:1px solid transparent;width:100%;max-width:560px;padding:2px 0;outline:none}
+.deal-title-input:hover,.deal-title-input:focus{border-bottom-color:var(--border2)}
+.deal-company-input{font-size:0.9rem;color:var(--text-sub);background:transparent;border:none;border-bottom:1px solid transparent;width:100%;max-width:420px;padding:3px 0;outline:none;margin-top:4px}
+.deal-company-input:hover,.deal-company-input:focus{border-bottom-color:var(--border2)}
+.team-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.team-avatars{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end;max-width:220px}
+.team-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:600;cursor:pointer;border:2px solid transparent;background:var(--surface2);color:var(--text-dim);transition:.15s;font-family:'Space Grotesk',sans-serif}
+.team-av.on{background:linear-gradient(135deg,#9EF54A,#5EE7D8);color:#0a1219;border-color:#9EF54A}
+.deal-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;margin:24px 0}
+.deal-card{background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:16px;min-height:104px;display:flex;flex-direction:column;text-decoration:none;color:var(--text)}
+.deal-card.link{cursor:pointer}
+.deal-card.link:hover{border-color:var(--lime)}
+.deal-card.dashed{border-style:dashed;align-items:center;justify-content:center;color:var(--text-dim);font-size:0.84rem}
+.deal-card.dashed:hover{border-color:var(--cyan);color:var(--text)}
+.dc-label{font-size:0.66rem;letter-spacing:0.09em;text-transform:uppercase;color:var(--text-dim)}
+.dc-title{font-size:0.95rem;font-weight:600;margin-top:4px;line-height:1.3}
+.dc-meta{font-size:0.76rem;color:var(--text-dim);margin-top:3px}
+.dc-actions{margin-top:auto;padding-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+.dc-btn{font-size:0.72rem;padding:6px 11px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);color:var(--text);cursor:pointer;text-decoration:none;display:inline-block}
+.dc-btn:hover{border-color:var(--cyan)}
+.dc-btn.primary{background:linear-gradient(135deg,#9EF54A,#5EE7D8);color:#0a1219;border-color:#9EF54A;font-weight:600}
+.meta-bar{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:18px}
+.meta-bar .field-block{margin:0}
 </style>
 </head>
 <body>
@@ -34,7 +50,7 @@
   </div>
   <nav class="sidebar-nav">
     <a class="nav-item" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
-    <a class="nav-item" href="pipeline.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Pipeline</a>
+    <a class="nav-item active" href="pipeline.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Pipeline</a>
     <a class="nav-item" href="proposals.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Proposals</a>
     <a class="nav-item" href="contacts.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Contacts</a>
     <div class="nav-divider"></div>
@@ -48,148 +64,255 @@
 
 <!-- ── MAIN ───────────────────────────────────────────────── -->
 <main class="main">
-  <div class="page-header">
-    <div>
-      <div style="margin-bottom:6px"><a href="pipeline.html" style="color:var(--text-dim);font-size:0.78rem;text-decoration:none">&larr; Pipeline</a></div>
-      <div class="page-title" id="page-title">Enquiry</div>
-      <div class="page-sub" id="page-sub"></div>
+  <div class="page-header" style="align-items:flex-start">
+    <div style="flex:1;min-width:0">
+      <div style="margin-bottom:8px"><a href="pipeline.html" style="color:var(--text-dim);font-size:0.78rem;text-decoration:none">&larr; Pipeline</a></div>
+      <input id="d-title" class="deal-title-input" placeholder="Project title…">
+      <input id="d-company" class="deal-company-input" placeholder="Company / business">
     </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <a id="btn-reply" href="#" class="btn-ghost">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        Reply via email
-      </a>
-      <a id="btn-proposal" href="#" class="btn-ghost">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        Create proposal
-      </a>
-      <button class="btn-primary" id="btn-save" onclick="saveEnquiry()">
+    <div class="team-wrap">
+      <span class="dc-label">Team</span>
+      <div class="team-avatars" id="d-team"></div>
+      <button class="btn-primary" id="btn-save" onclick="saveDeal()" style="margin-top:4px">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
         Save
       </button>
     </div>
   </div>
 
-  <div class="editor-grid" id="content" style="display:none">
+  <div id="content" style="display:none">
 
-    <!-- Left: message + notes -->
-    <div>
-      <div class="panel" style="padding:24px">
-        <div class="detail-label" style="margin-bottom:10px">Message</div>
-        <div class="msg-box" id="e-message"></div>
-        <div class="detail-label" style="margin:22px 0 8px">Interested in</div>
-        <div id="e-interests" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+    <!-- Cards: proposal · PDF · contacts -->
+    <div class="deal-cards" id="deal-cards"></div>
+
+    <!-- Stage + value -->
+    <div class="meta-bar">
+      <div class="field-block">
+        <div class="dc-label" style="margin-bottom:5px">Stage</div>
+        <select class="stage-select" id="d-stage">
+          <option value="new">New</option>
+          <option value="proposal_sent">Proposal Sent</option>
+          <option value="accepted">Accepted</option>
+          <option value="in_progress">In Progress</option>
+          <option value="completed">Completed</option>
+          <option value="on_hold">On Hold</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
       </div>
-      <div class="panel" style="padding:24px;margin-top:16px">
-        <div class="detail-label" style="margin-bottom:10px">Internal notes</div>
-        <textarea class="notes-textarea" id="e-notes" rows="5" placeholder="Notes only you can see…"></textarea>
+      <div class="field-block">
+        <div class="dc-label" style="margin-bottom:5px">Est. value (€)</div>
+        <input type="number" class="value-input" id="d-value" placeholder="e.g. 4500">
       </div>
-      <div id="comms" style="margin-top:16px"></div>
     </div>
 
-    <!-- Right: contact + pipeline -->
-    <div>
-      <div class="panel" style="padding:20px">
-        <div class="detail-label" style="margin-bottom:12px">Contact</div>
-        <div class="side-meta" style="margin-top:0">
-          <div>Name <strong id="e-name"></strong></div>
-          <div>Email <strong><a id="e-email" href="" style="color:var(--cyan);text-decoration:none"></a></strong></div>
-          <div id="e-company-row">Company <strong id="e-company"></strong></div>
-          <div>Submitted <strong id="e-submitted"></strong></div>
-        </div>
-      </div>
+    <!-- Internal notes -->
+    <div class="panel" style="padding:20px">
+      <div class="detail-label" style="margin-bottom:10px">Internal notes</div>
+      <textarea class="notes-textarea" id="d-notes" rows="4" placeholder="Notes only the team can see…"></textarea>
+    </div>
 
-      <div class="panel" style="padding:20px;margin-top:16px">
-        <div class="detail-label" style="margin-bottom:12px">Pipeline</div>
-        <div class="field-block">
-          <div class="detail-label" style="font-size:0.66rem">Stage</div>
-          <select class="stage-select" id="e-stage" style="width:100%">
-            <option value="new">New</option>
-            <option value="proposal_sent">Proposal Sent</option>
-            <option value="accepted">Accepted</option>
-            <option value="in_progress">In Progress</option>
-            <option value="completed">Completed</option>
-            <option value="on_hold">On Hold</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
-        </div>
-        <div class="field-block" style="margin-bottom:0">
-          <div class="detail-label" style="font-size:0.66rem">Est. project value (€)</div>
-          <input type="number" class="value-input" id="e-value" placeholder="e.g. 4500">
-        </div>
-      </div>
+    <!-- Communication history -->
+    <div style="margin-top:24px">
+      <div class="detail-label" style="margin-bottom:4px">Communication history</div>
+      <div id="comms"></div>
     </div>
   </div>
 </main>
 
+<!-- ── COMPOSE EMAIL MODAL ────────────────────────────────── -->
+<div class="modal-overlay" id="compose-modal" style="display:none" onclick="if(event.target===this)closeCompose()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">Send email</div>
+      <button class="modal-close" onclick="closeCompose()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="field-block">
+        <div class="dc-label" style="margin-bottom:5px">From</div>
+        <select class="stage-select" id="c-from" style="width:100%">
+          <option value="contact@incremento.co">contact@incremento.co</option>
+          <option value="robin@incremento.co">robin@incremento.co</option>
+          <option value="contacto@incremento.co">contacto@incremento.co (PT)</option>
+          <option value="help@incremento.co">help@incremento.co</option>
+        </select>
+      </div>
+      <div class="field-block">
+        <div class="dc-label" style="margin-bottom:5px">To</div>
+        <input class="value-input" id="c-to" style="width:100%" placeholder="client@example.com">
+      </div>
+      <div class="field-block">
+        <div class="dc-label" style="margin-bottom:5px">Subject</div>
+        <input class="value-input" id="c-subject" style="width:100%">
+      </div>
+      <div class="field-block">
+        <div class="dc-label" style="margin-bottom:5px">Message</div>
+        <textarea class="notes-textarea" id="c-body" rows="7" style="width:100%" placeholder="Write your message — a branded signature is added automatically."></textarea>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;margin-top:6px">
+        <button class="btn-primary" id="c-send" onclick="sendCompose()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Send
+        </button>
+        <span id="c-status" style="font-size:0.78rem;color:var(--text-dim)"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="admin.js"></script>
 <script>
 const params = new URLSearchParams(location.search);
-const enquiryId = parseInt(params.get('id'));
-let enquiry = null;
+const dealId = parseInt(params.get('id'));
+let deal = null, contacts = [], team = [], assigned = new Set(), proposals = [];
 
-function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function jsStr(s){ return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+function initials(name){ return String(name||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?'; }
+function eur(n){ return n>0 ? '€'+Number(n).toLocaleString() : ''; }
 
 async function load() {
-  if (!enquiryId) { document.getElementById('page-sub').textContent = 'No enquiry selected'; return; }
+  if (!dealId) { document.getElementById('d-title').value = 'No deal selected'; return; }
   try {
-    enquiry = await apiFetch('/api/enquiries/' + enquiryId);
-    if (enquiry.error) throw new Error(enquiry.error);
-  } catch (e) {
-    document.getElementById('page-sub').textContent = 'Failed to load enquiry';
-    return;
-  }
+    deal = await apiFetch('/api/enquiries/' + dealId);
+    if (deal.error) throw new Error(deal.error);
+  } catch { document.getElementById('d-title').value = 'Failed to load'; return; }
 
-  document.getElementById('page-title').textContent = enquiry.name + (enquiry.company ? ' — ' + enquiry.company : '');
-  document.getElementById('page-sub').textContent = enquiry.email;
+  // Parallel: contacts, team, assignees, proposals
+  const [cRes, tRes, aRes, pRes] = await Promise.all([
+    apiFetch('/api/contacts?enquiry_id=' + dealId).catch(()=>({contacts:[]})),
+    apiFetch('/api/team').catch(()=>({team:[]})),
+    apiFetch('/api/enquiries/' + dealId + '/assignees').catch(()=>({assignees:[]})),
+    apiFetch('/api/proposals').catch(()=>({proposals:[]})),
+  ]);
+  contacts = (cRes.contacts && cRes.contacts.length) ? cRes.contacts
+           : [{ name: deal.name, email: deal.email, role: '', is_primary: 1 }];
+  team = tRes.team || [];
+  assigned = new Set((aRes.assignees || []).map(a => a.id));
+  proposals = (pRes.proposals || []).filter(p => (p.client_email||'').toLowerCase() === (deal.email||'').toLowerCase());
 
-  document.getElementById('e-message').textContent = enquiry.message || '';
-  document.getElementById('e-name').textContent = enquiry.name || '—';
-  const em = document.getElementById('e-email');
-  em.textContent = enquiry.email;
-  em.href = `mailto:${enquiry.email}?subject=Re: Your enquiry to Incremento`;
-  document.getElementById('e-company').textContent = enquiry.company || '—';
-  document.getElementById('e-submitted').textContent = new Date(enquiry.submitted_at).toLocaleString('en-GB');
+  document.title = (deal.project_title || deal.company || deal.name) + ' — Deal';
+  document.getElementById('d-title').value   = deal.project_title || (deal.company ? deal.company + ' — enquiry' : (deal.name + ' — enquiry'));
+  document.getElementById('d-company').value = deal.company || '';
+  document.getElementById('d-stage').value   = deal.stage || 'new';
+  document.getElementById('d-value').value   = deal.value || '';
+  document.getElementById('d-notes').value   = deal.notes || '';
 
-  const ints = document.getElementById('e-interests');
-  try {
-    const arr = typeof enquiry.interests==='string' ? JSON.parse(enquiry.interests||'[]') : (enquiry.interests||[]);
-    ints.innerHTML = arr.length ? arr.map(i=>`<span class="interest-pill">${escHtml(i.replace(/-/g,' '))}</span>`).join('') : '<span style="color:var(--text-dim);font-size:0.8rem">—</span>';
-  } catch { ints.textContent = '—'; }
+  renderTeam();
+  renderCards();
+  document.getElementById('content').style.display = 'block';
 
-  document.getElementById('e-stage').value = enquiry.stage || 'new';
-  document.getElementById('e-value').value = enquiry.value || '';
-  document.getElementById('e-notes').value = enquiry.notes || '';
-
-  document.getElementById('btn-reply').href = `mailto:${enquiry.email}?subject=Re: Your enquiry to Incremento`;
-  document.getElementById('btn-proposal').href = `proposal.html?enquiry=${enquiry.id}`;
-
-  document.getElementById('content').style.display = 'grid';
-
-  mountComms(document.getElementById('comms'), {
-    email: enquiry.email,
-    enquiry_id: enquiry.id,
-  });
+  mountComms(document.getElementById('comms'), { email: deal.email, enquiry_id: deal.id });
 }
 
-async function saveEnquiry() {
-  const btn = document.getElementById('btn-save');
-  const orig = btn.innerHTML;
+function renderTeam() {
+  document.getElementById('d-team').innerHTML = team.map(m => `
+    <div class="team-av ${assigned.has(m.id)?'on':''}" title="${escHtml(m.name)}${assigned.has(m.id)?' (assigned)':' — click to assign'}" onclick="toggleAssign(${m.id})">${initials(m.name)}</div>
+  `).join('') || '<span style="font-size:0.74rem;color:var(--text-dim)">No team</span>';
+}
+
+async function toggleAssign(id) {
+  if (assigned.has(id)) assigned.delete(id); else assigned.add(id);
+  renderTeam();
+  try {
+    await apiFetch('/api/enquiries/' + dealId + '/assignees', { method:'POST', body: JSON.stringify({ member_ids: [...assigned] }) });
+  } catch { /* revert on failure */ if (assigned.has(id)) assigned.delete(id); else assigned.add(id); renderTeam(); }
+}
+
+function renderCards() {
+  let html = '';
+  // Proposal cards
+  if (proposals.length) {
+    proposals.forEach(p => {
+      const pdf = p.token ? `<a class="dc-btn" href="https://enquiries.incremento.co/p/${p.token}?pdf=1" target="_blank" onclick="event.stopPropagation()">PDF</a>` : '';
+      html += `
+        <div class="deal-card link" onclick="location.href='proposal.html?id=${p.id}'">
+          <span class="dc-label">Proposal</span>
+          <div class="dc-title">${escHtml(p.title||'Untitled')}</div>
+          <div class="dc-meta">${escHtml((p.status||'draft'))}${p.total_value>0?' · '+eur(p.total_value):''}</div>
+          <div class="dc-actions"><span class="dc-btn">Open</span>${pdf}</div>
+        </div>`;
+    });
+  } else {
+    html += `<div class="deal-card dashed link" onclick="location.href='proposal.html?enquiry=${dealId}'">+ Create proposal</div>`;
+  }
+  // Contact cards
+  contacts.forEach(c => {
+    html += `
+      <div class="deal-card">
+        <span class="dc-label">Contact${c.is_primary?' · primary':''}</span>
+        <div class="dc-title">${escHtml(c.name)}</div>
+        <div class="dc-meta">${c.role?escHtml(c.role)+' · ':''}${escHtml(c.email||'no email')}</div>
+        <div class="dc-actions">${c.email?`<button class="dc-btn primary" onclick="openCompose('${jsStr(c.email)}','${jsStr(c.name)}')">Send message</button>`:''}</div>
+      </div>`;
+  });
+  // Add contact
+  html += `<div class="deal-card dashed link" onclick="addContact()">+ Add contact</div>`;
+  document.getElementById('deal-cards').innerHTML = html;
+}
+
+async function addContact() {
+  const name = prompt('Contact name'); if (!name) return;
+  const email = prompt('Email (optional)') || '';
+  const role  = prompt('Role / title (optional)') || '';
+  try {
+    await apiFetch('/api/contacts', { method:'POST', body: JSON.stringify({ enquiry_id: dealId, name, email, role }) });
+    const cRes = await apiFetch('/api/contacts?enquiry_id=' + dealId);
+    contacts = cRes.contacts || contacts;
+    renderCards();
+  } catch { alert('Could not add contact'); }
+}
+
+/* ── Compose ─────────────────────────────────────────────── */
+function openCompose(email, name) {
+  document.getElementById('c-to').value = email || '';
+  document.getElementById('c-subject').value = 'Re: your enquiry to Incremento';
+  document.getElementById('c-body').value = name ? ('Hi ' + name.split(' ')[0] + ',\n\n') : '';
+  document.getElementById('c-status').textContent = '';
+  document.getElementById('compose-modal').style.display = 'flex';
+  setTimeout(()=>document.getElementById('c-body').focus(), 50);
+}
+function closeCompose(){ document.getElementById('compose-modal').style.display = 'none'; }
+
+async function sendCompose() {
+  const btn = document.getElementById('c-send'), status = document.getElementById('c-status');
+  const payload = {
+    from: document.getElementById('c-from').value,
+    to: document.getElementById('c-to').value.trim(),
+    subject: document.getElementById('c-subject').value.trim(),
+    body: document.getElementById('c-body').value.trim(),
+    enquiry_id: dealId,
+  };
+  if (!payload.to || !payload.body) { status.textContent = 'Recipient and message required'; status.style.color = '#ff8a8a'; return; }
+  btn.disabled = true; status.style.color = 'var(--text-dim)'; status.textContent = 'Sending…';
+  try {
+    await apiFetch('/api/send-email', { method:'POST', body: JSON.stringify(payload) });
+    status.textContent = '✓ Sent';
+    setTimeout(() => {
+      closeCompose();
+      mountComms(document.getElementById('comms'), { email: deal.email, enquiry_id: deal.id });
+    }, 700);
+  } catch {
+    status.textContent = 'Send failed'; status.style.color = '#ff8a8a';
+  }
+  btn.disabled = false;
+}
+
+/* ── Save deal ───────────────────────────────────────────── */
+async function saveDeal() {
+  const btn = document.getElementById('btn-save'); const orig = btn.innerHTML;
   btn.disabled = true; btn.textContent = 'Saving…';
   try {
-    await apiFetch('/api/enquiries/' + enquiryId, {
-      method: 'PATCH',
-      body: JSON.stringify({
-        stage: document.getElementById('e-stage').value,
-        value: parseInt(document.getElementById('e-value').value) || 0,
-        notes: document.getElementById('e-notes').value,
-      })
-    });
+    await apiFetch('/api/enquiries/' + dealId, { method:'PATCH', body: JSON.stringify({
+      project_title: document.getElementById('d-title').value.trim(),
+      company:       document.getElementById('d-company').value.trim(),
+      stage:         document.getElementById('d-stage').value,
+      value:         parseInt(document.getElementById('d-value').value) || 0,
+      notes:         document.getElementById('d-notes').value,
+    })});
     btn.innerHTML = '✓ Saved';
     setTimeout(()=>{ btn.innerHTML = orig; btn.disabled = false; }, 1500);
   } catch {
-    btn.textContent = 'Error — retry';
-    btn.disabled = false;
+    btn.textContent = 'Error — retry'; btn.disabled = false;
   }
 }
 
