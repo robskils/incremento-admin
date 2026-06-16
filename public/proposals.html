@@ -90,8 +90,11 @@
 
   <!-- Proposal email template -->
   <div class="panel" style="margin-top:20px">
-    <div class="panel-header"><span class="panel-title">Proposal Email</span></div>
-    <div style="padding:20px">
+    <div class="panel-header" onclick="toggleProposalEmail()" style="cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between">
+      <span class="panel-title">Proposal Email</span>
+      <svg id="pe-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-linecap="round" style="transition:transform .2s"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div id="pe-body" style="padding:20px;display:none">
       <p class="settings-row-sub" style="margin-bottom:16px">The wording of the email clients receive when you send a proposal. The branded header, the green “View your proposal” button and the footer stay fixed. Use <code style="color:var(--lime)">{name}</code>, <code style="color:var(--lime)">{title}</code> and <code style="color:var(--lime)">{company}</code> — they’re filled in automatically.</p>
 
       <div style="margin-bottom:16px">
@@ -223,6 +226,14 @@ async function openDraftPicker() {
 function closePicker(){ document.getElementById('picker-modal').style.display='none'; }
 
 /* ── Proposal email template ─────────────────────────────── */
+function toggleProposalEmail() {
+  const body = document.getElementById('pe-body');
+  const chev = document.getElementById('pe-chevron');
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  if (chev) chev.style.transform = open ? '' : 'rotate(180deg)';
+}
+
 const TPL_DEFAULTS = {
   proposal_email_intro: 'Thanks for getting in touch — your proposal for {title} is ready. It covers the scope, timeline and investment, and you can accept it online with one click.',
   proposal_email_closing: 'Any questions at all, just hit reply — happy to walk you through it.',
