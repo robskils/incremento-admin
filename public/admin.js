@@ -287,16 +287,20 @@ async function mountComms(container, opts) {
       listEl.innerHTML = msgs.map(m => {
         const meta = COMMS_META[m.kind] || COMMS_META.note;
         const inbound = m.direction === 'inbound';
-        const arrow = inbound ? '↘ From client' : '↗ To client';
+        // Two-colour thread: client = cyan (left), Incremento = lime (right)
+        const who    = inbound ? 'Client' : 'Incremento';
+        const accent = inbound ? '#5EE7D8' : '#9EF54A';
+        const bg     = inbound ? 'rgba(94,231,216,0.09)' : 'rgba(158,245,74,0.09)';
+        const border = inbound ? 'rgba(94,231,216,0.38)' : 'rgba(158,245,74,0.38)';
+        const align  = inbound ? 'flex-start' : 'flex-end';
         return `
-          <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">
-            <div style="flex:0 0 4px;border-radius:4px;background:${meta.color};opacity:0.8"></div>
-            <div style="flex:1;min-width:0">
+          <div style="display:flex;justify-content:${align};margin:10px 0">
+            <div style="max-width:80%;min-width:0;background:${bg};border:1px solid ${border};border-radius:12px;padding:10px 14px">
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px">
-                <span style="font-size:0.7rem;font-weight:600;color:${meta.color}">${meta.label}</span>
-                <span style="font-size:0.68rem;color:var(--text-dim)">${arrow}</span>
-                ${m.source==='manual'?'<span style="font-size:0.64rem;color:var(--text-dim);border:1px solid var(--border2);border-radius:10px;padding:1px 6px">logged</span>':''}
-                <span style="font-size:0.68rem;color:var(--text-dim);margin-left:auto">${timeAgo(m.created_at)}</span>
+                <span style="font-size:0.72rem;font-weight:600;color:${accent}">${who}</span>
+                <span style="font-size:0.66rem;color:var(--text-dim)">${meta.label}</span>
+                ${m.source==='manual'?'<span style="font-size:0.62rem;color:var(--text-dim);border:1px solid var(--border2);border-radius:10px;padding:1px 6px">logged</span>':''}
+                <span style="font-size:0.66rem;color:var(--text-dim);margin-left:auto">${timeAgo(m.created_at)}</span>
               </div>
               ${m.subject?`<div style="font-size:0.86rem;font-weight:500;color:var(--text)">${commsEscape(m.subject)}</div>`:''}
               ${m.body?`<div style="font-size:0.82rem;color:var(--text-sub);line-height:1.5;white-space:pre-wrap;margin-top:2px">${commsEscape(m.body)}</div>`:''}
