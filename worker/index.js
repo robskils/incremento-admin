@@ -312,6 +312,19 @@ async function handleAdmin(request, env, url, cors) {
     return createMessage(request, env, cors);
   }
 
+  // Contacts (people on a deal)
+  const contactId = path.match(/^\/api\/contacts\/(\d+)$/);
+  if (path === '/api/contacts' && method === 'GET')  return listContacts(env, url, cors);
+  if (path === '/api/contacts' && method === 'POST') return createContact(request, env, cors);
+  if (contactId && method === 'PATCH')  return updateContact(parseInt(contactId[1]), request, env, cors);
+  if (contactId && method === 'DELETE') return deleteContact(parseInt(contactId[1]), env, cors);
+
+  // Team + deal assignees
+  const asgMatch = path.match(/^\/api\/enquiries\/(\d+)\/assignees$/);
+  if (path === '/api/team' && method === 'GET') return listTeam(env, cors);
+  if (asgMatch && method === 'GET')  return listAssignees(parseInt(asgMatch[1]), env, cors);
+  if (asgMatch && method === 'POST') return setAssignees(parseInt(asgMatch[1]), request, env, cors);
+
   // Settings (editable proposal email template, etc.)
   if (path === '/api/settings' && method === 'GET') {
     return getSettings(env, cors);
@@ -536,6 +549,83 @@ async function createMessage(request, env, cors) {
     source: 'manual',
   });
   return json({ ok: true }, 201, cors);
+}
+
+/* ── Contacts (people on a deal) ─────────────────────────── */
+async function listContacts(env, url, cors) {
+  if (!env.DB) return json({ error: 'Database not configured' }, 503, cors);
+  const eid = url.searchParams.get('enquiry_id');
+  try {
+    const q = eid
+      ? env.DB.prepare('SELECT * FROM contacts WHERE enquiry_id = ? ORDER BY is_primary DESC, id').bind(parseInt(eid))
+      : env.DB.prepare('SELECT * FROM contacts ORDER BY id DESC');
+    const r = await q.all();
+    return json({ contacts: r.results || [] }, 200, cors);
+  } catch (e) { console.error('listContacts', e); return json({ error: 'Database error' }, 500, cors); }
+}
+
+async function createContact(request, env, cors) {
+  if (!env.DB) return json({ error: 'Database not configured' }, 503, cors);
+  let b; try { b = await request.json(); } catch { return json({ error: 'Invalid JSON' }, 400, cors); }
+  if (!b.name) return json({ error: 'name required' }, 400, cors);
+  try {
+    const res = await env.DB.prepare(
+      'INSERT INTO contacts (enquiry_id,name,email,role,phone,is_primary,created_at) VALUES (?,?,?,?,?,?,?)'
+    ).bind(b.enquiry_id || null, b.name, b.email || null, b.role || null, b.phone || null, b.is_primary ? 1 : 0, new Date().toISOString()).run();
+    const row = await env.DB.prepare('SELECT * FROM contacts WHERE id = ?').bind(res.meta.last_row_id).first();
+    return json(row, 201, cors);
+  } catch (e) { console.error('createContact', e); return json({ error: 'Database error' }, 500, cors); }
+}
+
+async function updateContact(id, request, env, cors) {
+  if (!env.DB) return json({ error: 'Database not configured' }, 503, cors);
+  let b; try { b = await request.json(); } catch { return json({ error: 'Invalid JSON' }, 400, cors); }
+  const fields = ['name', 'email', 'role', 'phone', 'is_primary'];
+  const set = [], args = [];
+  for (const f of fields) if (b[f] !== undefined) { set.push(`${f} = ?`); args.push(f === 'is_primary' ? (b[f] ? 1 : 0) : b[f]); }
+  if (!set.length) return json({ error: 'Nothing to update' }, 400, cors);
+  args.push(id);
+  try {
+    await env.DB.prepare(`UPDATE contacts SET ${set.join(', ')} WHERE id = ?`).bind(...args).run();
+    const row = await env.DB.prepare('SELECT * FROM contacts WHERE id = ?').bind(id).first();
+    return json(row || { ok: true }, 200, cors);
+  } catch (e) { console.error('updateContact', e); return json({ error: 'Database error' }, 500, cors); }
+}
+
+async function deleteContact(id, env, cors) {
+  if (!env.DB) return json({ error: 'Database not configured' }, 503, cors);
+  try { await env.DB.prepare('DELETE FROM contacts WHERE id = ?').bind(id).run(); return json({ ok: true }, 200, cors); }
+  catch (e) { console.error('deleteContact', e); return json({ error: 'Database error' }, 500, cors); }
+}
+
+/* ── Team + deal assignees ───────────────────────────────── */
+async function listTeam(env, cors) {
+  if (!env.DB) return json({ error: 'Database not configured' }, 503, cors);
+  try { const r = await env.DB.prepare('SELECT * FROM team_members WHERE active = 1 ORDER BY id').all(); return json({ team: r.results || [] }, 200, cors); }
+  catch (e) { console.error('listTeam', e); return json({ error: 'Database error' }, 500, cors); }
+}
+
+async function listAssignees(eid, env, cors) {
+  if (!env.DB) return json({ error: 'Database not configured' }, 503, cors);
+  try {
+    const r = await env.DB.prepare(
+      'SELECT tm.* FROM deal_assignees da JOIN team_members tm ON tm.id = da.member_id WHERE da.enquiry_id = ? ORDER BY tm.id'
+    ).bind(eid).all();
+    return json({ assignees: r.results || [] }, 200, cors);
+  } catch (e) { console.error('listAssignees', e); return json({ error: 'Database error' }, 500, cors); }
+}
+
+async function setAssignees(eid, request, env, cors) {
+  if (!env.DB) return json({ error: 'Database not configured' }, 503, cors);
+  let b; try { b = await request.json(); } catch { return json({ error: 'Invalid JSON' }, 400, cors); }
+  const ids = Array.isArray(b.member_ids) ? b.member_ids : [];
+  try {
+    await env.DB.prepare('DELETE FROM deal_assignees WHERE enquiry_id = ?').bind(eid).run();
+    for (const mid of ids) {
+      await env.DB.prepare('INSERT OR IGNORE INTO deal_assignees (enquiry_id, member_id) VALUES (?, ?)').bind(eid, mid).run();
+    }
+    return json({ ok: true }, 200, cors);
+  } catch (e) { console.error('setAssignees', e); return json({ error: 'Database error' }, 500, cors); }
 }
 
 /* ── POST / → form submission ────────────────────────────── */
