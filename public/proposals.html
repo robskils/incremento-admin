@@ -57,7 +57,6 @@
   </div>
   <nav class="sidebar-nav">
     <a class="nav-item" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
-    <div class="nav-divider"></div>
     <a class="nav-item" href="pipeline.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Pipeline</a>
     <a class="nav-item active" href="proposals.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Proposals</a>
     <a class="nav-item" href="contacts.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Contacts</a>
@@ -86,6 +85,44 @@
   <div class="panel">
     <div id="prop-list">
       <div class="empty-state">Loading…</div>
+    </div>
+  </div>
+
+  <!-- Proposal email template -->
+  <div class="panel" style="margin-top:20px">
+    <div class="panel-header"><span class="panel-title">Proposal Email</span></div>
+    <div style="padding:20px">
+      <p class="settings-row-sub" style="margin-bottom:16px">The wording of the email clients receive when you send a proposal. The branded header, the green “View your proposal” button and the footer stay fixed. Use <code style="color:var(--lime)">{name}</code>, <code style="color:var(--lime)">{title}</code> and <code style="color:var(--lime)">{company}</code> — they’re filled in automatically.</p>
+
+      <div style="margin-bottom:16px">
+        <div class="detail-label" style="margin-bottom:6px">Greeting</div>
+        <div class="settings-row-sub">Fixed: “Hi {name},” — automatic.</div>
+      </div>
+
+      <div style="margin-bottom:16px">
+        <div class="detail-label" style="margin-bottom:6px">Intro paragraph</div>
+        <textarea id="tpl-intro" class="notes-textarea" rows="3" style="width:100%;box-sizing:border-box"></textarea>
+      </div>
+
+      <div style="margin-bottom:16px">
+        <div class="detail-label" style="margin-bottom:6px">Closing line</div>
+        <textarea id="tpl-closing" class="notes-textarea" rows="2" style="width:100%;box-sizing:border-box"></textarea>
+      </div>
+
+      <div style="margin-bottom:18px">
+        <div class="detail-label" style="margin-bottom:6px">Signature</div>
+        <textarea id="tpl-signature" class="notes-textarea" rows="2" style="width:100%;box-sizing:border-box" placeholder="Robin&#10;Incremento · Lisbon"></textarea>
+        <div class="settings-row-sub" style="margin-top:5px">First line bold; lines below appear smaller, joined with “·”.</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:center">
+        <button class="btn-primary" id="tpl-save" onclick="saveTemplate()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Save email template
+        </button>
+        <button class="btn-ghost" id="tpl-reset" onclick="resetTemplate()">Reset to default</button>
+        <span id="tpl-status" style="font-size:0.78rem;color:var(--text-dim)"></span>
+      </div>
     </div>
   </div>
 </main>
@@ -168,7 +205,52 @@ async function openDraftPicker() {
 }
 function closePicker(){ document.getElementById('picker-modal').style.display='none'; }
 
+/* ── Proposal email template ─────────────────────────────── */
+const TPL_DEFAULTS = {
+  proposal_email_intro: 'Thanks for getting in touch — your proposal for {title} is ready. It covers the scope, timeline and investment, and you can accept it online with one click.',
+  proposal_email_closing: 'Any questions at all, just hit reply — happy to walk you through it.',
+  proposal_email_signature: 'Robin\nIncremento · Lisbon',
+};
+
+async function loadTemplate() {
+  try {
+    const s = await apiFetch('/api/settings');
+    document.getElementById('tpl-intro').value     = s.proposal_email_intro     ?? TPL_DEFAULTS.proposal_email_intro;
+    document.getElementById('tpl-closing').value   = s.proposal_email_closing   ?? TPL_DEFAULTS.proposal_email_closing;
+    document.getElementById('tpl-signature').value = s.proposal_email_signature ?? TPL_DEFAULTS.proposal_email_signature;
+  } catch {
+    document.getElementById('tpl-status').textContent = 'Could not load settings';
+  }
+}
+
+async function saveTemplate() {
+  const btn = document.getElementById('tpl-save');
+  const status = document.getElementById('tpl-status');
+  btn.disabled = true;
+  status.textContent = 'Saving…';
+  try {
+    await apiFetch('/api/settings', { method:'PATCH', body: JSON.stringify({
+      proposal_email_intro:     document.getElementById('tpl-intro').value.trim(),
+      proposal_email_closing:   document.getElementById('tpl-closing').value.trim(),
+      proposal_email_signature: document.getElementById('tpl-signature').value.trim(),
+    })});
+    status.textContent = '✓ Saved';
+    setTimeout(()=>{ status.textContent = ''; }, 2500);
+  } catch {
+    status.textContent = 'Save failed';
+  }
+  btn.disabled = false;
+}
+
+function resetTemplate() {
+  document.getElementById('tpl-intro').value     = TPL_DEFAULTS.proposal_email_intro;
+  document.getElementById('tpl-closing').value   = TPL_DEFAULTS.proposal_email_closing;
+  document.getElementById('tpl-signature').value = TPL_DEFAULTS.proposal_email_signature;
+  document.getElementById('tpl-status').textContent = 'Reset — remember to Save';
+}
+
 loadProposals();
+loadTemplate();
 </script>
 </body>
 </html>
