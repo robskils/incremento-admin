@@ -23,7 +23,7 @@
 
 <aside class="sidebar">
   <div class="sidebar-top">
-    <div class="sidebar-brand">
+    <div class="sidebar-brand" style="cursor:pointer" onclick="if(!event.target.closest('.sidebar-brand-link'))location.href='dashboard.html'">
       <svg width="26" height="26" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="sg" x1="0" y1="32" x2="32" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#9EF54A"/><stop offset="100%" stop-color="#5EE7D8"/></linearGradient></defs><rect x="4" y="20" width="5" height="8" rx="2.5" fill="url(#sg)" opacity="0.55"/><rect x="12" y="14" width="5" height="14" rx="2.5" fill="url(#sg)" opacity="0.78"/><rect x="20" y="10" width="5" height="18" rx="2.5" fill="url(#sg)"/><circle cx="22.5" cy="5.5" r="2.25" fill="url(#sg)"/></svg>
       <span class="sidebar-brand-name">incremento<span class="dot">.</span></span>
       <a class="sidebar-brand-link" href="https://incremento.co" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
@@ -31,17 +31,16 @@
   </div>
   <nav class="sidebar-nav">
     <a class="nav-item" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
-    <a class="nav-item" href="inbox.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Inbox<span class="nav-badge" id="nav-badge" style="display:none"></span></a>
     <div class="nav-divider"></div>
     <a class="nav-item" href="pipeline.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Pipeline</a>
+    <a class="nav-item" href="proposals.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Proposals</a>
     <a class="nav-item" href="contacts.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Contacts</a>
     <div class="nav-divider"></div>
-    <a class="nav-item" href="analytics.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Analytics</a>
-    <div class="nav-divider"></div>
+    <a class="nav-item" href="brand.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="19" cy="13" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="10" cy="20" r="2.5"/><path d="M11 4.5A8 8 0 104 14"/></svg>Brand</a>
     <a class="nav-item active" href="settings.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Settings</a>
   </nav>
   <div class="sidebar-footer">
-    <a class="nav-item" href="#" onclick="sessionStorage.removeItem('inc_admin_key');location.reload()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sign Out</a>
+    <a class="nav-item" href="#" onclick="sessionStorage.removeItem('inc_admin_key');localStorage.removeItem('inc_admin_token');location.reload()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sign Out</a>
   </div>
 </aside>
 
@@ -72,8 +71,46 @@
               <div class="settings-row-label">Current Session</div>
               <div class="settings-row-sub" id="key-status">Checking…</div>
             </div>
-            <button class="btn-ghost" onclick="sessionStorage.removeItem('inc_admin_key');location.reload()">Clear &amp; Re-enter</button>
+            <button class="btn-ghost" onclick="sessionStorage.removeItem('inc_admin_key');localStorage.removeItem('inc_admin_token');location.reload()">Clear &amp; Re-enter</button>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Proposal email template -->
+    <div class="panel" style="margin-bottom:20px">
+      <div class="panel-header"><span class="panel-title">Proposal Email</span></div>
+      <div style="padding:20px">
+        <p class="settings-row-sub" style="margin-bottom:16px">The wording of the email clients receive when you send a proposal. The branded header, the green “View your proposal” button and the footer stay fixed. Use <code style="color:var(--lime)">{name}</code>, <code style="color:var(--lime)">{title}</code> and <code style="color:var(--lime)">{company}</code> — they’re filled in automatically.</p>
+
+        <div style="margin-bottom:16px">
+          <div class="detail-label" style="margin-bottom:6px">Greeting</div>
+          <div class="settings-row-sub">Fixed: “Hi {name},” — automatic.</div>
+        </div>
+
+        <div style="margin-bottom:16px">
+          <div class="detail-label" style="margin-bottom:6px">Intro paragraph</div>
+          <textarea id="tpl-intro" class="notes-textarea" rows="3" style="width:100%;box-sizing:border-box"></textarea>
+        </div>
+
+        <div style="margin-bottom:16px">
+          <div class="detail-label" style="margin-bottom:6px">Closing line</div>
+          <textarea id="tpl-closing" class="notes-textarea" rows="2" style="width:100%;box-sizing:border-box"></textarea>
+        </div>
+
+        <div style="margin-bottom:18px">
+          <div class="detail-label" style="margin-bottom:6px">Signature</div>
+          <textarea id="tpl-signature" class="notes-textarea" rows="2" style="width:100%;box-sizing:border-box" placeholder="Robin&#10;Incremento · Lisbon"></textarea>
+          <div class="settings-row-sub" style="margin-top:5px">First line bold; lines below appear smaller, joined with “·”.</div>
+        </div>
+
+        <div style="display:flex;gap:10px;align-items:center">
+          <button class="btn-primary" id="tpl-save" onclick="saveTemplate()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Save email template
+          </button>
+          <button class="btn-ghost" id="tpl-reset" onclick="resetTemplate()">Reset to default</button>
+          <span id="tpl-status" style="font-size:0.78rem;color:var(--text-dim)"></span>
         </div>
       </div>
     </div>
@@ -154,6 +191,52 @@ const stored = sessionStorage.getItem('inc_admin_key');
 document.getElementById('key-status').textContent = stored
   ? 'Key set (session active — ends when tab closes)'
   : 'No key — enter one below';
+
+/* ── Proposal email template ─────────────────────────────── */
+const TPL_DEFAULTS = {
+  proposal_email_intro: 'Thanks for getting in touch — your proposal for {title} is ready. It covers the scope, timeline and investment, and you can accept it online with one click.',
+  proposal_email_closing: 'Any questions at all, just hit reply — happy to walk you through it.',
+  proposal_email_signature: 'Robin\nIncremento · Lisbon',
+};
+
+async function loadTemplate() {
+  try {
+    const s = await apiFetch('/api/settings');
+    document.getElementById('tpl-intro').value     = s.proposal_email_intro     ?? TPL_DEFAULTS.proposal_email_intro;
+    document.getElementById('tpl-closing').value   = s.proposal_email_closing   ?? TPL_DEFAULTS.proposal_email_closing;
+    document.getElementById('tpl-signature').value = s.proposal_email_signature ?? TPL_DEFAULTS.proposal_email_signature;
+  } catch {
+    document.getElementById('tpl-status').textContent = 'Could not load settings';
+  }
+}
+
+async function saveTemplate() {
+  const btn = document.getElementById('tpl-save');
+  const status = document.getElementById('tpl-status');
+  btn.disabled = true;
+  status.textContent = 'Saving…';
+  try {
+    await apiFetch('/api/settings', { method:'PATCH', body: JSON.stringify({
+      proposal_email_intro:     document.getElementById('tpl-intro').value.trim(),
+      proposal_email_closing:   document.getElementById('tpl-closing').value.trim(),
+      proposal_email_signature: document.getElementById('tpl-signature').value.trim(),
+    })});
+    status.textContent = '✓ Saved';
+    setTimeout(()=>{ status.textContent = ''; }, 2500);
+  } catch {
+    status.textContent = 'Save failed';
+  }
+  btn.disabled = false;
+}
+
+function resetTemplate() {
+  document.getElementById('tpl-intro').value     = TPL_DEFAULTS.proposal_email_intro;
+  document.getElementById('tpl-closing').value   = TPL_DEFAULTS.proposal_email_closing;
+  document.getElementById('tpl-signature').value = TPL_DEFAULTS.proposal_email_signature;
+  document.getElementById('tpl-status').textContent = 'Reset — remember to Save';
+}
+
+loadTemplate();
 </script>
 </body>
 </html>

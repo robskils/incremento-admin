@@ -48,9 +48,9 @@ body {
   --purple-pale:rgba(167,139,250,0.10);
 
   /* Text */
-  --text:      #e0e8f0;
-  --text-sub:  rgba(224,232,240,0.60);
-  --text-dim:  rgba(224,232,240,0.35);
+  --text:      #eef3f8;
+  --text-sub:  rgba(232,240,248,0.86);
+  --text-dim:  rgba(232,240,248,0.70);
 
   /* Layout */
   --sidebar-w: 232px;
@@ -336,7 +336,6 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   letter-spacing: 0.02em;
 }
 .stage-new        { background: var(--cyan-pale);   color: var(--cyan); }
-.stage-qualifying { background: var(--blue-pale);   color: var(--blue); }
 .stage-proposal   { background: var(--amber-pale);  color: var(--amber); }
 .stage-accepted   { background: var(--lime-pale);   color: var(--lime); }
 .stage-in_progress{ background: var(--green-pale);  color: var(--green); }
@@ -726,7 +725,7 @@ select.select-sm:focus { border-color: var(--lime); }
   color: var(--text-dim);
   font-size: 0.85rem;
 }
-.empty-state svg { width: 32px; margin: 0 auto 12px; opacity: 0.3; }
+.empty-state svg { display: block; width: 32px; height: 32px; margin: 0 auto 12px; opacity: 0.3; }
 
 /* ── QUOTE BLOCK ──────────────────────────────────────────── */
 .quote-block {
@@ -743,7 +742,7 @@ select.select-sm:focus { border-color: var(--lime); }
   max-width: 500px;
   margin: 0 auto 10px;
 }
-.quote-block cite { font-size: 0.78rem; color: var(--text-dim); opacity: 0.6; }
+.quote-block cite { font-size: 0.78rem; color: var(--text-sub); }
 
 /* ── RESPONSIVE ───────────────────────────────────────────── */
 @media (max-width: 1280px) {

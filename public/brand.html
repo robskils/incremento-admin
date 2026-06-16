@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brand Assets — Incremento Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="admin.css">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<style>
+.brand-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.asset-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.asset-preview{height:150px;display:flex;align-items:center;justify-content:center;padding:24px}
+.asset-preview.on-dark{background:#0F1426}
+.asset-preview.on-light{background:#F4F6FA}
+.asset-preview img{max-width:100%;max-height:100%;object-fit:contain}
+.asset-meta{padding:14px 16px;border-top:1px solid var(--border)}
+.asset-name{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:0.9rem;color:var(--text)}
+.asset-use{font-size:0.74rem;color:var(--text-dim);margin-top:2px}
+.asset-dls{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.dl-btn{display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;font-weight:500;padding:5px 11px;border-radius:6px;border:1px solid var(--border2);color:var(--text-sub);text-decoration:none;transition:all .15s}
+.dl-btn:hover{border-color:var(--lime);color:var(--lime)}
+.swatch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+.swatch{border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;transition:transform .12s}
+.swatch:hover{transform:translateY(-2px)}
+.swatch-chip{height:84px}
+.swatch-meta{padding:11px 14px}
+.swatch-name{font-weight:600;font-size:0.84rem;color:var(--text)}
+.swatch-hex{font-family:monospace;font-size:0.76rem;color:var(--text-dim);margin-top:1px}
+.swatch-use{font-size:0.7rem;color:var(--text-dim);margin-top:4px}
+.copied{color:var(--lime)!important}
+.guide-item{display:flex;gap:10px;font-size:0.84rem;color:var(--text-sub);padding:7px 0;line-height:1.5}
+.guide-item svg{flex:0 0 16px;margin-top:2px}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN OVERLAY ─────────────────────────────────────── -->
+<div id="login-overlay" style="display:none;position:fixed;inset:0;background:rgba(10,18,25,0.97);z-index:999;align-items:center;justify-content:center"></div>
+
+<!-- ── SIDEBAR ────────────────────────────────────────────── -->
+<aside class="sidebar">
+  <div class="sidebar-top">
+    <div class="sidebar-brand" style="cursor:pointer" onclick="if(!event.target.closest('.sidebar-brand-link'))location.href='dashboard.html'">
+      <svg width="26" height="26" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="sg" x1="0" y1="32" x2="32" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#9EF54A"/><stop offset="100%" stop-color="#5EE7D8"/></linearGradient></defs><rect x="4" y="20" width="5" height="8" rx="2.5" fill="url(#sg)" opacity="0.55"/><rect x="12" y="14" width="5" height="14" rx="2.5" fill="url(#sg)" opacity="0.78"/><rect x="20" y="10" width="5" height="18" rx="2.5" fill="url(#sg)"/><circle cx="22.5" cy="5.5" r="2.25" fill="url(#sg)"/></svg>
+      <span class="sidebar-brand-name">incremento<span class="dot">.</span></span>
+      <a class="sidebar-brand-link" href="https://incremento.co" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <a class="nav-item" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <div class="nav-divider"></div>
+    <a class="nav-item" href="pipeline.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Pipeline</a>
+    <a class="nav-item" href="proposals.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Proposals</a>
+    <a class="nav-item" href="contacts.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Contacts</a>
+    <div class="nav-divider"></div>
+    <a class="nav-item active" href="brand.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="19" cy="13" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="10" cy="20" r="2.5"/><path d="M11 4.5A8 8 0 104 14"/></svg>Brand</a>
+    <a class="nav-item" href="settings.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Settings</a>
+  </nav>
+  <div class="sidebar-footer">
+    <a class="nav-item" href="#" onclick="sessionStorage.removeItem('inc_admin_key');localStorage.removeItem('inc_admin_token');location.reload()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sign Out</a>
+  </div>
+</aside>
+
+<!-- ── MAIN ───────────────────────────────────────────────── -->
+<main class="main">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Brand Assets</div>
+      <div class="page-sub">Logos, colours and guidelines — click any colour to copy its hex</div>
+    </div>
+    <a href="brand/incremento-brand-pack.zip" class="btn-primary" download>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download all (.zip)
+    </a>
+  </div>
+
+  <!-- Logos -->
+  <div class="panel" style="margin-bottom:20px">
+    <div class="panel-header"><span class="panel-title">Logos</span></div>
+    <div style="padding:20px">
+      <div class="brand-grid" id="logo-grid"></div>
+    </div>
+  </div>
+
+  <!-- Colours -->
+  <div class="panel" style="margin-bottom:20px">
+    <div class="panel-header"><span class="panel-title">Colour Palette</span></div>
+    <div style="padding:20px">
+      <div class="swatch-grid" id="swatch-grid"></div>
+      <div style="margin-top:18px">
+        <div class="detail-label" style="margin-bottom:8px">Brand gradient</div>
+        <div onclick="copyText('linear-gradient(135deg, #C7F26B 0%, #7FE9E0 100%)', this)"
+             style="height:64px;border-radius:var(--radius-lg);cursor:pointer;background:linear-gradient(135deg,#C7F26B 0%,#7FE9E0 100%);display:flex;align-items:center;justify-content:center;font-family:monospace;font-size:0.78rem;color:#0F1426;font-weight:600">
+          linear-gradient(135deg, #C7F26B 0%, #7FE9E0 100%)
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Typography & guidelines -->
+  <div class="panel">
+    <div class="panel-header"><span class="panel-title">Typography &amp; Guidelines</span></div>
+    <div style="padding:20px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+        <div>
+          <div class="detail-label" style="margin-bottom:10px">Type</div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:1.4rem;color:var(--text);letter-spacing:-0.02em">Space Grotesk</div>
+          <div class="asset-use">Display &amp; headings · 500–700 · −0.02em</div>
+          <div style="font-family:'Inter',sans-serif;font-size:1.1rem;color:var(--text);margin-top:14px">Inter</div>
+          <div class="asset-use">Body &amp; UI · 400–600</div>
+        </div>
+        <div>
+          <div class="detail-label" style="margin-bottom:10px">Guidelines</div>
+          <div class="guide-item"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Keep clear space around the mark equal to the height of the dot.</div>
+          <div class="guide-item"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Don't recolour the gradient.</div>
+          <div class="guide-item"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Don't stretch or rotate the mark.</div>
+          <div class="guide-item"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Don't place the dark lockup on busy photos without a scrim.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="admin.js"></script>
+<script>
+const ASSETS = [
+  { name:'Primary lockup',   use:'Wordmark + mark — main logo',        bg:'dark',  base:'logo-full-dark' },
+  { name:'Primary lockup',   use:'For light backgrounds',              bg:'light', base:'logo-full-light' },
+  { name:'Incremento Labs',  use:'AI consultancy lockup',              bg:'dark',  base:'logo-labs-dark' },
+  { name:'Incremento Labs',  use:'Labs lockup, light backgrounds',     bg:'light', base:'logo-labs-light' },
+  { name:'Mark',             use:'Standalone icon (transparent)',      bg:'dark',  base:'logo-mark' },
+  { name:'Mark',             use:'Standalone icon, light backgrounds', bg:'light', base:'logo-mark' },
+  { name:'App icon',         use:'Square — social avatar / app',       bg:'dark',  base:'logo-square-dark' },
+  { name:'App icon',         use:'Square, light backgrounds',          bg:'light', base:'logo-square-light' },
+  { name:'Favicon',          use:'Browser tab icon',                   bg:'dark',  base:'favicon' },
+];
+
+document.getElementById('logo-grid').innerHTML = ASSETS.map(a => `
+  <div class="asset-card">
+    <div class="asset-preview on-${a.bg}"><img src="brand/${a.base}.svg" alt="${a.name}"></div>
+    <div class="asset-meta">
+      <div class="asset-name">${a.name}</div>
+      <div class="asset-use">${a.use}</div>
+      <div class="asset-dls">
+        <a class="dl-btn" href="brand/${a.base}.svg" download><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>SVG</a>
+        <a class="dl-btn" href="brand/${a.base}.png" download>PNG</a>
+      </div>
+    </div>
+  </div>`).join('');
+
+const COLOURS = [
+  { name:'Midnight',   hex:'#0F1426', use:'Primary background',  text:'#F4F6FA' },
+  { name:'Foreground', hex:'#F4F6FA', use:'Text on dark',        text:'#0F1426' },
+  { name:'Lime',       hex:'#C7F26B', use:'Accent / gradient start', text:'#0F1426' },
+  { name:'Cyan',       hex:'#7FE9E0', use:'Accent / gradient end',   text:'#0F1426' },
+];
+
+document.getElementById('swatch-grid').innerHTML = COLOURS.map(c => `
+  <div class="swatch" onclick="copyText('${c.hex}', this.querySelector('.swatch-hex'))">
+    <div class="swatch-chip" style="background:${c.hex}"></div>
+    <div class="swatch-meta">
+      <div class="swatch-name">${c.name}</div>
+      <div class="swatch-hex">${c.hex}</div>
+      <div class="swatch-use">${c.use}</div>
+    </div>
+  </div>`).join('');
+
+function copyText(text, el) {
+  navigator.clipboard.writeText(text).then(() => {
+    if (!el) return;
+    const orig = el.textContent;
+    el.textContent = 'Copied!';
+    el.classList.add('copied');
+    setTimeout(() => { el.textContent = orig; el.classList.remove('copied'); }, 1200);
+  });
+}
+</script>
+</body>
+</html>

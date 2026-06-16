@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proposals — Incremento Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="admin.css">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<style>
+.prop-status{display:inline-flex;align-items:center;gap:5px;font-size:0.68rem;font-weight:600;padding:3px 9px;border-radius:20px;letter-spacing:0.04em;text-transform:uppercase}
+.ps-draft{background:rgba(148,163,184,0.12);color:#94a3b8}
+.ps-sent{background:rgba(245,158,11,0.12);color:#f59e0b}
+.ps-viewed{background:rgba(94,231,216,0.12);color:#5EE7D8}
+.ps-accepted{background:rgba(158,245,74,0.12);color:#9EF54A}
+.ps-declined{background:rgba(239,68,68,0.12);color:#ef4444}
+.editor-section{margin-bottom:22px}
+.editor-section .detail-label{margin-bottom:8px}
+.ed-item{display:flex;gap:8px;margin-bottom:8px;align-items:flex-start}
+.ed-item input,.ed-item textarea{flex:1;padding:8px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;font-family:'Inter',sans-serif;font-size:0.84rem;color:var(--text);outline:none;resize:vertical}
+.ed-item .ed-narrow{flex:0 0 110px}
+.ed-del{flex:0 0 auto;background:none;border:none;color:var(--text-dim);cursor:pointer;padding:8px 4px;font-size:1rem;line-height:1}
+.ed-del:hover{color:#ef4444}
+.ed-add{background:none;border:1px dashed var(--border2);color:var(--text-dim);border-radius:8px;padding:7px 14px;font-size:0.78rem;cursor:pointer;font-family:'Inter',sans-serif}
+.ed-add:hover{color:var(--lime);border-color:var(--lime)}
+.modal.modal-wide{max-width:760px;width:94vw}
+.draft-pick{padding:12px 16px;border:1px solid var(--border2);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:border-color 0.15s}
+.draft-pick:hover{border-color:var(--lime)}
+.draft-pick .dp-name{font-weight:600;font-size:0.9rem}
+.draft-pick .dp-meta{font-size:0.74rem;color:var(--text-dim);margin-top:2px}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(10,18,25,0.3);border-top-color:#0a1219;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:-2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN OVERLAY ─────────────────────────────────────── -->
+<div id="login-overlay" style="display:none;position:fixed;inset:0;background:rgba(10,18,25,0.97);z-index:999;align-items:center;justify-content:center">
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:40px;width:100%;max-width:380px;text-align:center">
+    <svg width="36" height="36" viewBox="0 0 32 32" fill="none" style="margin:0 auto 16px"><defs><linearGradient id="lg" x1="0" y1="32" x2="32" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#9EF54A"/><stop offset="100%" stop-color="#5EE7D8"/></linearGradient></defs><rect x="4" y="20" width="5" height="8" rx="2.5" fill="url(#lg)" opacity="0.55"/><rect x="12" y="14" width="5" height="14" rx="2.5" fill="url(#lg)" opacity="0.78"/><rect x="20" y="10" width="5" height="18" rx="2.5" fill="url(#lg)"/><circle cx="22.5" cy="5.5" r="2.25" fill="url(#lg)"/></svg>
+    <p style="font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:600;color:var(--text);margin-bottom:6px">incremento<span style="color:var(--lime)">.</span> admin</p>
+    <p style="font-size:0.78rem;color:var(--text-dim);margin-bottom:24px">Enter your admin key to continue</p>
+    <input id="login-key" type="password" placeholder="Admin key" style="width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;font-family:'Inter',sans-serif;font-size:0.88rem;color:var(--text);outline:none;margin-bottom:12px">
+    <button id="login-btn" class="btn-primary" style="width:100%;justify-content:center">Unlock</button>
+  </div>
+</div>
+
+<!-- ── SIDEBAR ────────────────────────────────────────────── -->
+<aside class="sidebar">
+  <div class="sidebar-top">
+    <div class="sidebar-brand" style="cursor:pointer" onclick="if(!event.target.closest('.sidebar-brand-link'))location.href='dashboard.html'">
+      <svg width="26" height="26" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="sg" x1="0" y1="32" x2="32" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#9EF54A"/><stop offset="100%" stop-color="#5EE7D8"/></linearGradient></defs><rect x="4" y="20" width="5" height="8" rx="2.5" fill="url(#sg)" opacity="0.55"/><rect x="12" y="14" width="5" height="14" rx="2.5" fill="url(#sg)" opacity="0.78"/><rect x="20" y="10" width="5" height="18" rx="2.5" fill="url(#sg)"/><circle cx="22.5" cy="5.5" r="2.25" fill="url(#sg)"/></svg>
+      <span class="sidebar-brand-name">incremento<span class="dot">.</span></span>
+      <a class="sidebar-brand-link" href="https://incremento.co" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <a class="nav-item" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <div class="nav-divider"></div>
+    <a class="nav-item" href="pipeline.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Pipeline</a>
+    <a class="nav-item active" href="proposals.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Proposals</a>
+    <a class="nav-item" href="contacts.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Contacts</a>
+    <div class="nav-divider"></div>
+    <a class="nav-item" href="brand.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="19" cy="13" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="10" cy="20" r="2.5"/><path d="M11 4.5A8 8 0 104 14"/></svg>Brand</a>
+    <a class="nav-item" href="settings.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Settings</a>
+  </nav>
+  <div class="sidebar-footer">
+    <a class="nav-item" href="#" onclick="sessionStorage.removeItem('inc_admin_key');localStorage.removeItem('inc_admin_token');location.reload()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sign Out</a>
+  </div>
+</aside>
+
+<!-- ── MAIN ───────────────────────────────────────────────── -->
+<main class="main">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Proposals</div>
+      <div class="page-sub" id="prop-count"></div>
+    </div>
+    <button class="btn-primary" onclick="openDraftPicker()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      New proposal
+    </button>
+  </div>
+
+  <div class="panel">
+    <div id="prop-list">
+      <div class="empty-state">Loading…</div>
+    </div>
+  </div>
+</main>
+
+<!-- ── DRAFT PICKER MODAL (choose an enquiry) ──────────────── -->
+<div class="modal-overlay" id="picker-modal" style="display:none" onclick="if(event.target===this)closePicker()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">New proposal</div>
+      <button class="modal-close" onclick="closePicker()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.82rem;color:var(--text-dim);margin-bottom:14px">Pick an enquiry — Claude drafts the proposal from their message, then you edit and send.</p>
+      <div id="picker-list"><div class="empty-state">Loading enquiries…</div></div>
+      <div style="margin-top:14px;text-align:center">
+        <button class="ed-add" onclick="location.href='proposal.html'">Or start from a blank proposal</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="admin.js"></script>
+<script>
+let proposals = [];
+let editing = null;       // proposal being edited (null = new)
+let draftPrefill = null;  // AI draft awaiting save
+
+const PUBLIC_BASE = 'https://enquiries.incremento.co';
+
+function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+const eur = n => '€' + Number(n||0).toLocaleString();
+
+const STATUS_LABEL = { draft:'Draft', sent:'Sent', viewed:'Viewed', accepted:'Accepted', declined:'Declined' };
+
+async function loadProposals() {
+  try {
+    const data = await apiFetch('/api/proposals');
+    proposals = data.proposals || [];
+    renderList();
+  } catch {
+    document.getElementById('prop-list').innerHTML = '<div class="empty-state">Failed to load proposals</div>';
+  }
+}
+
+function renderList() {
+  document.getElementById('prop-count').textContent = proposals.length + ' proposal' + (proposals.length===1?'':'s');
+  if (!proposals.length) {
+    document.getElementById('prop-list').innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>No proposals yet — create one from an enquiry</div>';
+    return;
+  }
+  document.getElementById('prop-list').innerHTML = proposals.map(p => `
+    <div class="inbox-row" onclick="location.href='proposal.html?id='+${p.id}">
+      <div class="inbox-row-header">
+        <span class="inbox-row-name">${escHtml(p.title)}</span>
+        <span class="inbox-row-time">${timeAgo(p.created_at)}</span>
+      </div>
+      <div class="inbox-row-sub">
+        <span class="prop-status ps-${p.status}">${STATUS_LABEL[p.status]||p.status}</span>
+        <span style="font-size:0.74rem;color:var(--text-dim)">${escHtml(p.client_name)}${p.client_company?' · '+escHtml(p.client_company):''}</span>
+        ${p.total_value>0?`<span style="font-size:0.74rem;color:var(--green)">${eur(p.total_value)}</span>`:''}
+        ${p.viewed_at?`<span style="font-size:0.7rem;color:var(--cyan)">👁 viewed ${timeAgo(p.viewed_at)}</span>`:''}
+      </div>
+    </div>`).join('');
+}
+
+/* ── Draft picker ─────────────────────────────────────────── */
+async function openDraftPicker() {
+  document.getElementById('picker-modal').style.display = 'flex';
+  try {
+    const data = await apiFetch('/api/enquiries?limit=50');
+    const list = (data.enquiries||[]).filter(e => !['completed','cancelled'].includes(e.stage));
+    document.getElementById('picker-list').innerHTML = list.length ? list.map(e => `
+      <div class="draft-pick" onclick="location.href='proposal.html?enquiry='+${e.id}">
+        <div class="dp-name">${escHtml(e.name)}${e.company?` · ${escHtml(e.company)}`:''}</div>
+        <div class="dp-meta">${escHtml((e.message||'').slice(0,110))}…</div>
+      </div>`).join('') : '<div class="empty-state">No open enquiries</div>';
+  } catch {
+    document.getElementById('picker-list').innerHTML = '<div class="empty-state">Failed to load</div>';
+  }
+}
+function closePicker(){ document.getElementById('picker-modal').style.display='none'; }
+
+loadProposals();
+</script>
+</body>
+</html>

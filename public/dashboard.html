@@ -31,7 +31,7 @@
 <!-- ── SIDEBAR ────────────────────────────────────────────── -->
 <aside class="sidebar">
   <div class="sidebar-top">
-    <div class="sidebar-brand">
+    <div class="sidebar-brand" style="cursor:pointer" onclick="if(!event.target.closest('.sidebar-brand-link'))location.href='dashboard.html'">
       <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
         <defs><linearGradient id="sg" x1="0" y1="32" x2="32" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#9EF54A"/><stop offset="100%" stop-color="#5EE7D8"/></linearGradient></defs>
         <rect x="4" y="20" width="5" height="8" rx="2.5" fill="url(#sg)" opacity="0.55"/>
@@ -50,33 +50,25 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
       Dashboard
     </a>
-    <a class="nav-item" href="inbox.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-      Inbox
-      <span class="nav-badge" id="nav-badge" style="display:none"></span>
-    </a>
     <div class="nav-divider"></div>
     <a class="nav-item" href="pipeline.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
       Pipeline
     </a>
+    <a class="nav-item" href="proposals.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Proposals</a>
     <a class="nav-item" href="contacts.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
       Contacts
     </a>
     <div class="nav-divider"></div>
-    <a class="nav-item" href="analytics.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-      Analytics
-    </a>
-    <div class="nav-divider"></div>
+    <a class="nav-item" href="brand.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="19" cy="13" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="10" cy="20" r="2.5"/><path d="M11 4.5A8 8 0 104 14"/></svg>Brand</a>
     <a class="nav-item" href="settings.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
       Settings
     </a>
   </nav>
   <div class="sidebar-footer">
-    <a class="nav-item" href="#" onclick="sessionStorage.removeItem('inc_admin_key');location.reload()">
+    <a class="nav-item" href="#" onclick="sessionStorage.removeItem('inc_admin_key');localStorage.removeItem('inc_admin_token');location.reload()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
       Sign Out
     </a>
@@ -137,23 +129,49 @@
   <!-- Pipeline funnel -->
   <div class="pipeline-funnel" id="pipeline-funnel">
     <div class="funnel-stage" onclick="location.href='pipeline.html?stage=new'"><div class="funnel-num" id="f-new">—</div><div class="funnel-label">New</div></div>
-    <div class="funnel-stage" onclick="location.href='pipeline.html?stage=qualifying'"><div class="funnel-num" id="f-qualifying">—</div><div class="funnel-label">Qualifying</div></div>
-    <div class="funnel-stage" onclick="location.href='pipeline.html?stage=proposal_sent'"><div class="funnel-num" id="f-proposal">—</div><div class="funnel-label">Proposal Sent</div></div>
+<div class="funnel-stage" onclick="location.href='pipeline.html?stage=proposal_sent'"><div class="funnel-num" id="f-proposal">—</div><div class="funnel-label">Proposal Sent</div></div>
     <div class="funnel-stage" onclick="location.href='pipeline.html?stage=accepted'"><div class="funnel-num" id="f-accepted">—</div><div class="funnel-label">Accepted</div></div>
     <div class="funnel-stage" onclick="location.href='pipeline.html?stage=in_progress'"><div class="funnel-num" id="f-progress">—</div><div class="funnel-label">In Progress</div></div>
     <div class="funnel-stage" onclick="location.href='pipeline.html?stage=completed'"><div class="funnel-num" id="f-completed">—</div><div class="funnel-label">Completed</div></div>
   </div>
 
-  <!-- Recent enquiries -->
-  <div class="panel">
-    <div class="panel-header">
-      <span class="panel-title">Recent Enquiries</span>
-      <a href="inbox.html" style="font-size:0.75rem;color:var(--lime)">View all →</a>
+  <!-- Won revenue + avg deal size -->
+  <div class="kpi-row" style="grid-template-columns:1fr 1fr;margin-top:4px">
+    <div class="kpi-card">
+      <div class="kpi-card-top"><div class="kpi-icon kpi-icon-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div><div class="kpi-label">Won Revenue</div></div>
+      <div class="kpi-value green" id="a-revenue">—</div>
+      <div class="kpi-sub">Accepted + completed deals</div>
     </div>
-    <div id="recent-list">
-      <div class="empty-state">Loading…</div>
+    <div class="kpi-card">
+      <div class="kpi-card-top"><div class="kpi-icon kpi-icon-amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div><div class="kpi-label">Avg Deal Size</div></div>
+      <div class="kpi-value amber" id="a-avg">—</div>
+      <div class="kpi-sub">Deals with a value set</div>
     </div>
   </div>
+
+  <!-- Enquiries by service -->
+  <div class="panel" style="margin-top:20px">
+    <div class="panel-header"><span class="panel-title">Enquiries by Service</span></div>
+    <div class="stage-bars" id="service-bars"><div style="padding:32px;text-align:center;color:var(--text-dim)">Loading…</div></div>
+  </div>
+
+  <!-- Monthly enquiries -->
+  <div class="panel" style="margin-top:20px">
+    <div class="panel-header"><span class="panel-title">Monthly Enquiries</span></div>
+    <div id="monthly-chart" style="padding:20px 20px 10px"><div style="text-align:center;color:var(--text-dim);padding:32px">Loading…</div></div>
+  </div>
+
+  <!-- Brand assets quick link -->
+  <a href="brand.html" class="panel" style="display:flex;align-items:center;gap:16px;padding:18px 22px;margin-top:20px;text-decoration:none;transition:border-color .15s" onmouseover="this.style.borderColor='var(--lime)'" onmouseout="this.style.borderColor=''">
+    <div style="flex:0 0 44px;height:44px;border-radius:10px;background:#0F1426;display:grid;place-items:center">
+      <svg width="24" height="24" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="bg" x1="0" y1="32" x2="32" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#C7F26B"/><stop offset="100%" stop-color="#7FE9E0"/></linearGradient></defs><rect x="4" y="20" width="5" height="8" rx="2.5" fill="url(#bg)" opacity="0.55"/><rect x="12" y="14" width="5" height="14" rx="2.5" fill="url(#bg)" opacity="0.78"/><rect x="20" y="10" width="5" height="18" rx="2.5" fill="url(#bg)"/><circle cx="22.5" cy="5.5" r="2.25" fill="url(#bg)"/></svg>
+    </div>
+    <div style="flex:1">
+      <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:0.95rem;color:var(--text)">Brand Assets</div>
+      <div style="font-size:0.78rem;color:var(--text-dim);margin-top:1px">Logos, colours and guidelines — download SVG/PNG</div>
+    </div>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+  </a>
 
   <!-- Quote -->
   <div class="quote-block">
@@ -166,11 +184,13 @@
 <script>
 document.getElementById('dash-date').textContent = new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
+const SERVICE_LABELS = {'web-design':'Web Design','product-ux':'Product UX','seo-growth':'SEO & Growth','ai-consultancy':'AI Consultancy','custom-software':'Custom Software','not-sure':'Not Sure Yet'};
+
 async function loadDashboard() {
   try {
     const [statsRes, enquiriesRes] = await Promise.all([
       apiFetch('/api/stats'),
-      apiFetch('/api/enquiries?limit=6'),
+      apiFetch('/api/enquiries?limit=500'),
     ]);
 
     const stats = statsRes;
@@ -203,32 +223,54 @@ async function loadDashboard() {
     const sc = {};
     (stats.stage_counts || []).forEach(s => sc[s.stage] = s.count);
     document.getElementById('f-new').textContent       = sc.new           || 0;
-    document.getElementById('f-qualifying').textContent = sc.qualifying    || 0;
     document.getElementById('f-proposal').textContent   = sc.proposal_sent || 0;
     document.getElementById('f-accepted').textContent   = sc.accepted      || 0;
     document.getElementById('f-progress').textContent   = sc.in_progress   || 0;
     document.getElementById('f-completed').textContent  = sc.completed     || 0;
 
-    // Recent list
-    if (enqs.length === 0) {
-      document.getElementById('recent-list').innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>No enquiries yet</div>';
-    } else {
-      document.getElementById('recent-list').innerHTML = enqs.map(e => `
-        <div class="inbox-row${e.stage==='new'?' unread':''}" onclick="location.href='inbox.html?id=${e.id}'">
-          <div class="inbox-row-header">
-            <span class="inbox-row-name">${escHtml(e.name)}${e.company ? ` <span style="color:var(--text-dim);font-weight:400">· ${escHtml(e.company)}</span>` : ''}</span>
-            <span class="inbox-row-time">${timeAgo(e.submitted_at)}</span>
-          </div>
-          <div class="inbox-row-sub">
-            ${stageBadge(e.stage)}
-            ${interestPills(e.interests)}
-          </div>
-          <div class="inbox-row-body">${escHtml(e.message)}</div>
+    // Won revenue + avg deal size
+    const acceptedDeals = enqs.filter(e => ['accepted','in_progress','completed'].includes(e.stage));
+    const wonRev  = acceptedDeals.reduce((s,e) => s + (e.value||0), 0);
+    const withVal = enqs.filter(e => e.value > 0);
+    const avg     = withVal.length ? Math.round(withVal.reduce((s,e)=>s+e.value,0)/withVal.length) : 0;
+    document.getElementById('a-revenue').textContent = wonRev > 0 ? '€' + wonRev.toLocaleString() : '—';
+    document.getElementById('a-avg').textContent     = avg > 0 ? '€' + avg.toLocaleString() : '—';
+
+    // Enquiries by service
+    const serviceCounts = {};
+    enqs.forEach(e => {
+      try {
+        const arr = typeof e.interests === 'string' ? JSON.parse(e.interests||'[]') : (e.interests||[]);
+        arr.forEach(i => { serviceCounts[i] = (serviceCounts[i]||0) + 1; });
+      } catch {}
+    });
+    const sorted = Object.entries(serviceCounts).sort((a,b)=>b[1]-a[1]);
+    const maxSvc = sorted.length ? sorted[0][1] : 1;
+    document.getElementById('service-bars').innerHTML = sorted.length === 0
+      ? '<div class="empty-state">No interest data yet</div>'
+      : sorted.map(([key,count]) => `
+        <div class="stage-bar-row">
+          <div class="stage-bar-label">${escHtml(SERVICE_LABELS[key]||key)}</div>
+          <div class="stage-bar-track"><div class="stage-bar-fill" style="width:${Math.max((count/maxSvc)*100,6)}%;background:var(--cyan)">${count}</div></div>
+          <div class="stage-bar-count">${count}</div>
         </div>`).join('');
+
+    // Monthly enquiries
+    const monthly = {};
+    enqs.forEach(e => { const d=new Date(e.submitted_at); const k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); monthly[k]=(monthly[k]||0)+1; });
+    const months = Object.keys(monthly).sort().slice(-12);
+    if (months.length === 0) {
+      document.getElementById('monthly-chart').innerHTML = '<div style="text-align:center;color:var(--text-dim);padding:32px">No data yet</div>';
+    } else {
+      const maxM = Math.max(...months.map(m=>monthly[m]), 1);
+      document.getElementById('monthly-chart').innerHTML = `
+        <div style="display:flex;align-items:flex-end;gap:8px;height:140px;padding-bottom:24px;position:relative">
+          ${months.map(m => { const h=Math.max((monthly[m]/maxM)*120,4); return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end;position:relative"><span style="font-size:0.68rem;color:var(--lime);font-weight:600">${monthly[m]}</span><div style="width:100%;height:${h}px;background:linear-gradient(to top,#9EF54A,#5EE7D8);border-radius:4px 4px 0 0;opacity:0.85"></div><span style="position:absolute;bottom:-20px;font-size:0.62rem;color:var(--text-dim);white-space:nowrap">${new Date(m+'-01').toLocaleDateString('en-GB',{month:'short',year:'2-digit'})}</span></div>`; }).join('')}
+        </div>`;
     }
   } catch(err) {
     console.error(err);
-    document.getElementById('recent-list').innerHTML = '<div class="empty-state">Failed to load — check admin key in Settings</div>';
+    document.getElementById('service-bars').innerHTML = '<div class="empty-state">Failed to load — check login in Settings</div>';
   }
 }
 

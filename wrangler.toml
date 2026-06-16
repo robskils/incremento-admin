@@ -6,10 +6,23 @@ compatibility_date = "2024-09-23"
 pattern = "enquiries.incremento.co"
 custom_domain = true
 
+# Admin API on the same hostname as the admin pages, so the Cloudflare
+# Access (email OTP) login cookie covers API calls too. Worker routes
+# take precedence over the Pages custom domain for matching paths.
+[[routes]]
+pattern = "admin.incremento.co/api/*"
+zone_name = "incremento.co"
+
+[[routes]]
+pattern = "admin.incremento.co/auth/*"
+zone_name = "incremento.co"
+
 [vars]
 TO_EMAIL   = "robin@incremento.co"
 FROM_EMAIL = "enquiries@incremento.co"
 SITE_URL   = "https://incremento.co"
+# Emails allowed to log in to the admin (email OTP login)
+ADMIN_EMAILS = "robin@lumley-savile.com,robin@incremento.co"
 
 # ── D1 Database ───────────────────────────────────────────────────────
 # SETUP: Run `wrangler d1 create incremento-admin` then paste the ID below
