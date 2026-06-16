@@ -177,7 +177,12 @@ function renderList() {
     <div class="inbox-row" onclick="location.href='proposal.html?id='+${p.id}">
       <div class="inbox-row-header">
         <span class="inbox-row-name">${escHtml(p.title)}</span>
-        <span class="inbox-row-time">${timeAgo(p.created_at)}</span>
+        <span style="display:flex;align-items:center;gap:12px">
+          <span class="inbox-row-time">${timeAgo(p.created_at)}</span>
+          <button title="Delete proposal" onclick="event.stopPropagation();deleteProposal(${p.id})" style="background:none;border:none;color:var(--text-dim);cursor:pointer;padding:2px;line-height:0;display:flex" onmouseover="this.style.color='#ff6b6b'" onmouseout="this.style.color='var(--text-dim)'">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+          </button>
+        </span>
       </div>
       <div class="inbox-row-sub">
         <span class="prop-status ps-${p.status}">${STATUS_LABEL[p.status]||p.status}</span>
@@ -186,6 +191,18 @@ function renderList() {
         ${p.viewed_at?`<span style="font-size:0.7rem;color:var(--cyan)">👁 viewed ${timeAgo(p.viewed_at)}</span>`:''}
       </div>
     </div>`).join('');
+}
+
+async function deleteProposal(id) {
+  const p = proposals.find(x => x.id === id);
+  if (!confirm('Delete the proposal "' + (p ? p.title : '') + '"?\nThis cannot be undone.')) return;
+  try {
+    await apiFetch('/api/proposals/' + id, { method: 'DELETE' });
+    proposals = proposals.filter(x => x.id !== id);
+    renderList();
+  } catch {
+    alert('Failed to delete the proposal. Please try again.');
+  }
 }
 
 /* ── Draft picker ─────────────────────────────────────────── */

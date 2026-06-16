@@ -297,6 +297,9 @@ async function handleAdmin(request, env, url, cors) {
   if (propId && method === 'PATCH') {
     return updateProposal(parseInt(propId[1]), request, env, cors);
   }
+  if (propId && method === 'DELETE') {
+    return deleteProposal(parseInt(propId[1]), env, cors);
+  }
   if (propSend && method === 'POST') {
     return sendProposal(parseInt(propSend[1]), env, cors);
   }
@@ -957,6 +960,18 @@ async function updateProposal(id, request, env, cors) {
     return json(row || { ok: true }, 200, cors);
   } catch (err) {
     console.error('D1 proposal update error:', err);
+    return json({ error: 'Database error' }, 500, cors);
+  }
+}
+
+/* ── DELETE /api/proposals/:id → remove a proposal ──────── */
+async function deleteProposal(id, env, cors) {
+  if (!env.DB) return json({ error: 'Database not configured' }, 503, cors);
+  try {
+    await env.DB.prepare('DELETE FROM proposals WHERE id = ?').bind(id).run();
+    return json({ ok: true }, 200, cors);
+  } catch (err) {
+    console.error('D1 proposal delete error:', err);
     return json({ error: 'Database error' }, 500, cors);
   }
 }
