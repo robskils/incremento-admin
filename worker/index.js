@@ -325,6 +325,9 @@ async function handleAdmin(request, env, url, cors) {
   if (asgMatch && method === 'GET')  return listAssignees(parseInt(asgMatch[1]), env, cors);
   if (asgMatch && method === 'POST') return setAssignees(parseInt(asgMatch[1]), request, env, cors);
 
+  // Send an email to a contact (from a chosen incremento.co address, with signature, logged)
+  if (path === '/api/send-email' && method === 'POST') return sendEmail(request, env, cors);
+
   // Settings (editable proposal email template, etc.)
   if (path === '/api/settings' && method === 'GET') {
     return getSettings(env, cors);
@@ -626,6 +629,69 @@ async function setAssignees(eid, request, env, cors) {
     }
     return json({ ok: true }, 200, cors);
   } catch (e) { console.error('setAssignees', e); return json({ error: 'Database error' }, 500, cors); }
+}
+
+/* ── Send email from a chosen incremento.co address ──────── */
+const SEND_SIGS = {
+  'robin@incremento.co':   { fromName: 'Robin Savile', name: 'Robin Savile', role: 'Founder, Incremento', tagline: 'Your complete digital solution' },
+  'contact@incremento.co': { fromName: 'Incremento',   name: 'Incremento',    role: '',                    tagline: 'Your complete digital solution' },
+  'contacto@incremento.co':{ fromName: 'Incremento',   name: 'Incremento',    role: '',                    tagline: 'A sua solução digital completa' },
+  'help@incremento.co':    { fromName: 'Incremento Support', name: 'Incremento Support', role: '',          tagline: 'Here to help' },
+};
+
+function escEmail(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function buildSentEmailHtml(bodyText, sig) {
+  return `
+  <div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.65;color:#1a2733">
+    <div style="white-space:pre-wrap">${escEmail(bodyText)}</div>
+    <table cellpadding="0" cellspacing="0" border="0" style="margin-top:26px"><tr><td style="background:#0e1820;border-radius:12px;padding:18px 22px;">
+      <div style="font-family:'Space Grotesk',Arial,sans-serif;font-size:18px;font-weight:700;color:#eef3f8">incremento<span style="color:#9EF54A">.</span></div>
+      <div style="margin-top:10px;font-size:15px;color:#ffffff;font-weight:bold">${escEmail(sig.name)}</div>
+      ${sig.role ? `<div style="font-size:12px;color:#9fb3c6;margin-top:1px">${escEmail(sig.role)}</div>` : ''}
+      <div style="margin-top:9px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#5EE7D8">${escEmail(sig.tagline)}</div>
+      <div style="margin-top:9px;font-size:12px"><a href="https://incremento.co" style="color:#9EF54A;text-decoration:none">incremento.co</a></div>
+    </td></tr></table>
+  </div>`;
+}
+
+async function sendEmail(request, env, cors) {
+  if (!env.RESEND_API_KEY) return json({ error: 'Email not configured' }, 503, cors);
+  let b; try { b = await request.json(); } catch { return json({ error: 'Invalid JSON' }, 400, cors); }
+  const from = SEND_SIGS[(b.from || '').toLowerCase()] ? b.from.toLowerCase() : 'contact@incremento.co';
+  const to = (b.to || '').trim();
+  const subject = (b.subject || '').trim();
+  const bodyText = (b.body || '').trim();
+  if (!to)       return json({ error: 'Recipient required' }, 400, cors);
+  if (!bodyText) return json({ error: 'Message body required' }, 400, cors);
+  const sig = SEND_SIGS[from];
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: `${sig.fromName} <${from}>`,
+        to: [to],
+        reply_to: from,
+        subject: subject || '(no subject)',
+        html: buildSentEmailHtml(bodyText, sig),
+        text: bodyText + '\n\n— ' + sig.name + '\nincremento.co',
+      }),
+    });
+    if (!res.ok) {
+      const detail = await res.text().catch(() => '');
+      return json({ error: 'Send failed', detail }, 502, cors);
+    }
+    await logMessage(env, {
+      contact_email: to, enquiry_id: b.enquiry_id || null,
+      direction: 'outbound', kind: 'email', source: 'admin',
+      subject, body: bodyText,
+    });
+    return json({ ok: true }, 200, cors);
+  } catch (e) {
+    console.error('sendEmail error:', e);
+    return json({ error: 'Send error' }, 500, cors);
+  }
 }
 
 /* ── POST / → form submission ────────────────────────────── */
