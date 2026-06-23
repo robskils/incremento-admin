@@ -14,9 +14,9 @@
 <div id="login-overlay" style="display:none;position:fixed;inset:0;background:rgba(10,18,25,0.97);z-index:999;align-items:center;justify-content:center">
   <div style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:40px;width:100%;max-width:380px;text-align:center">
     <svg width="36" height="36" viewBox="0 0 32 32" fill="none" style="margin:0 auto 16px"><defs><linearGradient id="lg" x1="0" y1="32" x2="32" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#9EF54A"/><stop offset="100%" stop-color="#5EE7D8"/></linearGradient></defs><rect x="4" y="20" width="5" height="8" rx="2.5" fill="url(#lg)" opacity="0.55"/><rect x="12" y="14" width="5" height="14" rx="2.5" fill="url(#lg)" opacity="0.78"/><rect x="20" y="10" width="5" height="18" rx="2.5" fill="url(#lg)"/><circle cx="22.5" cy="5.5" r="2.25" fill="url(#lg)"/></svg>
-    <p style="font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:600;color:var(--text);margin-bottom:6px">incremento<span style="color:var(--lime)">.</span> admin</p>
-    <p style="font-size:0.78rem;color:var(--text-dim);margin-bottom:24px">Enter your admin key to continue</p>
-    <input id="login-key" type="password" placeholder="Admin key" style="width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;font-family:'Inter',sans-serif;font-size:0.88rem;color:var(--text);outline:none;margin-bottom:12px">
+    <p style="font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:600;color:var(--text);margin-bottom:6px">incremento<span style="color:var(--lime)">.</span> admin</p>
+    <p style="font-size:1.1875rem;color:var(--text-dim);margin-bottom:24px">Enter your admin key to continue</p>
+    <input id="login-key" type="password" placeholder="Admin key" style="width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;font-family:'Inter',sans-serif;font-size:1.1875rem;color:var(--text);outline:none;margin-bottom:12px">
     <button id="login-btn" class="btn-primary" style="width:100%;justify-content:center">Unlock</button>
   </div>
 </div>
@@ -31,6 +31,7 @@
   </div>
   <nav class="sidebar-nav">
     <a class="nav-item" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a class="nav-item" href="triage.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>Triage<span class="nav-badge" id="triage-badge" style="display:none"></span></a>
     <a class="nav-item" href="pipeline.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Pipeline</a>
     <a class="nav-item" href="proposals.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Proposals</a>
     <a class="nav-item active" href="contacts.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Contacts</a>
@@ -63,29 +64,70 @@
   </div>
 </main>
 
+<!-- ── CONTACT CARD MODAL ──────────────────────────────────── -->
+<div class="modal-overlay" id="contact-modal" style="display:none" onclick="if(event.target===this)closeContact()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">Contact</div>
+      <button class="modal-close" onclick="closeContact()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body" id="contact-card-body"></div>
+  </div>
+</div>
+
 <script src="admin.js"></script>
 <script>
-let contacts = [];
+let people = [];          // one record per person (by email)
+let peopleByKey = {};
 let searchTerm = '';
 function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function jsStr(s) { return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
 function initials(name) { return (name||'?').split(' ').map(p=>p[0]||'').slice(0,2).join('').toUpperCase(); }
 
 async function loadContacts() {
   try {
-    const data = await apiFetch('/api/enquiries?limit=500');
-    const enqs = data.enquiries || [];
-    // Deduplicate by email, keep latest
+    // A person = one email, built from BOTH the enquiries (deal owners) and the
+    // contacts table (people added to deals, with role/phone). Merge the two.
+    const [eRes, cRes] = await Promise.all([
+      apiFetch('/api/enquiries?limit=500').catch(()=>({enquiries:[]})),
+      apiFetch('/api/contacts').catch(()=>({contacts:[]})),
+    ]);
+    const enquiries = eRes.enquiries || [];
+    const allContacts = cRes.contacts || [];
+    const byId = {}; enquiries.forEach(e => { byId[e.id] = e; });
+
     const map = {};
-    enqs.forEach(e => {
-      const key = (e.email||'').toLowerCase();
-      if (!map[key] || new Date(e.submitted_at) > new Date(map[key].submitted_at)) {
-        map[key] = { ...e, enquiry_count: (map[key]?.enquiry_count||0) + 1 };
-      } else {
-        map[key].enquiry_count = (map[key].enquiry_count||1) + 1;
-      }
+    const ensure = (email, name) => {
+      const k = (email||'').toLowerCase().trim();
+      if (!k) return null;
+      if (!map[k]) map[k] = { key:k, email:email, name:name||'', role:'', phone:'', company:'', deals:[], _ids:{}, last:null };
+      return map[k];
+    };
+    const addDeal = (p, e) => {
+      if (p._ids[e.id]) return;
+      p._ids[e.id] = 1;
+      p.deals.push({ id:e.id, title: e.project_title || e.company || (e.name + ' - enquiry'), stage:e.stage, company:e.company, submitted_at:e.submitted_at, value:e.value });
+      if (!p.last || new Date(e.submitted_at) > new Date(p.last)) p.last = e.submitted_at;
+    };
+
+    enquiries.forEach(e => {
+      const p = ensure(e.email, e.name); if (!p) return;
+      if (!p.name) p.name = e.name;
+      if (!p.company && e.company) p.company = e.company;
+      addDeal(p, e);
     });
-    contacts = Object.values(map).sort((a,b) => new Date(b.submitted_at) - new Date(a.submitted_at));
-    document.getElementById('contacts-sub').textContent = contacts.length + ' unique contact' + (contacts.length===1?'':'s');
+    allContacts.forEach(c => {
+      const p = ensure(c.email, c.name); if (!p) return;
+      if (c.name && !p.name) p.name = c.name;
+      if (c.role && !p.role)  p.role = c.role;
+      if (c.phone && !p.phone) p.phone = c.phone;
+      const e = byId[c.enquiry_id];
+      if (e) { if (!p.company && e.company) p.company = e.company; addDeal(p, e); }
+    });
+
+    people = Object.values(map).sort((a,b) => new Date(b.last||0) - new Date(a.last||0));
+    peopleByKey = map;
+    document.getElementById('contacts-sub').textContent = people.length + ' contact' + (people.length===1?'':'s');
     renderContacts();
   } catch {
     document.getElementById('contacts-list').innerHTML = '<div class="empty-state">Failed to load</div>';
@@ -93,38 +135,76 @@ async function loadContacts() {
 }
 
 function renderContacts() {
-  let list = contacts;
+  let list = people;
   if (searchTerm) {
     const q = searchTerm.toLowerCase();
-    list = list.filter(c =>
-      (c.name||'').toLowerCase().includes(q) ||
-      (c.email||'').toLowerCase().includes(q) ||
-      (c.company||'').toLowerCase().includes(q)
+    list = list.filter(p =>
+      (p.name||'').toLowerCase().includes(q) ||
+      (p.email||'').toLowerCase().includes(q) ||
+      (p.company||'').toLowerCase().includes(q) ||
+      (p.role||'').toLowerCase().includes(q)
     );
   }
   if (list.length === 0) {
     document.getElementById('contacts-list').innerHTML = '<div class="empty-state">No contacts found</div>';
     return;
   }
-  document.getElementById('contacts-list').innerHTML = list.map(c => `
-    <div class="contact-row" onclick="location.href='enquiry.html?id=${c.id}'">
-      <div class="contact-avatar">${escHtml(initials(c.name))}</div>
+  document.getElementById('contacts-list').innerHTML = list.map(p => `
+    <div class="contact-row" onclick="openContact('${jsStr(p.key)}')">
+      <div class="contact-avatar">${escHtml(initials(p.name))}</div>
       <div class="contact-info">
-        <div class="contact-name">${escHtml(c.name)}${c.company?` <span style="color:var(--text-dim);font-size:0.78rem;font-weight:400">· ${escHtml(c.company)}</span>`:''}</div>
-        <div class="contact-detail">${escHtml(c.email)} · Last: ${timeAgo(c.submitted_at)} · ${stageBadge(c.stage)}</div>
+        <div class="contact-name">${escHtml(p.name)}${p.company?` <span style="color:var(--text-dim);font-size:1.1875rem;font-weight:400">· ${escHtml(p.company)}</span>`:''}</div>
+        <div class="contact-detail">${escHtml(p.email)}${p.role?' · '+escHtml(p.role):''} · ${p.deals.length} deal${p.deals.length===1?'':'s'} · Last: ${timeAgo(p.last)}</div>
       </div>
       <div class="contact-actions">
-        <a class="contact-btn" href="mailto:${escHtml(c.email)}?subject=Following up — Incremento" onclick="event.stopPropagation()">
+        <a class="contact-btn" href="mailto:${escHtml(p.email)}?subject=Following up - Incremento" onclick="event.stopPropagation()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
           Email
         </a>
-        <button class="contact-btn" onclick="event.stopPropagation();location.href='enquiry.html?id=${c.id}'">
+        <button class="contact-btn" onclick="event.stopPropagation();openContact('${jsStr(p.key)}')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          View
+          Open
         </button>
       </div>
     </div>`).join('');
 }
+
+/* ── Contact card (full person record) ─────────────────────── */
+function openContact(key) {
+  const p = peopleByKey[key]; if (!p) return;
+  const mailto = `mailto:${escHtml(p.email)}?subject=Following up - Incremento`;
+  const row = (label, val) => val ? `<div style="display:flex;gap:16px;padding:11px 0;border-bottom:1px solid var(--border)">
+      <span style="flex:0 0 120px;color:var(--text-dim);font-size:1.0625rem;letter-spacing:0.04em;text-transform:uppercase">${label}</span>
+      <span style="flex:1;color:var(--text);min-width:0;overflow-wrap:anywhere">${val}</span></div>` : '';
+  const deals = p.deals.slice().sort((a,b) => new Date(b.submitted_at) - new Date(a.submitted_at));
+  const dealSummary = deals.length
+    ? deals.map(d => `<div style="margin-bottom:5px"><a href="enquiry.html?id=${d.id}" style="color:var(--cyan);text-decoration:none">${escHtml(d.title)}</a> ${stageBadge(d.stage)}</div>`).join('')
+    : '<span style="color:var(--text-dim)">No deal yet</span>';
+  const phoneVal = p.phone
+    ? `<a href="tel:${escHtml(p.phone)}" style="color:var(--cyan);text-decoration:none">${escHtml(p.phone)}</a>`
+    : '<span style="color:var(--text-dim)">Not on file</span>';
+  document.getElementById('contact-card-body').innerHTML = `
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+      <div class="contact-avatar" style="width:54px;height:54px;font-size:1.4rem;flex:0 0 auto">${escHtml(initials(p.name))}</div>
+      <div style="min-width:0">
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:1.45rem;font-weight:600;color:var(--text)">${escHtml(p.name)}</div>
+        ${p.company?`<div style="color:var(--text-dim);font-size:1.1875rem">${escHtml(p.company)}</div>`:''}
+      </div>
+    </div>
+    ${row('Email', `<a href="${mailto}" style="color:var(--cyan);text-decoration:none">${escHtml(p.email||'-')}</a>`)}
+    ${row('Phone', phoneVal)}
+    ${row('Role', p.role ? escHtml(p.role) : '')}
+    ${row('Last contact', timeAgo(p.last))}
+    ${row(deals.length>1?'Deals':'Deal', dealSummary)}
+    <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap">
+      <a class="btn-ghost" href="${mailto}">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Email
+      </a>
+    </div>`;
+  document.getElementById('contact-modal').style.display = 'flex';
+}
+function closeContact(){ document.getElementById('contact-modal').style.display = 'none'; }
 
 document.getElementById('search-input').addEventListener('input', e => {
   searchTerm = e.target.value.trim();

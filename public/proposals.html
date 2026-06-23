@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="admin.css">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <style>
-.prop-status{display:inline-flex;align-items:center;gap:5px;font-size:0.68rem;font-weight:600;padding:3px 9px;border-radius:20px;letter-spacing:0.04em;text-transform:uppercase}
+.prop-status{display:inline-flex;align-items:center;gap:5px;font-size:1.1875rem;font-weight:600;padding:3px 9px;border-radius:20px;letter-spacing:0.04em;text-transform:uppercase}
 .ps-draft{background:rgba(148,163,184,0.12);color:#94a3b8}
 .ps-sent{background:rgba(245,158,11,0.12);color:#f59e0b}
 .ps-viewed{background:rgba(94,231,216,0.12);color:#5EE7D8}
@@ -18,19 +18,78 @@
 .editor-section{margin-bottom:22px}
 .editor-section .detail-label{margin-bottom:8px}
 .ed-item{display:flex;gap:8px;margin-bottom:8px;align-items:flex-start}
-.ed-item input,.ed-item textarea{flex:1;padding:8px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;font-family:'Inter',sans-serif;font-size:0.84rem;color:var(--text);outline:none;resize:vertical}
+.ed-item input,.ed-item textarea,.ed-item select{flex:1;padding:8px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;font-family:'Inter',sans-serif;font-size:1.1875rem;color:var(--text);outline:none;resize:vertical}
+.lib-svc-head{font-family:'Space Grotesk',sans-serif;font-size:1.35rem;font-weight:600;color:var(--text);display:flex;align-items:center;gap:10px}
+.lib-svc-count{font-size:1.0625rem;font-weight:400;color:#0a1219;background:var(--cyan);border-radius:20px;padding:1px 10px}
+.lib-svc-empty .lib-svc-count{background:var(--surface3);color:var(--text-dim)}
 .ed-item .ed-narrow{flex:0 0 110px}
-.ed-del{flex:0 0 auto;background:none;border:none;color:var(--text-dim);cursor:pointer;padding:8px 4px;font-size:1rem;line-height:1}
+.ed-del{flex:0 0 auto;background:none;border:none;color:var(--text-dim);cursor:pointer;padding:8px 4px;font-size:1.1875rem;line-height:1}
 .ed-del:hover{color:#ef4444}
-.ed-add{background:none;border:1px dashed var(--border2);color:var(--text-dim);border-radius:8px;padding:7px 14px;font-size:0.78rem;cursor:pointer;font-family:'Inter',sans-serif}
+.ed-add{background:none;border:1px dashed var(--border2);color:var(--text-dim);border-radius:8px;padding:7px 14px;font-size:1.1875rem;cursor:pointer;font-family:'Inter',sans-serif}
 .ed-add:hover{color:var(--lime);border-color:var(--lime)}
 .modal.modal-wide{max-width:760px;width:94vw}
 .draft-pick{padding:12px 16px;border:1px solid var(--border2);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:border-color 0.15s}
 .draft-pick:hover{border-color:var(--lime)}
-.draft-pick .dp-name{font-weight:600;font-size:0.9rem}
-.draft-pick .dp-meta{font-size:0.74rem;color:var(--text-dim);margin-top:2px}
+.draft-pick .dp-name{font-weight:600;font-size:1.1875rem}
+.draft-pick .dp-meta{font-size:1.1875rem;color:var(--text-dim);margin-top:2px}
 .spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(10,18,25,0.3);border-top-color:#0a1219;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:-2px}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* Hub overview stats */
+.prop-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:22px}
+.prop-stat{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 18px}
+.prop-stat .ps-num{font-family:'Space Grotesk',sans-serif;font-size:1.55rem;font-weight:600;color:var(--text);line-height:1.1}
+.prop-stat .ps-lbl{font-size:1.1875rem;color:var(--text-dim);margin-top:4px}
+
+/* Hub tabs */
+.hub-tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:22px;flex-wrap:wrap}
+.hub-tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--text-dim);font-family:'Space Grotesk',sans-serif;font-size:1.1875rem;font-weight:500;padding:10px 16px;cursor:pointer;margin-bottom:-1px}
+.hub-tab:hover{color:var(--text-sub)}
+.hub-tab.active{color:var(--lime);border-bottom-color:var(--lime)}
+.hub-panel{display:none}
+.hub-panel.active{display:block}
+
+/* Component library */
+.lib-group{margin-bottom:26px}
+.lib-group-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.lib-group-title{font-family:'Space Grotesk',sans-serif;font-size:1.1875rem;font-weight:600;color:var(--text)}
+.lib-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.lib-card{background:var(--surface2);border:1px solid var(--border2);border-radius:12px;padding:14px 16px;position:relative}
+.lib-card .lc-title{font-size:1.1875rem;font-weight:600;color:var(--text);padding-right:46px}
+.lib-card .lc-body{font-size:1.1875rem;color:var(--text-sub);line-height:1.5;margin-top:5px;white-space:pre-wrap}
+.lib-card .lc-meta{font-size:1.1875rem;color:var(--cyan);margin-top:6px}
+.lib-card .lc-actions{position:absolute;top:11px;right:12px;display:flex;gap:6px}
+.lib-card .lc-btn{background:none;border:none;color:var(--text-dim);cursor:pointer;padding:2px;line-height:0;display:flex}
+.lib-card .lc-btn:hover{color:var(--lime)}
+.lib-card .lc-btn.del:hover{color:#ff6b6b}
+.lib-empty{font-size:1.1875rem;color:var(--text-dim);padding:10px 0}
+.lib-card .lc-section{font-size:1.0625rem;color:var(--text-dim);margin-top:6px}
+
+/* Proposal structure */
+.struct-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-bottom:14px}
+.struct-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.struct-num{flex:0 0 auto;width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--lime),var(--cyan));color:#0a1219;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.1875rem;display:flex;align-items:center;justify-content:center}
+.struct-title{flex:1 1 auto;min-width:0;padding:9px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;font-family:'Space Grotesk',sans-serif;font-size:1.35rem;font-weight:600;color:var(--text);outline:none}
+.struct-title:focus{border-color:var(--lime)}
+.struct-count{flex:0 0 auto;font-size:1.0625rem;color:var(--text-dim);background:var(--surface3);border-radius:20px;padding:3px 11px;white-space:nowrap}
+.struct-count.has{background:rgba(94,231,216,0.14);color:var(--cyan)}
+.struct-tools{flex:0 0 auto;display:flex;gap:4px}
+.struct-tools .lc-btn{background:none;border:none;color:var(--text-dim);cursor:pointer;padding:5px;line-height:0;display:flex;border-radius:6px}
+.struct-tools .lc-btn:hover{color:var(--lime);background:var(--surface2)}
+.struct-tools .lc-btn.del:hover{color:#ff6b6b}
+.struct-tools .lc-btn:disabled{opacity:0.3;cursor:not-allowed}
+.struct-lbl{display:block;font-size:1.0625rem;color:var(--text-sub);font-weight:600;margin:0 0 5px 2px}
+.struct-lbl span{color:var(--text-dim);font-weight:400}
+.struct-card textarea{width:100%;box-sizing:border-box;padding:10px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;font-family:'Inter',sans-serif;font-size:1.1875rem;color:var(--text);outline:none;resize:vertical;margin-bottom:14px;line-height:1.5}
+.struct-card textarea:focus{border-color:var(--lime)}
+.struct-actions{display:flex;align-items:center;gap:12px}
+.struct-status{font-size:1.0625rem;color:var(--text-dim)}
+
+/* Branding reference */
+.brand-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:22px}
+.brand-swatch{border-radius:12px;padding:16px;border:1px solid var(--border2);min-height:74px;display:flex;flex-direction:column;justify-content:flex-end}
+.brand-swatch .bs-name{font-size:1.1875rem;font-weight:600}
+.brand-swatch .bs-hex{font-size:1.1875rem;opacity:0.85;font-family:monospace}
 </style>
 </head>
 <body>
@@ -39,9 +98,9 @@
 <div id="login-overlay" style="display:none;position:fixed;inset:0;background:rgba(10,18,25,0.97);z-index:999;align-items:center;justify-content:center">
   <div style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:40px;width:100%;max-width:380px;text-align:center">
     <svg width="36" height="36" viewBox="0 0 32 32" fill="none" style="margin:0 auto 16px"><defs><linearGradient id="lg" x1="0" y1="32" x2="32" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#9EF54A"/><stop offset="100%" stop-color="#5EE7D8"/></linearGradient></defs><rect x="4" y="20" width="5" height="8" rx="2.5" fill="url(#lg)" opacity="0.55"/><rect x="12" y="14" width="5" height="14" rx="2.5" fill="url(#lg)" opacity="0.78"/><rect x="20" y="10" width="5" height="18" rx="2.5" fill="url(#lg)"/><circle cx="22.5" cy="5.5" r="2.25" fill="url(#lg)"/></svg>
-    <p style="font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:600;color:var(--text);margin-bottom:6px">incremento<span style="color:var(--lime)">.</span> admin</p>
-    <p style="font-size:0.78rem;color:var(--text-dim);margin-bottom:24px">Enter your admin key to continue</p>
-    <input id="login-key" type="password" placeholder="Admin key" style="width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;font-family:'Inter',sans-serif;font-size:0.88rem;color:var(--text);outline:none;margin-bottom:12px">
+    <p style="font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:600;color:var(--text);margin-bottom:6px">incremento<span style="color:var(--lime)">.</span> admin</p>
+    <p style="font-size:1.1875rem;color:var(--text-dim);margin-bottom:24px">Enter your admin key to continue</p>
+    <input id="login-key" type="password" placeholder="Admin key" style="width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;font-family:'Inter',sans-serif;font-size:1.1875rem;color:var(--text);outline:none;margin-bottom:12px">
     <button id="login-btn" class="btn-primary" style="width:100%;justify-content:center">Unlock</button>
   </div>
 </div>
@@ -57,6 +116,7 @@
   </div>
   <nav class="sidebar-nav">
     <a class="nav-item" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a class="nav-item" href="triage.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>Triage<span class="nav-badge" id="triage-badge" style="display:none"></span></a>
     <a class="nav-item" href="pipeline.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Pipeline</a>
     <a class="nav-item active" href="proposals.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Proposals</a>
     <a class="nav-item" href="contacts.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Contacts</a>
@@ -74,7 +134,7 @@
   <div class="page-header">
     <div>
       <div class="page-title">Proposals</div>
-      <div class="page-sub" id="prop-count"></div>
+      <div class="page-sub">Your central hub for everything proposals — pipeline, components, email &amp; brand</div>
     </div>
     <button class="btn-primary" onclick="openDraftPicker()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
@@ -82,24 +142,62 @@
     </button>
   </div>
 
-  <div class="panel">
-    <div id="prop-list">
-      <div class="empty-state">Loading…</div>
-    </div>
+  <!-- Overview stats (always visible) -->
+  <div class="prop-stats" id="prop-stats"></div>
+
+  <!-- Tabs -->
+  <div class="hub-tabs">
+    <button class="hub-tab active" data-tab="list"      onclick="switchTab('list')">Proposals <span id="prop-count-pill" style="color:var(--text-dim);font-weight:400"></span></button>
+    <button class="hub-tab"        data-tab="structure" onclick="switchTab('structure')">Proposal Structure</button>
+    <button class="hub-tab"        data-tab="library"   onclick="switchTab('library')">Components</button>
+    <button class="hub-tab"        data-tab="email"     onclick="switchTab('email')">Email</button>
+    <button class="hub-tab"        data-tab="branding"  onclick="switchTab('branding')">Branding</button>
   </div>
 
-  <!-- Proposal email template -->
-  <div class="panel" style="margin-top:20px">
-    <div class="panel-header" onclick="toggleProposalEmail()" style="cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between">
-      <span class="panel-title">Proposal Email</span>
-      <svg id="pe-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-linecap="round" style="transition:transform .2s"><polyline points="6 9 12 15 18 9"/></svg>
+  <!-- ── TAB: Proposals list ─────────────────────────────── -->
+  <section class="hub-panel active" id="panel-list">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+      <button class="btn-ghost" id="archived-toggle" onclick="toggleArchived()" style="font-size:1.0625rem;padding:6px 12px">Show archived</button>
     </div>
-    <div id="pe-body" style="padding:20px;display:none">
-      <p class="settings-row-sub" style="margin-bottom:16px">The wording of the email clients receive when you send a proposal. The branded header, the green “View your proposal” button and the footer stay fixed. Use <code style="color:var(--lime)">{name}</code>, <code style="color:var(--lime)">{title}</code> and <code style="color:var(--lime)">{company}</code> — they’re filled in automatically.</p>
+    <div class="panel">
+      <div id="prop-list"><div class="empty-state">Loading…</div></div>
+    </div>
+  </section>
+
+  <!-- ── TAB: Proposal Structure ─────────────────────────── -->
+  <section class="hub-panel" id="panel-structure">
+    <div class="panel" style="padding:20px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
+      <p class="settings-row-sub" style="margin:0;flex:1 1 320px">The skeleton of every proposal, in order. <strong style="color:var(--text)">Shared content</strong> in a section appears in every proposal you create; leave it blank to write that section fresh each time. Components from the Components tab attach to these sections.</p>
+      <button class="btn-primary" onclick="addSection()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        Add section
+      </button>
+    </div>
+    <div id="structure-list"><div class="empty-state">Loading structure…</div></div>
+  </section>
+
+  <!-- ── TAB: Components ─────────────────────────────────── -->
+  <section class="hub-panel" id="panel-library">
+    <div class="panel" style="padding:20px;margin-bottom:20px">
+      <p class="settings-row-sub" style="margin:0">Your menu of services and the components within each - the specialities you offer, in consistent, client-ready wording. Pick a service (SEO, AI &amp; Automation, Hosting &amp; Infrastructure...), grab the components you want (on-page optimisation, keyword research, Google Analytics setup...), and copy them straight into a proposal.</p>
+    </div>
+    <div id="lib-content"><div class="empty-state">Loading library…</div></div>
+  </section>
+
+  <!-- ── TAB: Email ──────────────────────────────────────── -->
+  <section class="hub-panel" id="panel-email">
+    <div class="panel" style="padding:20px">
+      <p class="settings-row-sub" style="margin-bottom:16px">The wording of the email clients receive when you send a proposal. The branded header, the green “View your proposal” button and the footer stay fixed. Use <code style="color:var(--lime)">{name}</code>, <code style="color:var(--lime)">{title}</code> and <code style="color:var(--lime)">{company}</code> - they’re filled in automatically. Each client's <strong style="color:var(--text)">communication language</strong> (set on their deal) decides which set is used.</p>
+
+      <div class="lang-toggle" id="email-lang-toggle" style="margin-bottom:18px">
+        <button type="button" class="lang-opt active" data-lang="en" onclick="switchEmailLang('en')">English</button>
+        <button type="button" class="lang-opt" data-lang="pt" onclick="switchEmailLang('pt')">Português</button>
+      </div>
 
       <div style="margin-bottom:16px">
         <div class="detail-label" style="margin-bottom:6px">Greeting</div>
-        <div class="settings-row-sub">Fixed: “Hi {name},” — automatic.</div>
+        <input id="tpl-greeting" class="value-input" style="width:100%;box-sizing:border-box" placeholder="Hi {name},">
+        <div class="settings-row-sub" style="margin-top:5px">Use <code style="color:var(--lime)">{name}</code> for the client's name.</div>
       </div>
 
       <div style="margin-bottom:16px">
@@ -124,11 +222,105 @@
           Save email template
         </button>
         <button class="btn-ghost" id="tpl-reset" onclick="resetTemplate()">Reset to default</button>
-        <span id="tpl-status" style="font-size:0.78rem;color:var(--text-dim)"></span>
+        <span id="tpl-status" style="font-size:1.1875rem;color:var(--text-dim)"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TAB: Branding ───────────────────────────────────── -->
+  <section class="hub-panel" id="panel-branding">
+    <div class="panel" style="padding:24px;margin-bottom:20px">
+      <div class="detail-label" style="margin-bottom:6px">“Why Incremento” section</div>
+      <p class="settings-row-sub" style="margin-bottom:16px">The pitch that appears near the end of every proposal page (the “Why Incremento” section and the “Led by Robin” note). Edited per language - the proposal uses the set matching the client's language.</p>
+
+      <div class="lang-toggle" id="why-lang-toggle" style="margin-bottom:18px">
+        <button type="button" class="lang-opt active" data-lang="en" onclick="switchWhyLang('en')">English</button>
+        <button type="button" class="lang-opt" data-lang="pt" onclick="switchWhyLang('pt')">Português</button>
+      </div>
+
+      <div style="margin-bottom:16px">
+        <div class="detail-label" style="margin-bottom:6px">Why Incremento</div>
+        <textarea id="why-text" class="notes-textarea" rows="5" style="width:100%;box-sizing:border-box"></textarea>
+      </div>
+
+      <div style="margin-bottom:16px">
+        <div class="detail-label" style="margin-bottom:6px">“Led by” heading</div>
+        <input id="why-ledby-heading" class="value-input" style="width:100%;box-sizing:border-box" placeholder="Led by Robin Savile">
+      </div>
+
+      <div style="margin-bottom:18px">
+        <div class="detail-label" style="margin-bottom:6px">“Led by” paragraph</div>
+        <textarea id="why-ledby-text" class="notes-textarea" rows="5" style="width:100%;box-sizing:border-box"></textarea>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:center">
+        <button class="btn-primary" id="why-save" onclick="saveWhy()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Save “Why Incremento”
+        </button>
+        <button class="btn-ghost" onclick="resetWhy()">Reset to default</button>
+        <span id="why-status" style="font-size:1.0625rem;color:var(--text-dim)"></span>
+      </div>
+      <p class="settings-row-sub" style="margin-top:10px">The “Why Incremento” heading itself and the 6 / 20+ / 4 stats stay fixed. Line breaks are kept.</p>
+    </div>
+
+    <div class="panel" style="padding:24px">
+      <div class="detail-label" style="margin-bottom:6px">Proposal palette</div>
+      <p class="settings-row-sub" style="margin-bottom:16px">Every proposal page is rendered in the Incremento dark theme. These are the fixed brand elements.</p>
+      <div class="brand-grid">
+        <div class="brand-swatch" style="background:#0e1820"><span class="bs-name" style="color:#fff">Midnight</span><span class="bs-hex" style="color:#9fb1bd">#0e1820</span></div>
+        <div class="brand-swatch" style="background:#9EF54A"><span class="bs-name" style="color:#0e1820">Lime (accept)</span><span class="bs-hex" style="color:#173a08">#9EF54A</span></div>
+        <div class="brand-swatch" style="background:#5EE7D8"><span class="bs-name" style="color:#0e1820">Cyan</span><span class="bs-hex" style="color:#0c3b36">#5EE7D8</span></div>
+        <div class="brand-swatch" style="background:#f59e0b"><span class="bs-name" style="color:#0e1820">Amber (sent)</span><span class="bs-hex" style="color:#3d2702">#f59e0b</span></div>
+      </div>
+
+      <div class="detail-label" style="margin:18px 0 8px">“View your proposal” button</div>
+      <div style="margin-bottom:20px"><span style="display:inline-block;background:#9EF54A;color:#0e1820;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:1.1875rem;padding:11px 22px;border-radius:10px">View your proposal →</span></div>
+
+      <div class="detail-label" style="margin-bottom:6px">Type</div>
+      <p class="settings-row-sub" style="margin-bottom:18px">Headings: <strong style="font-family:'Space Grotesk',sans-serif;color:var(--text)">Space Grotesk</strong> · Body: <strong style="color:var(--text)">Inter</strong> · Footer: <span style="color:var(--text-dim)">incremento.co · Lisbon</span></p>
+
+      <a class="btn-ghost" href="brand.html">Open full brand assets →</a>
+    </div>
+  </section>
+</main>
+
+<!-- ── ADD / EDIT COMPONENT MODAL ──────────────────────────── -->
+<div class="modal-overlay" id="block-modal" style="display:none" onclick="if(event.target===this)closeBlock()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title" id="block-modal-title">New component</div>
+      <button class="modal-close" onclick="closeBlock()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="block-id">
+      <div class="editor-section">
+        <div class="detail-label">Service</div>
+        <div class="ed-item"><select id="block-service"></select></div>
+      </div>
+      <div class="editor-section">
+        <div class="detail-label">Proposal section <span style="color:var(--text-dim);font-weight:400">- where this fits in the proposal</span></div>
+        <div class="ed-item"><select id="block-section"></select></div>
+      </div>
+      <div class="editor-section">
+        <div class="detail-label">Component</div>
+        <div class="ed-item"><input id="block-title" placeholder="e.g. On-page optimisation"></div>
+      </div>
+      <div class="editor-section">
+        <div class="detail-label">Description <span style="color:var(--text-dim);font-weight:400">(client-facing wording)</span></div>
+        <div class="ed-item"><textarea id="block-body" rows="4" placeholder="What this includes, in the words a client will read"></textarea></div>
+      </div>
+      <div class="editor-section">
+        <div class="detail-label">Default price (€) <span style="color:var(--text-dim);font-weight:400">- optional, can be set per proposal</span></div>
+        <div class="ed-item"><input id="block-price" type="number" placeholder="leave blank to price per deal"></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;justify-content:flex-end">
+        <button class="btn-ghost" onclick="closeBlock()">Cancel</button>
+        <button class="btn-primary" id="block-save" onclick="saveBlock()">Save component</button>
       </div>
     </div>
   </div>
-</main>
+</div>
 
 <!-- ── DRAFT PICKER MODAL (choose an enquiry) ──────────────── -->
 <div class="modal-overlay" id="picker-modal" style="display:none" onclick="if(event.target===this)closePicker()">
@@ -138,7 +330,7 @@
       <button class="modal-close" onclick="closePicker()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
-      <p style="font-size:0.82rem;color:var(--text-dim);margin-bottom:14px">Pick an enquiry — Claude drafts the proposal from their message, then you edit and send.</p>
+      <p style="font-size:1.1875rem;color:var(--text-dim);margin-bottom:14px">Pick an enquiry — Claude drafts the proposal from their message, then you edit and send.</p>
       <div id="picker-list"><div class="empty-state">Loading enquiries…</div></div>
       <div style="margin-top:14px;text-align:center">
         <button class="ed-add" onclick="location.href='proposal.html'">Or start from a blank proposal</button>
@@ -160,45 +352,88 @@ const eur = n => '€' + Number(n||0).toLocaleString();
 
 const STATUS_LABEL = { draft:'Draft', sent:'Sent', viewed:'Viewed', accepted:'Accepted', declined:'Declined' };
 
+let showingArchived = false;
 async function loadProposals() {
   try {
-    const data = await apiFetch('/api/proposals');
+    const data = await apiFetch('/api/proposals' + (showingArchived ? '?archived=1' : ''));
     proposals = data.proposals || [];
     renderList();
   } catch {
     document.getElementById('prop-list').innerHTML = '<div class="empty-state">Failed to load proposals</div>';
   }
 }
+function toggleArchived() {
+  showingArchived = !showingArchived;
+  document.getElementById('archived-toggle').textContent = showingArchived ? 'Show active' : 'Show archived';
+  loadProposals();
+}
+
+function renderStats() {
+  const by = s => proposals.filter(p => p.status === s).length;
+  const pipelineVal = proposals.filter(p => !['declined'].includes(p.status)).reduce((s,p)=>s+Number(p.total_value||0),0);
+  const acceptedVal = proposals.filter(p => p.status==='accepted').reduce((s,p)=>s+Number(p.total_value||0),0);
+  const decided = by('accepted') + by('declined');
+  const winRate = decided ? Math.round(by('accepted')/decided*100) : null;
+  const stats = [
+    { num: proposals.length,                 lbl: 'Total proposals' },
+    { num: by('sent')+by('viewed'),         lbl: 'Awaiting decision' },
+    { num: by('accepted'),                  lbl: 'Accepted' },
+    { num: eur(pipelineVal),                lbl: 'Pipeline value' },
+    { num: winRate==null?'—':winRate+'%',   lbl: 'Win rate' },
+  ];
+  document.getElementById('prop-stats').innerHTML = stats.map(s =>
+    `<div class="prop-stat"><div class="ps-num">${s.num}</div><div class="ps-lbl">${s.lbl}</div></div>`).join('');
+  document.getElementById('prop-count-pill').textContent = '(' + proposals.length + ')';
+}
 
 function renderList() {
-  document.getElementById('prop-count').textContent = proposals.length + ' proposal' + (proposals.length===1?'':'s');
+  renderStats();
   if (!proposals.length) {
-    document.getElementById('prop-list').innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>No proposals yet — create one from an enquiry</div>';
+    const msg = showingArchived ? 'No archived proposals' : 'No proposals yet - create one from an enquiry';
+    document.getElementById('prop-list').innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>${msg}</div>`;
     return;
   }
+  const iconBtn = (title, color, onclick, path) =>
+    `<button title="${title}" onclick="event.stopPropagation();${onclick}" style="background:none;border:none;color:var(--text-dim);cursor:pointer;padding:2px;line-height:0;display:flex" onmouseover="this.style.color='${color}'" onmouseout="this.style.color='var(--text-dim)'"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${path}</svg></button>`;
+  const archiveIcon = '<rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 001 1h12a1 1 0 001-1V8"/><line x1="10" y1="12" x2="14" y2="12"/>';
+  const restoreIcon = '<path d="M3 7v6h6"/><path d="M3.5 13a9 9 0 102.13-9.36L3 7"/>';
+  const trashIcon   = '<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>';
   document.getElementById('prop-list').innerHTML = proposals.map(p => `
     <div class="inbox-row" onclick="location.href='proposal.html?id='+${p.id}">
       <div class="inbox-row-header">
         <span class="inbox-row-name">${escHtml(p.title)}</span>
-        <span style="display:flex;align-items:center;gap:12px">
+        <span style="display:flex;align-items:center;gap:10px">
           <span class="inbox-row-time">${timeAgo(p.created_at)}</span>
-          <button title="Delete proposal" onclick="event.stopPropagation();deleteProposal(${p.id})" style="background:none;border:none;color:var(--text-dim);cursor:pointer;padding:2px;line-height:0;display:flex" onmouseover="this.style.color='#ff6b6b'" onmouseout="this.style.color='var(--text-dim)'">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
-          </button>
+          ${showingArchived
+            ? iconBtn('Restore', 'var(--cyan)', 'restoreProposal('+p.id+')', restoreIcon)
+            : iconBtn('Archive', 'var(--cyan)', 'archiveProposal('+p.id+')', archiveIcon)}
+          ${iconBtn('Delete permanently', '#ff6b6b', 'deleteProposal('+p.id+')', trashIcon)}
         </span>
       </div>
       <div class="inbox-row-sub">
         <span class="prop-status ps-${p.status}">${STATUS_LABEL[p.status]||p.status}</span>
-        <span style="font-size:0.74rem;color:var(--text-dim)">${escHtml(p.client_name)}${p.client_company?' · '+escHtml(p.client_company):''}</span>
-        ${p.total_value>0?`<span style="font-size:0.74rem;color:var(--green)">${eur(p.total_value)}</span>`:''}
-        ${p.viewed_at?`<span style="font-size:0.7rem;color:var(--cyan)">👁 viewed ${timeAgo(p.viewed_at)}</span>`:''}
+        <span style="font-size:1.1875rem;color:var(--text-dim)">${escHtml(p.client_name)}${p.client_company?' · '+escHtml(p.client_company):''}</span>
+        ${p.total_value>0?`<span style="font-size:1.1875rem;color:var(--green)">${eur(p.total_value)}</span>`:''}
+        ${p.viewed_at?`<span style="font-size:1.1875rem;color:var(--cyan)">👁 viewed ${timeAgo(p.viewed_at)}</span>`:''}
       </div>
     </div>`).join('');
 }
 
+async function setArchived(id, val) {
+  try {
+    await apiFetch('/api/proposals/' + id, { method: 'PATCH', body: JSON.stringify({ archived: val }) });
+    proposals = proposals.filter(x => x.id !== id);   // leaves the current (active/archived) view
+    renderList();
+  } catch {
+    alert('Could not update the proposal. Please try again.');
+  }
+}
+function archiveProposal(id){ setArchived(id, 1); }
+function restoreProposal(id){ setArchived(id, 0); }
+
 async function deleteProposal(id) {
   const p = proposals.find(x => x.id === id);
-  if (!confirm('Delete the proposal "' + (p ? p.title : '') + '"?\nThis cannot be undone.')) return;
+  if (!confirm('Permanently delete the proposal "' + (p ? p.title : '') + '"?\nThis cannot be undone. (To keep it but hide it, use Archive instead.)')) return;
   try {
     await apiFetch('/api/proposals/' + id, { method: 'DELETE' });
     proposals = proposals.filter(x => x.id !== id);
@@ -225,44 +460,315 @@ async function openDraftPicker() {
 }
 function closePicker(){ document.getElementById('picker-modal').style.display='none'; }
 
-/* ── Proposal email template ─────────────────────────────── */
-function toggleProposalEmail() {
-  const body = document.getElementById('pe-body');
-  const chev = document.getElementById('pe-chevron');
-  const open = body.style.display !== 'none';
-  body.style.display = open ? 'none' : 'block';
-  if (chev) chev.style.transform = open ? '' : 'rotate(180deg)';
+/* ── Tabs ─────────────────────────────────────────────────── */
+let libraryLoaded = false;
+function switchTab(tab) {
+  document.querySelectorAll('.hub-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.hub-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + tab));
+  if (tab === 'library' && !libraryLoaded) loadLibrary();
+  if (tab === 'structure' && !structureLoaded) loadStructure();
 }
 
+/* ── Component library ────────────────────────────────────── */
+// Services (specialities) Incremento offers — each holds reusable components
+const SERVICES = [
+  { key:'web-design',     label:'Web Design' },
+  { key:'web-development', label:'Web Development' },
+  { key:'seo',            label:'SEO' },
+  { key:'ai',             label:'AI & Automation' },
+  { key:'analytics',      label:'Analytics & Tracking' },
+  { key:'infrastructure', label:'Hosting & Infrastructure' },
+  { key:'email',          label:'Email' },
+  { key:'ecommerce',      label:'E-commerce' },
+  { key:'ux',             label:'UX & Product Design' },
+  { key:'paid',           label:'Paid & Social' },
+  { key:'general',        label:'General & Terms' },
+];
+const SERVICE_LABEL = Object.fromEntries(SERVICES.map(s => [s.key, s.label]));
+let blocks = [];
+let sections = [];             // proposal structure sections (shared with the Structure tab)
+
+async function loadLibrary() {
+  libraryLoaded = true;
+  try {
+    const [bd, sd] = await Promise.all([
+      apiFetch('/api/proposal-blocks'),
+      apiFetch('/api/proposal-sections'),
+    ]);
+    blocks = bd.blocks || [];
+    sections = sd.sections || [];
+  } catch { blocks = []; }
+  renderLibrary();
+}
+
+function svcOf(b){ return b.service && SERVICE_LABEL[b.service] ? b.service : 'general'; }
+function sectionLabel(id){ const s = sections.find(x => String(x.id) === String(id)); return s ? s.title : ''; }
+
+function renderLibrary() {
+  document.getElementById('lib-content').innerHTML = SERVICES.map(s => {
+    const items = blocks.filter(b => svcOf(b) === s.key);
+    const cards = items.length ? `<div class="lib-cards">${items.map(libCard).join('')}</div>`
+      : '<div class="lib-empty">No components yet.</div>';
+    return `<div class="lib-group ${items.length?'':'lib-svc-empty'}">
+      <div class="lib-group-head">
+        <span class="lib-svc-head">${escHtml(s.label)} <span class="lib-svc-count">${items.length}</span></span>
+        <button class="ed-add" onclick="openBlock('${s.key}')">+ Add component</button>
+      </div>
+      ${cards}
+    </div>`;
+  }).join('');
+}
+
+function libCard(b) {
+  const price = (b.price != null && b.price !== '') ? `<div class="lc-meta">${eur(b.price)}</div>` : '';
+  return `<div class="lib-card">
+    <div class="lc-actions">
+      <button class="lc-btn" title="Copy" onclick="copyBlock(${b.id},this)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+      <button class="lc-btn" title="Edit" onclick="openBlock('${svcOf(b)}',${b.id})"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"/></svg></button>
+      <button class="lc-btn del" title="Delete" onclick="deleteBlock(${b.id})"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
+    </div>
+    <div class="lc-title">${escHtml(b.title)}</div>
+    ${b.body?`<div class="lc-body">${escHtml(b.body)}</div>`:''}
+    ${price}
+    ${b.section_id?`<div class="lc-section">→ ${escHtml(sectionLabel(b.section_id))||'section'}</div>`:''}
+  </div>`;
+}
+
+function openBlock(service, id) {
+  const b = id ? blocks.find(x => x.id === id) : null;
+  document.getElementById('block-id').value = id || '';
+  document.getElementById('block-modal-title').textContent = b ? 'Edit component' : 'New component';
+  const sel = document.getElementById('block-service');
+  sel.innerHTML = SERVICES.map(s => `<option value="${s.key}">${escHtml(s.label)}</option>`).join('');
+  sel.value = b ? svcOf(b) : (service || 'web-design');
+  const ssel = document.getElementById('block-section');
+  ssel.innerHTML = '<option value="">— Not assigned —</option>' +
+    sections.map(s => `<option value="${s.id}">${escHtml(s.title)}</option>`).join('');
+  ssel.value = b && b.section_id != null ? String(b.section_id) : '';
+  document.getElementById('block-title').value = b ? b.title : '';
+  document.getElementById('block-body').value  = b ? (b.body||'') : '';
+  document.getElementById('block-price').value = b && b.price != null ? b.price : '';
+  document.getElementById('block-modal').style.display = 'flex';
+  document.getElementById('block-title').focus();
+}
+function closeBlock(){ document.getElementById('block-modal').style.display='none'; }
+
+async function saveBlock() {
+  const id = document.getElementById('block-id').value;
+  const title = document.getElementById('block-title').value.trim();
+  if (!title) { document.getElementById('block-title').focus(); return; }
+  const payload = {
+    kind: 'component',
+    service: document.getElementById('block-service').value,
+    section_id: document.getElementById('block-section').value,
+    title,
+    body: document.getElementById('block-body').value.trim(),
+    price: document.getElementById('block-price').value,
+  };
+  const btn = document.getElementById('block-save'); btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    if (id) await apiFetch('/api/proposal-blocks/' + id, { method:'PATCH', body: JSON.stringify(payload) });
+    else    await apiFetch('/api/proposal-blocks', { method:'POST', body: JSON.stringify(payload) });
+    closeBlock();
+    await loadLibrary();
+  } catch { alert('Could not save the component. Please try again.'); }
+  btn.disabled = false; btn.textContent = 'Save component';
+}
+
+async function deleteBlock(id) {
+  const b = blocks.find(x => x.id === id);
+  if (!confirm('Delete "' + (b?b.title:'') + '" from the library?')) return;
+  try { await apiFetch('/api/proposal-blocks/' + id, { method:'DELETE' }); blocks = blocks.filter(x=>x.id!==id); renderLibrary(); }
+  catch { alert('Failed to delete.'); }
+}
+
+async function copyBlock(id, el) {
+  const b = blocks.find(x => x.id === id); if (!b) return;
+  let text = b.body || b.title;
+  if (b.price != null && b.price !== '') text = `${b.title} - ${eur(b.price)}${b.body?'\n'+b.body:''}`;
+  try {
+    await navigator.clipboard.writeText(text);
+    if (el) { const html = el.innerHTML; el.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9EF54A" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>'; setTimeout(()=>{ el.innerHTML = html; }, 1100); }
+  } catch {}
+}
+
+/* ── Proposal structure ───────────────────────────────────── */
+let structureLoaded = false;
+
+async function loadStructure() {
+  structureLoaded = true;
+  try {
+    const [sd, bd] = await Promise.all([
+      apiFetch('/api/proposal-sections'),
+      apiFetch('/api/proposal-blocks'),
+    ]);
+    sections = sd.sections || [];
+    blocks = bd.blocks || [];           // keep components in sync for counts + the modal
+  } catch {
+    document.getElementById('structure-list').innerHTML = '<div class="empty-state">Failed to load structure</div>';
+    return;
+  }
+  renderStructure();
+}
+
+function countFor(sectionId){ return blocks.filter(b => String(b.section_id) === String(sectionId)).length; }
+
+function renderStructure() {
+  const el = document.getElementById('structure-list');
+  if (!sections.length) {
+    el.innerHTML = '<div class="empty-state">No sections yet - add one to start building your proposal structure.</div>';
+    return;
+  }
+  el.innerHTML = sections.map((s, i) => {
+    const n = countFor(s.id);
+    return `<div class="struct-card" data-id="${s.id}">
+      <div class="struct-head">
+        <span class="struct-num">${i+1}</span>
+        <input class="struct-title" value="${escHtml(s.title)}" placeholder="Section title">
+        <span class="struct-count ${n?'has':''}" title="Components attached">${n} component${n===1?'':'s'}</span>
+        <span class="struct-tools">
+          <button class="lc-btn" title="Move up" ${i===0?'disabled':''} onclick="moveSection(${s.id},-1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg></button>
+          <button class="lc-btn" title="Move down" ${i===sections.length-1?'disabled':''} onclick="moveSection(${s.id},1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+          <button class="lc-btn del" title="Remove section" onclick="removeSection(${s.id})"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
+        </span>
+      </div>
+      <label class="struct-lbl">Guidance <span>(what this section should cover)</span></label>
+      <textarea class="struct-desc" rows="2" placeholder="Notes on what goes in this section">${escHtml(s.description||'')}</textarea>
+      <label class="struct-lbl">Shared content <span>(used in every proposal - leave blank to write per proposal)</span></label>
+      <textarea class="struct-shared" rows="3" placeholder="Boilerplate that appears in every proposal">${escHtml(s.shared_content||'')}</textarea>
+      <div class="struct-actions">
+        <button class="btn-primary" onclick="saveSection(${s.id})">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Save
+        </button>
+        <span class="struct-status"></span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function saveSection(id) {
+  const card = document.querySelector(`.struct-card[data-id="${id}"]`);
+  if (!card) return;
+  const body = {
+    title: card.querySelector('.struct-title').value.trim(),
+    description: card.querySelector('.struct-desc').value,
+    shared_content: card.querySelector('.struct-shared').value,
+  };
+  if (!body.title) { card.querySelector('.struct-title').focus(); return; }
+  const status = card.querySelector('.struct-status');
+  status.textContent = 'Saving…';
+  try {
+    await apiFetch('/api/proposal-sections/' + id, { method:'PATCH', body: JSON.stringify(body) });
+    const s = sections.find(x => x.id === id);
+    if (s) { s.title = body.title; s.description = body.description; s.shared_content = body.shared_content; }
+    status.textContent = '✓ Saved';
+    setTimeout(() => { status.textContent = ''; }, 2200);
+  } catch { status.textContent = 'Save failed'; }
+}
+
+async function addSection() {
+  const title = prompt('Name of the new section:');
+  if (!title || !title.trim()) return;
+  try {
+    await apiFetch('/api/proposal-sections', { method:'POST', body: JSON.stringify({ title: title.trim() }) });
+    await loadStructure();
+  } catch { alert('Could not add the section. Please try again.'); }
+}
+
+async function removeSection(id) {
+  const s = sections.find(x => x.id === id);
+  const n = countFor(id);
+  if (n > 0) {
+    alert(`"${s ? s.title : 'This section'}" still has ${n} component${n===1?'':'s'} attached.\n\nReassign or delete ${n===1?'it':'them'} in the Components tab before removing this section.`);
+    return;
+  }
+  if (!confirm(`Remove the section "${s ? s.title : ''}"? This cannot be undone.`)) return;
+  try {
+    const r = await apiFetch('/api/proposal-sections/' + id, { method:'DELETE' });
+    if (r && r.error) { alert(r.message || 'Could not remove the section.'); return; }
+    await loadStructure();
+  } catch { alert('Could not remove the section. Please try again.'); }
+}
+
+async function moveSection(id, dir) {
+  const i = sections.findIndex(x => x.id === id);
+  const j = i + dir;
+  if (i < 0 || j < 0 || j >= sections.length) return;
+  const a = sections[i], b = sections[j];
+  // Reassign sequential positions across the whole list to keep ordering robust
+  const reordered = sections.slice();
+  reordered[i] = b; reordered[j] = a;
+  try {
+    await Promise.all(reordered.map((s, idx) =>
+      apiFetch('/api/proposal-sections/' + s.id, { method:'PATCH', body: JSON.stringify({ position: idx + 1 }) })
+    ));
+    await loadStructure();
+  } catch { alert('Could not reorder the sections. Please try again.'); }
+}
+
+// Per-language defaults (mirror the worker's EMAIL_TEMPLATE_DEFAULTS)
 const TPL_DEFAULTS = {
-  proposal_email_intro: 'Thanks for getting in touch — your proposal for {title} is ready. It covers the scope, timeline and investment, and you can accept it online with one click.',
-  proposal_email_closing: 'Any questions at all, just hit reply — happy to walk you through it.',
-  proposal_email_signature: 'Robin\nIncremento · Lisbon',
+  en: {
+    greeting: 'Hi {name},',
+    intro: 'It was great to meet and talk through your project. As promised, here is your proposal for {title} - it covers the scope, timeline and investment, and you can accept it online with one click.',
+    closing: 'Any questions at all, just hit reply - happy to walk you through it.',
+    signature: 'Robin\nIncremento · Lisbon',
+  },
+  pt: {
+    greeting: 'Olá {name},',
+    intro: 'Foi um prazer falar consigo sobre o seu projeto. Conforme combinado, segue a sua proposta para {title} - cobre o âmbito, o calendário e o investimento, e pode aceitá-la online com um único clique.',
+    closing: 'Qualquer questão, é só responder a este email - com todo o gosto explico tudo.',
+    signature: 'Robin\nIncremento · Lisboa',
+  },
 };
+const TPL_FIELDS = ['greeting', 'intro', 'closing', 'signature'];
+let emailLang = 'en';
+let tplModel = { en: {}, pt: {} };   // working copy for both languages
+
+function tplReadInputs(lang) {
+  TPL_FIELDS.forEach(f => { tplModel[lang][f] = document.getElementById('tpl-' + f).value; });
+}
+function tplRender(lang) {
+  TPL_FIELDS.forEach(f => { document.getElementById('tpl-' + f).value = tplModel[lang][f] ?? ''; });
+}
 
 async function loadTemplate() {
   try {
     const s = await apiFetch('/api/settings');
-    document.getElementById('tpl-intro').value     = s.proposal_email_intro     ?? TPL_DEFAULTS.proposal_email_intro;
-    document.getElementById('tpl-closing').value   = s.proposal_email_closing   ?? TPL_DEFAULTS.proposal_email_closing;
-    document.getElementById('tpl-signature').value = s.proposal_email_signature ?? TPL_DEFAULTS.proposal_email_signature;
+    for (const lang of ['en', 'pt']) {
+      TPL_FIELDS.forEach(f => {
+        tplModel[lang][f] = s['proposal_email_' + f + '_' + lang] ?? TPL_DEFAULTS[lang][f];
+      });
+    }
+    tplRender(emailLang);
   } catch {
     document.getElementById('tpl-status').textContent = 'Could not load settings';
   }
 }
 
+function switchEmailLang(lang) {
+  if (lang === emailLang) return;
+  tplReadInputs(emailLang);        // keep any unsaved edits to the current language
+  emailLang = lang;
+  document.querySelectorAll('#email-lang-toggle .lang-opt').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  tplRender(lang);
+  document.getElementById('tpl-status').textContent = '';
+}
+
 async function saveTemplate() {
   const btn = document.getElementById('tpl-save');
   const status = document.getElementById('tpl-status');
+  tplReadInputs(emailLang);
   btn.disabled = true;
   status.textContent = 'Saving…';
+  const payload = {};
+  for (const lang of ['en', 'pt']) {
+    TPL_FIELDS.forEach(f => { payload['proposal_email_' + f + '_' + lang] = (tplModel[lang][f] || '').trim(); });
+  }
   try {
-    await apiFetch('/api/settings', { method:'PATCH', body: JSON.stringify({
-      proposal_email_intro:     document.getElementById('tpl-intro').value.trim(),
-      proposal_email_closing:   document.getElementById('tpl-closing').value.trim(),
-      proposal_email_signature: document.getElementById('tpl-signature').value.trim(),
-    })});
-    status.textContent = '✓ Saved';
+    await apiFetch('/api/settings', { method:'PATCH', body: JSON.stringify(payload) });
+    status.textContent = '✓ Saved (both languages)';
     setTimeout(()=>{ status.textContent = ''; }, 2500);
   } catch {
     status.textContent = 'Save failed';
@@ -271,14 +777,78 @@ async function saveTemplate() {
 }
 
 function resetTemplate() {
-  document.getElementById('tpl-intro').value     = TPL_DEFAULTS.proposal_email_intro;
-  document.getElementById('tpl-closing').value   = TPL_DEFAULTS.proposal_email_closing;
-  document.getElementById('tpl-signature').value = TPL_DEFAULTS.proposal_email_signature;
-  document.getElementById('tpl-status').textContent = 'Reset — remember to Save';
+  TPL_FIELDS.forEach(f => { tplModel[emailLang][f] = TPL_DEFAULTS[emailLang][f]; });
+  tplRender(emailLang);
+  document.getElementById('tpl-status').textContent = 'Reset ' + (emailLang === 'pt' ? 'Português' : 'English') + ' - remember to Save';
+}
+
+/* ── "Why Incremento" proposal-page copy (per language) ──── */
+const WHY_DEFAULTS = {
+  en: {
+    why_text: 'Web, product and growth under one roof, plus Incremento Labs for applied AI. You work directly with senior people who ship - no juniors, no handoffs, no fluff. We start with your goals and your customers, not a template, so what we build actually moves your numbers.',
+    why_ledby_heading: 'Led by Robin Savile',
+    why_ledby_text: 'Incremento is led by Robin Savile, who brings over 20 years of digital, product and growth-marketing experience across B2B and B2C. He has led search marketing for brands including the Four Seasons Hotels across the EMEA region, Cancer Research UK and MyVoucherCodes. A genuinely safe pair of hands who pairs senior strategy with hands-on delivery, so you always deal directly with the person doing the thinking.',
+  },
+  pt: {
+    why_text: 'Web, produto e crescimento sob o mesmo teto, mais o Incremento Labs para IA aplicada. Trabalha diretamente com profissionais seniores que entregam - sem juniores, sem intermediários, sem enrolação. Começamos pelos seus objetivos e pelos seus clientes, não por um modelo, para que aquilo que construímos faça realmente mexer os seus números.',
+    why_ledby_heading: 'Liderada por Robin Savile',
+    why_ledby_text: 'A Incremento é liderada por Robin Savile, que traz mais de 20 anos de experiência em digital, produto e marketing de crescimento em B2B e B2C. Liderou marketing de pesquisa para marcas como os hotéis Four Seasons na região EMEA, a Cancer Research UK e a MyVoucherCodes. Um par de mãos verdadeiramente seguro, que combina estratégia sénior com execução prática, para que lide sempre diretamente com quem está a pensar o trabalho.',
+  },
+};
+const WHY_KEYS = ['why_text', 'why_ledby_heading', 'why_ledby_text'];
+const WHY_EL = { why_text: 'why-text', why_ledby_heading: 'why-ledby-heading', why_ledby_text: 'why-ledby-text' };
+let whyLang = 'en';
+let whyModel = { en: {}, pt: {} };
+
+function whyReadInputs(lang) { WHY_KEYS.forEach(k => { whyModel[lang][k] = document.getElementById(WHY_EL[k]).value; }); }
+function whyRender(lang) { WHY_KEYS.forEach(k => { document.getElementById(WHY_EL[k]).value = whyModel[lang][k] ?? ''; }); }
+
+async function loadWhy() {
+  try {
+    const s = await apiFetch('/api/settings');
+    for (const lang of ['en', 'pt']) {
+      WHY_KEYS.forEach(k => { whyModel[lang][k] = s['proposal_' + k + '_' + lang] ?? WHY_DEFAULTS[lang][k]; });
+    }
+    whyRender(whyLang);
+  } catch {}
+}
+
+function switchWhyLang(lang) {
+  if (lang === whyLang) return;
+  whyReadInputs(whyLang);
+  whyLang = lang;
+  document.querySelectorAll('#why-lang-toggle .lang-opt').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  whyRender(lang);
+  document.getElementById('why-status').textContent = '';
+}
+
+async function saveWhy() {
+  const btn = document.getElementById('why-save');
+  const status = document.getElementById('why-status');
+  whyReadInputs(whyLang);
+  btn.disabled = true;
+  status.textContent = 'Saving…';
+  const payload = {};
+  for (const lang of ['en', 'pt']) {
+    WHY_KEYS.forEach(k => { payload['proposal_' + k + '_' + lang] = (whyModel[lang][k] || '').trim(); });
+  }
+  try {
+    await apiFetch('/api/settings', { method:'PATCH', body: JSON.stringify(payload) });
+    status.textContent = '✓ Saved (both languages)';
+    setTimeout(() => { status.textContent = ''; }, 2500);
+  } catch { status.textContent = 'Save failed'; }
+  btn.disabled = false;
+}
+
+function resetWhy() {
+  WHY_KEYS.forEach(k => { whyModel[whyLang][k] = WHY_DEFAULTS[whyLang][k]; });
+  whyRender(whyLang);
+  document.getElementById('why-status').textContent = 'Reset ' + (whyLang === 'pt' ? 'Português' : 'English') + ' - remember to Save';
 }
 
 loadProposals();
 loadTemplate();
+loadWhy();
 </script>
 </body>
 </html>

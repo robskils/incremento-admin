@@ -8,6 +8,7 @@ html { font-size: 16px; }
 body {
   font-family: 'Inter', sans-serif;
   font-weight: 400;
+  font-size: 17px;            /* readable base — no admin text below 17px */
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
@@ -89,7 +90,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 }
 .sidebar-brand-name {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 600;
   color: var(--text);
   letter-spacing: -0.02em;
@@ -110,7 +111,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   align-items: center;
   gap: 9px;
   padding: 8px 18px;
-  font-size: 0.84rem;
+  font-size: 1.1875rem;
   color: var(--text-sub);
   cursor: pointer;
   transition: all var(--trans);
@@ -131,7 +132,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   margin-left: auto;
   background: var(--lime);
   color: #0a1219;
-  font-size: 0.62rem;
+  font-size: 1.1875rem;
   font-weight: 700;
   padding: 2px 6px;
   border-radius: 10px;
@@ -173,7 +174,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   letter-spacing: -0.02em;
 }
 .page-sub {
-  font-size: 0.78rem;
+  font-size: 1.1875rem;
   color: var(--text-dim);
   margin-top: 2px;
 }
@@ -222,7 +223,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .kpi-icon-purple { background: var(--purple-pale); color: var(--purple); }
 .kpi-icon-slate  { background: var(--slate-pale); color: var(--slate); }
 
-.kpi-label { font-size: 0.72rem; color: var(--text-dim); font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
+.kpi-label { font-size: 1.1875rem; color: var(--text-dim); font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
 .kpi-value {
   font-family: 'Space Grotesk', sans-serif;
   font-size: 2rem;
@@ -237,7 +238,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .kpi-value.green { color: var(--green); }
 .kpi-value.amber { color: var(--amber); }
 .kpi-value.red   { color: var(--red); }
-.kpi-sub { font-size: 0.72rem; color: var(--text-dim); }
+.kpi-sub { font-size: 1.1875rem; color: var(--text-dim); }
 
 /* ── PANEL / CARD ─────────────────────────────────────────── */
 .panel {
@@ -258,11 +259,11 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 }
 .panel-title {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.88rem;
+  font-size: 1.1875rem;
   font-weight: 600;
   color: var(--text);
 }
-.panel-meta { font-size: 0.72rem; color: var(--text-dim); }
+.panel-meta { font-size: 1.1875rem; color: var(--text-dim); }
 
 /* ── PIPELINE FUNNEL ──────────────────────────────────────── */
 .pipeline-funnel {
@@ -293,7 +294,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   letter-spacing: -0.02em;
 }
 .funnel-stage.active .funnel-num { color: var(--lime); }
-.funnel-label { font-size: 0.65rem; color: var(--text-dim); white-space: nowrap; letter-spacing: 0.02em; }
+.funnel-label { font-size: 1.1875rem; color: var(--text-dim); white-space: nowrap; letter-spacing: 0.02em; }
 
 /* ── STAGE BARS (Analytics) ───────────────────────────────── */
 .stage-bars { padding: 6px 0; }
@@ -304,7 +305,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   gap: 12px;
   padding: 7px 20px;
 }
-.stage-bar-label { font-size: 0.8rem; color: var(--text-sub); }
+.stage-bar-label { font-size: 1.1875rem; color: var(--text-sub); }
 .stage-bar-track {
   height: 26px;
   border-radius: 4px;
@@ -317,16 +318,16 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   display: flex;
   align-items: center;
   padding-left: 8px;
-  font-size: 0.72rem;
+  font-size: 1.1875rem;
   font-weight: 600;
   color: #0a1219;
   transition: width 0.6s ease;
 }
-.stage-bar-count { font-size: 0.78rem; color: var(--text-dim); text-align: right; }
+.stage-bar-count { font-size: 1.1875rem; color: var(--text-dim); text-align: right; }
 
 /* ── STAGE BADGES ─────────────────────────────────────────── */
 .stage-badge {
-  font-size: 0.68rem;
+  font-size: 1.1875rem;
   font-weight: 600;
   padding: 3px 9px;
   border-radius: 4px;
@@ -336,6 +337,8 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   letter-spacing: 0.02em;
 }
 .stage-new        { background: var(--cyan-pale);   color: var(--cyan); }
+.stage-meeting_booked { background: rgba(56,189,248,0.14); color: #38bdf8; }
+.stage-call_complete  { background: rgba(45,212,191,0.14); color: #2dd4bf; }
 .stage-proposal   { background: var(--amber-pale);  color: var(--amber); }
 .stage-accepted   { background: var(--lime-pale);   color: var(--lime); }
 .stage-in_progress{ background: var(--green-pale);  color: var(--green); }
@@ -361,10 +364,10 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   margin-bottom: 4px;
   gap: 12px;
 }
-.inbox-row-name { font-size: 0.88rem; font-weight: 500; color: var(--text); }
-.inbox-row-time  { font-size: 0.7rem; color: var(--text-dim); flex-shrink: 0; }
+.inbox-row-name { font-size: 1.1875rem; font-weight: 500; color: var(--text); }
+.inbox-row-time  { font-size: 1.1875rem; color: var(--text-dim); flex-shrink: 0; }
 .inbox-row-sub   {
-  font-size: 0.75rem;
+  font-size: 1.1875rem;
   color: var(--text-sub);
   margin-bottom: 5px;
   display: flex;
@@ -373,7 +376,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   flex-wrap: wrap;
 }
 .inbox-row-body {
-  font-size: 0.78rem;
+  font-size: 1.1875rem;
   color: var(--text-dim);
   line-height: 1.5;
   overflow: hidden;
@@ -401,15 +404,15 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   background: var(--surface3);
   border: 1px solid var(--border);
   display: flex; align-items: center; justify-content: center;
-  font-size: 0.88rem;
+  font-size: 1.1875rem;
   font-weight: 600;
   color: var(--lime);
   flex-shrink: 0;
   font-family: 'Space Grotesk', sans-serif;
 }
 .contact-info { flex: 1; min-width: 0; }
-.contact-name { font-size: 0.88rem; font-weight: 500; color: var(--text); margin-bottom: 2px; }
-.contact-detail { font-size: 0.73rem; color: var(--text-dim); }
+.contact-name { font-size: 1.1875rem; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+.contact-detail { font-size: 1.1875rem; color: var(--text-dim); }
 .contact-actions { display: flex; gap: 8px; flex-shrink: 0; }
 .contact-btn {
   display: flex;
@@ -418,7 +421,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   padding: 5px 10px;
   border: 1px solid var(--border2);
   border-radius: 5px;
-  font-size: 0.7rem;
+  font-size: 1.1875rem;
   color: var(--text-sub);
   background: transparent;
   cursor: pointer;
@@ -429,7 +432,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 
 /* ── INTEREST TAGS ────────────────────────────────────────── */
 .interest-pill {
-  font-size: 0.65rem;
+  font-size: 1.1875rem;
   font-weight: 500;
   padding: 2px 7px;
   border-radius: 20px;
@@ -447,7 +450,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .filter-tab {
   padding: 5px 12px;
   border-radius: 6px;
-  font-size: 0.75rem;
+  font-size: 1.1875rem;
   font-weight: 500;
   color: var(--text-dim);
   background: transparent;
@@ -475,7 +478,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .search-bar input {
   border: none; outline: none;
   font-family: 'Inter', sans-serif;
-  font-size: 0.83rem;
+  font-size: 1.1875rem;
   color: var(--text);
   background: none;
   width: 100%;
@@ -502,7 +505,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   color: #0a1219;
   border-radius: var(--radius);
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.8rem;
+  font-size: 1.1875rem;
   font-weight: 600;
   cursor: pointer;
   transition: all var(--trans);
@@ -520,19 +523,29 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   border: 1px solid var(--border2);
   border-radius: var(--radius);
   font-family: 'Inter', sans-serif;
-  font-size: 0.78rem;
+  font-size: 1.1875rem;
   color: var(--text-sub);
   cursor: pointer;
   transition: all var(--trans);
 }
 .btn-ghost:hover { border-color: var(--lime); color: var(--lime); }
 
+/* Language toggle (EN / PT) - shared across deal, proposal, send & email pages */
+.lang-toggle { display: inline-flex; gap: 0; background: var(--surface2); border: 1px solid var(--border2); border-radius: 9px; padding: 3px; }
+.lang-opt {
+  background: none; border: none; cursor: pointer;
+  font-family: 'Inter', sans-serif; font-size: 1.0625rem; font-weight: 500;
+  color: var(--text-dim); padding: 6px 16px; border-radius: 6px; transition: all var(--trans);
+}
+.lang-opt:hover { color: var(--text-sub); }
+.lang-opt.active { background: linear-gradient(135deg, var(--lime), var(--cyan)); color: #0a1219; font-weight: 600; }
+
 select.select-sm {
   padding: 7px 12px;
   border: 1px solid var(--border);
   border-radius: 6px;
   font-family: 'Inter', sans-serif;
-  font-size: 0.78rem;
+  font-size: 1.1875rem;
   color: var(--text-sub);
   background: var(--surface2);
   outline: none;
@@ -571,7 +584,7 @@ select.select-sm:focus { border-color: var(--lime); }
   justify-content: space-between;
   gap: 12px;
 }
-.modal-title { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 600; color: var(--text); }
+.modal-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.1875rem; font-weight: 600; color: var(--text); }
 .modal-close {
   width: 28px; height: 28px;
   display: flex; align-items: center; justify-content: center;
@@ -587,19 +600,19 @@ select.select-sm:focus { border-color: var(--lime); }
 
 .detail-field { margin-bottom: 16px; }
 .detail-label {
-  font-size: 0.68rem;
+  font-size: 1.1875rem;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-dim);
   margin-bottom: 4px;
 }
-.detail-value { font-size: 0.88rem; color: var(--text); line-height: 1.6; }
+.detail-value { font-size: 1.1875rem; color: var(--text); line-height: 1.6; }
 .detail-message {
   background: var(--surface2);
   border-radius: 6px;
   padding: 14px 16px;
-  font-size: 0.85rem;
+  font-size: 1.1875rem;
   color: var(--text-sub);
   line-height: 1.7;
   white-space: pre-wrap;
@@ -612,7 +625,7 @@ select.select-sm:focus { border-color: var(--lime); }
   border: 1px solid var(--border2);
   border-radius: var(--radius);
   font-family: 'Inter', sans-serif;
-  font-size: 0.85rem;
+  font-size: 1.1875rem;
   color: var(--text);
   outline: none;
   transition: border-color var(--trans);
@@ -627,7 +640,7 @@ select.select-sm:focus { border-color: var(--lime); }
   border: 1px solid var(--border);
   border-radius: var(--radius);
   font-family: 'Inter', sans-serif;
-  font-size: 0.85rem;
+  font-size: 1.1875rem;
   color: var(--text);
   outline: none;
   resize: vertical;
@@ -643,7 +656,7 @@ select.select-sm:focus { border-color: var(--lime); }
   border: 1px solid var(--border);
   border-radius: var(--radius);
   font-family: 'Inter', sans-serif;
-  font-size: 0.85rem;
+  font-size: 1.1875rem;
   color: var(--text);
   outline: none;
   width: 160px;
@@ -668,14 +681,14 @@ select.select-sm:focus { border-color: var(--lime); }
   align-items: center;
   justify-content: center;
   color: var(--text-dim);
-  font-size: 0.8rem;
+  font-size: 1.1875rem;
 }
 
 /* ── SETTINGS ─────────────────────────────────────────────── */
 .settings-section { margin-bottom: 28px; }
 .settings-label {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.8rem;
+  font-size: 1.1875rem;
   font-weight: 600;
   color: var(--text-dim);
   letter-spacing: 0.06em;
@@ -691,15 +704,15 @@ select.select-sm:focus { border-color: var(--lime); }
   border-bottom: 1px solid var(--border);
 }
 .settings-row:last-child { border-bottom: none; }
-.settings-row-label { font-size: 0.85rem; color: var(--text); }
-.settings-row-sub   { font-size: 0.73rem; color: var(--text-dim); margin-top: 1px; }
+.settings-row-label { font-size: 1.1875rem; color: var(--text); }
+.settings-row-sub   { font-size: 1.1875rem; color: var(--text-dim); margin-top: 1px; }
 .settings-input {
   padding: 7px 12px;
   background: var(--surface2);
   border: 1px solid var(--border);
   border-radius: 6px;
   font-family: 'Inter', sans-serif;
-  font-size: 0.82rem;
+  font-size: 1.1875rem;
   color: var(--text);
   outline: none;
   min-width: 220px;
@@ -723,7 +736,7 @@ select.select-sm:focus { border-color: var(--lime); }
   padding: 48px 24px;
   text-align: center;
   color: var(--text-dim);
-  font-size: 0.85rem;
+  font-size: 1.1875rem;
 }
 .empty-state svg { display: block; width: 32px; height: 32px; margin: 0 auto 12px; opacity: 0.3; }
 
@@ -742,7 +755,7 @@ select.select-sm:focus { border-color: var(--lime); }
   max-width: 500px;
   margin: 0 auto 10px;
 }
-.quote-block cite { font-size: 0.78rem; color: var(--text-sub); }
+.quote-block cite { font-size: 1.1875rem; color: var(--text-sub); }
 
 /* ── RESPONSIVE ───────────────────────────────────────────── */
 @media (max-width: 1280px) {

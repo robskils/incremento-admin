@@ -11,27 +11,54 @@
 <style>
 .deal-title-input{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:600;color:var(--text);background:transparent;border:none;border-bottom:1px solid transparent;width:100%;max-width:560px;padding:2px 0;outline:none}
 .deal-title-input:hover,.deal-title-input:focus{border-bottom-color:var(--border2)}
-.deal-company-input{font-size:0.9rem;color:var(--text-sub);background:transparent;border:none;border-bottom:1px solid transparent;width:100%;max-width:420px;padding:3px 0;outline:none;margin-top:4px}
+.deal-company-input{font-size:1.1875rem;color:var(--text-sub);background:transparent;border:none;border-bottom:1px solid transparent;width:100%;max-width:420px;padding:3px 0;outline:none;margin-top:4px}
 .deal-company-input:hover,.deal-company-input:focus{border-bottom-color:var(--border2)}
+.deal-company-row{display:flex;flex-direction:column;gap:8px;max-width:680px;margin-top:6px}
+.deal-company-row .deal-company-input{width:100%;max-width:none}
+.deal-url-row{display:flex;align-items:center;gap:8px}
+.deal-url-row .deal-company-input{flex:0 1 360px;min-width:0}
+#d-url-link{font-size:0.95rem;color:var(--cyan);text-decoration:none;white-space:nowrap;display:none;align-items:center;gap:3px;flex:0 0 auto}
+#d-url-link svg{width:11px;height:11px}
+#d-url-link:hover{text-decoration:underline}
 .team-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
 .team-avatars{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end;max-width:220px}
-.team-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:600;cursor:pointer;border:2px solid transparent;background:var(--surface2);color:var(--text-dim);transition:.15s;font-family:'Space Grotesk',sans-serif}
+.team-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1875rem;font-weight:600;cursor:pointer;border:2px solid transparent;background:var(--surface2);color:var(--text-dim);transition:.15s;font-family:'Space Grotesk',sans-serif}
 .team-av.on{background:linear-gradient(135deg,#9EF54A,#5EE7D8);color:#0a1219;border-color:#9EF54A}
-.deal-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;margin:24px 0}
-.deal-card{background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:16px;min-height:104px;display:flex;flex-direction:column;text-decoration:none;color:var(--text)}
+.deal-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px;margin:24px 0}
+.deal-card{background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:20px 22px;min-height:140px;display:flex;flex-direction:column;text-decoration:none;color:var(--text)}
 .deal-card.link{cursor:pointer}
 .deal-card.link:hover{border-color:var(--lime)}
-.deal-card.dashed{border-style:dashed;align-items:center;justify-content:center;color:var(--text-dim);font-size:0.84rem}
+.deal-card.dashed{border-style:dashed;align-items:center;justify-content:center;color:var(--text-dim);font-size:1.1875rem}
 .deal-card.dashed:hover{border-color:var(--cyan);color:var(--text)}
-.dc-label{font-size:0.66rem;letter-spacing:0.09em;text-transform:uppercase;color:var(--text-dim)}
-.dc-title{font-size:0.95rem;font-weight:600;margin-top:4px;line-height:1.3}
-.dc-meta{font-size:0.76rem;color:var(--text-dim);margin-top:3px}
+.dc-label{font-size:1.0625rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-dim);white-space:nowrap}
+.dc-title{font-size:1.25rem;font-weight:600;margin-top:6px;line-height:1.3}
+.dc-meta{font-size:1.1875rem;color:var(--text-dim);margin-top:4px;overflow-wrap:anywhere}
 .dc-actions{margin-top:auto;padding-top:10px;display:flex;gap:8px;flex-wrap:wrap}
-.dc-btn{font-size:0.72rem;padding:6px 11px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);color:var(--text);cursor:pointer;text-decoration:none;display:inline-block}
+.dc-btn{font-size:1.1875rem;padding:6px 11px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);color:var(--text);cursor:pointer;text-decoration:none;display:inline-block}
 .dc-btn:hover{border-color:var(--cyan)}
 .dc-btn.primary{background:linear-gradient(135deg,#9EF54A,#5EE7D8);color:#0a1219;border-color:#9EF54A;font-weight:600}
-.meta-bar{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:18px}
+.meta-bar{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin:0}
 .meta-bar .field-block{margin:0}
+/* Two-column deal layout */
+.deal-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:30px;align-items:start;margin-top:6px}
+@media(max-width:980px){.deal-grid{grid-template-columns:1fr}}
+.deal-col{display:flex;flex-direction:column;gap:26px;min-width:0}
+.deal-section .detail-label{margin-bottom:12px}
+/* Service tags */
+.svc-tags{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.svc-tag{font:inherit;font-size:1.0625rem;font-weight:600;padding:8px 14px;border-radius:999px;cursor:pointer;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);display:inline-flex;align-items:center;gap:7px;transition:background .15s,border-color .15s}
+.svc-tag.on{background:linear-gradient(135deg,rgba(158,245,74,.18),rgba(94,231,216,.18));border-color:rgba(158,245,74,.55);color:#eafff0}
+.svc-tag.on:hover{border-color:#ff6b6b;background:rgba(255,107,107,.14)}
+.svc-tag .svc-x{font-size:1.25rem;line-height:1;opacity:.7}
+.svc-tag.add{border-style:dashed;color:var(--text-dim)}
+.svc-tag.add:hover{color:var(--lime);border-color:var(--lime)}
+.svc-add-wrap{position:relative;display:inline-block}
+.svc-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:20;background:var(--bg-soft,#13202b);border:1px solid var(--border);border-radius:12px;padding:6px;min-width:200px;box-shadow:0 12px 32px rgba(0,0,0,.45);flex-direction:column;gap:2px}
+.svc-menu.open{display:flex}
+.svc-opt{font:inherit;font-size:1.0625rem;text-align:left;padding:9px 12px;border-radius:8px;border:none;background:none;color:var(--text);cursor:pointer}
+.svc-opt:hover{background:rgba(158,245,74,.14);color:#eafff0}
+/* Cards adapt to the column width (2-across when there's room, else 1) */
+.deal-grid .deal-cards{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin:0}
 </style>
 </head>
 <body>
@@ -50,6 +77,7 @@
   </div>
   <nav class="sidebar-nav">
     <a class="nav-item" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a class="nav-item" href="triage.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>Triage<span class="nav-badge" id="triage-badge" style="display:none"></span></a>
     <a class="nav-item active" href="pipeline.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Pipeline</a>
     <a class="nav-item" href="proposals.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Proposals</a>
     <a class="nav-item" href="contacts.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Contacts</a>
@@ -66,58 +94,125 @@
 <main class="main">
   <div class="page-header" style="align-items:flex-start">
     <div style="flex:1;min-width:0">
-      <div style="margin-bottom:8px"><a href="pipeline.html" style="color:var(--text-dim);font-size:0.78rem;text-decoration:none">&larr; Pipeline</a></div>
+      <div style="margin-bottom:8px"><a href="pipeline.html" style="color:var(--text-dim);font-size:1.1875rem;text-decoration:none">&larr; Pipeline</a></div>
       <input id="d-title" class="deal-title-input" placeholder="Project title…">
-      <input id="d-company" class="deal-company-input" placeholder="Company / business">
+      <div class="deal-company-row">
+        <input id="d-company" class="deal-company-input" list="company-list" placeholder="Company name" autocomplete="off" onchange="onCompanyPick();autoSaveCompany()">
+        <div class="deal-url-row">
+          <input id="d-company-url" class="deal-company-input" type="url" placeholder="Company URL (https://…)" autocomplete="off" oninput="updateUrlLink()" onchange="autoSaveCompany()">
+          <a id="d-url-link" target="_blank" rel="noopener" title="Open website">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Visit
+          </a>
+        </div>
+        <datalist id="company-list"></datalist>
+      </div>
     </div>
     <div class="team-wrap">
-      <span class="dc-label">Team</span>
-      <div class="team-avatars" id="d-team"></div>
-      <button class="btn-primary" id="btn-save" onclick="saveDeal()" style="margin-top:4px">
+      <button class="btn-primary" id="btn-save" onclick="saveDeal()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
         Save
+      </button>
+      <button id="btn-delete" onclick="deleteDeal()" title="Delete this deal" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:1.0625rem;display:inline-flex;align-items:center;gap:6px;padding:4px 2px;font-family:'Inter',sans-serif" onmouseover="this.style.color='#ff6b6b'" onmouseout="this.style.color='var(--text-dim)'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+        Delete deal
       </button>
     </div>
   </div>
 
   <div id="content" style="display:none">
+    <div class="deal-grid">
 
-    <!-- Cards: proposal · PDF · contacts -->
-    <div class="deal-cards" id="deal-cards"></div>
+      <!-- LEFT: deal facts -->
+      <div class="deal-col">
+        <!-- Stage + value -->
+        <div class="meta-bar">
+          <div class="field-block">
+            <div class="dc-label" style="margin-bottom:5px">Stage</div>
+            <select class="stage-select" id="d-stage">
+              <option value="new">New</option>
+              <option value="meeting_booked">Call Booked</option>
+              <option value="call_complete">Call Complete</option>
+              <option value="proposal_sent">Proposal Sent</option>
+              <option value="accepted">Accepted</option>
+              <option value="in_progress">In Progress</option>
+              <option value="on_hold">On Hold</option>
+              <option value="completed">Complete</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div class="field-block">
+            <div class="dc-label" style="margin-bottom:5px">Est. value (€)</div>
+            <input type="number" class="value-input" id="d-value" placeholder="e.g. 4500">
+          </div>
+          <div class="field-block">
+            <div class="dc-label" style="margin-bottom:5px">Language</div>
+            <div class="lang-toggle" id="deal-lang-toggle">
+              <button type="button" class="lang-opt active" data-lang="en" onclick="setDealLanguage('en')">English</button>
+              <button type="button" class="lang-opt" data-lang="pt" onclick="setDealLanguage('pt')">Português</button>
+            </div>
+          </div>
+        </div>
 
-    <!-- Stage + value -->
-    <div class="meta-bar">
-      <div class="field-block">
-        <div class="dc-label" style="margin-bottom:5px">Stage</div>
-        <select class="stage-select" id="d-stage">
-          <option value="new">New</option>
-          <option value="proposal_sent">Proposal Sent</option>
-          <option value="accepted">Accepted</option>
-          <option value="in_progress">In Progress</option>
-          <option value="completed">Completed</option>
-          <option value="on_hold">On Hold</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
+        <div class="deal-section">
+          <div class="detail-label">Services wanted</div>
+          <div class="svc-tags" id="svc-tags"></div>
+        </div>
+
+        <div class="deal-section">
+          <div class="detail-label">Proposal</div>
+          <div class="deal-cards" id="proposal-cards"></div>
+        </div>
+
+        <div class="deal-section">
+          <div class="detail-label">Contacts</div>
+          <div class="deal-cards" id="contact-cards"></div>
+        </div>
+
+        <div class="deal-section">
+          <div class="detail-label">Internal notes</div>
+          <div class="panel" style="padding:20px">
+            <textarea class="notes-textarea" id="d-notes" rows="5" placeholder="Notes only the team can see…" style="width:100%;box-sizing:border-box"></textarea>
+          </div>
+        </div>
       </div>
-      <div class="field-block">
-        <div class="dc-label" style="margin-bottom:5px">Est. value (€)</div>
-        <input type="number" class="value-input" id="d-value" placeholder="e.g. 4500">
+
+      <!-- RIGHT: communication history (pulled up) -->
+      <div class="deal-col">
+        <div class="deal-section">
+          <div class="detail-label">Communication history</div>
+          <div id="comms"></div>
+        </div>
       </div>
-    </div>
 
-    <!-- Internal notes -->
-    <div class="panel" style="padding:20px">
-      <div class="detail-label" style="margin-bottom:10px">Internal notes</div>
-      <textarea class="notes-textarea" id="d-notes" rows="4" placeholder="Notes only the team can see…"></textarea>
-    </div>
-
-    <!-- Communication history -->
-    <div style="margin-top:24px">
-      <div class="detail-label" style="margin-bottom:4px">Communication history</div>
-      <div id="comms"></div>
     </div>
   </div>
 </main>
+
+<!-- ── ADD / EDIT CONTACT MODAL ───────────────────────────── -->
+<div class="modal-overlay" id="contact-form-modal" style="display:none" onclick="if(event.target===this)closeContactForm()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title" id="cf-title">Add contact</div>
+      <button class="modal-close" onclick="closeContactForm()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="cf-idx">
+      <div class="field-block"><div class="dc-label" style="margin-bottom:5px">Name</div><input class="value-input" id="cf-name" style="width:100%" placeholder="Full name"></div>
+      <div class="field-block"><div class="dc-label" style="margin-bottom:5px">Email</div><input class="value-input" id="cf-email" type="email" style="width:100%" placeholder="name@company.com"></div>
+      <div class="field-block"><div class="dc-label" style="margin-bottom:5px">Role / title</div><input class="value-input" id="cf-role" style="width:100%" placeholder="e.g. Managing Partner"></div>
+      <div class="field-block"><div class="dc-label" style="margin-bottom:5px">Phone</div><input class="value-input" id="cf-phone" type="tel" style="width:100%" placeholder="+351 …"></div>
+      <label class="field-block" style="display:flex;align-items:center;gap:9px;cursor:pointer;margin-bottom:14px">
+        <input type="checkbox" id="cf-primary" style="flex:0 0 auto">
+        <span style="font-size:1.0625rem;color:var(--text-sub)">Primary contact for this deal</span>
+      </label>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:6px">
+        <button class="btn-ghost" onclick="closeContactForm()">Cancel</button>
+        <button class="btn-primary" id="cf-save" onclick="saveContactForm()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ── COMPOSE EMAIL MODAL ────────────────────────────────── -->
 <div class="modal-overlay" id="compose-modal" style="display:none" onclick="if(event.target===this)closeCompose()">
@@ -153,7 +248,7 @@
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           Send
         </button>
-        <span id="c-status" style="font-size:0.78rem;color:var(--text-dim)"></span>
+        <span id="c-status" style="font-size:1.1875rem;color:var(--text-dim)"></span>
       </div>
     </div>
   </div>
@@ -163,7 +258,18 @@
 <script>
 const params = new URLSearchParams(location.search);
 const dealId = parseInt(params.get('id'));
-let deal = null, contacts = [], team = [], assigned = new Set(), proposals = [];
+let deal = null, contacts = [], team = [], assigned = new Set(), proposals = [], companyUrls = {}, interests = [];
+
+// Same options as the contact form on incremento.co
+const SERVICE_OPTS = [
+  ['web-design',        'Web Design'],
+  ['web-apps',          'Web Apps'],
+  ['digital-marketing', 'Digital Marketing'],
+  ['ai-consultancy',    'AI Consultancy'],
+  ['custom-software',   'Custom Software'],
+  ['not-sure',          'Not sure yet'],
+];
+const svcLabel = slug => (SERVICE_OPTS.find(o => o[0] === slug) || [slug, slug.replace(/-/g,' ')])[1];
 
 function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function jsStr(s){ return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
@@ -178,36 +284,98 @@ async function load() {
   } catch { document.getElementById('d-title').value = 'Failed to load'; return; }
 
   // Parallel: contacts, team, assignees, proposals
-  const [cRes, tRes, aRes, pRes] = await Promise.all([
+  const [cRes, tRes, aRes, pRes, coRes] = await Promise.all([
     apiFetch('/api/contacts?enquiry_id=' + dealId).catch(()=>({contacts:[]})),
     apiFetch('/api/team').catch(()=>({team:[]})),
     apiFetch('/api/enquiries/' + dealId + '/assignees').catch(()=>({assignees:[]})),
     apiFetch('/api/proposals').catch(()=>({proposals:[]})),
+    apiFetch('/api/companies').catch(()=>({companies:[]})),
   ]);
   contacts = (cRes.contacts && cRes.contacts.length) ? cRes.contacts
            : [{ name: deal.name, email: deal.email, role: '', is_primary: 1 }];
   team = tRes.team || [];
   assigned = new Set((aRes.assignees || []).map(a => a.id));
-  proposals = (pRes.proposals || []).filter(p => (p.client_email||'').toLowerCase() === (deal.email||'').toLowerCase());
+  proposals = (pRes.proposals || []).filter(p =>
+    p.enquiry_id != null
+      ? String(p.enquiry_id) === String(dealId)
+      : (p.client_email||'').toLowerCase() === (deal.email||'').toLowerCase());
 
   document.title = (deal.project_title || deal.company || deal.name) + ' — Deal';
   document.getElementById('d-title').value   = deal.project_title || (deal.company ? deal.company + ' — enquiry' : (deal.name + ' — enquiry'));
   document.getElementById('d-company').value = deal.company || '';
+  document.getElementById('d-company-url').value = deal.company_url || '';
+  renderDealLanguage(deal.language === 'pt' ? 'pt' : 'en');
+  updateUrlLink();
+
+  // Populate the company picker (added companies) and keep their URLs for auto-fill
+  companyUrls = {};
+  const dl = document.getElementById('company-list');
+  dl.innerHTML = (coRes.companies || []).map(c => {
+    if (c.company && c.url) companyUrls[c.company.toLowerCase()] = c.url;
+    return `<option value="${escHtml(c.company)}"></option>`;
+  }).join('');
+
   document.getElementById('d-stage').value   = deal.stage || 'new';
   document.getElementById('d-value').value   = deal.value || '';
   document.getElementById('d-notes').value   = deal.notes || '';
 
+  try { interests = typeof deal.interests === 'string' ? JSON.parse(deal.interests || '[]') : (deal.interests || []); }
+  catch { interests = []; }
+  if (!Array.isArray(interests)) interests = [];
+
+  renderServices();
   renderTeam();
   renderCards();
   document.getElementById('content').style.display = 'block';
 
-  mountComms(document.getElementById('comms'), { email: deal.email, enquiry_id: deal.id });
+  mountComms(document.getElementById('comms'), { email: deal.email, enquiry_id: deal.id, hideHeading: true });
 }
 
+function renderServices() {
+  const el = document.getElementById('svc-tags');
+  if (!el) return;
+  const active = SERVICE_OPTS.filter(o => interests.includes(o[0]));
+  const available = SERVICE_OPTS.filter(o => !interests.includes(o[0]));
+  let html = active.map(o =>
+    `<button type="button" class="svc-tag on" onclick="toggleService('${o[0]}')" title="Remove">${escHtml(o[1])} <span class="svc-x">×</span></button>`
+  ).join('');
+  if (!active.length) html += `<span style="font-size:1.0625rem;color:var(--text-dim);align-self:center">No services tagged yet.</span>`;
+  if (available.length) {
+    html += `<span class="svc-add-wrap">
+        <button type="button" class="svc-tag add" onclick="document.getElementById('svc-add').classList.toggle('open')">+ Add service</button>
+        <span class="svc-menu" id="svc-add">` +
+        available.map(o => `<button type="button" class="svc-opt" onclick="toggleService('${o[0]}')">${escHtml(o[1])}</button>`).join('') +
+      `</span></span>`;
+  }
+  el.innerHTML = html;
+}
+
+async function toggleService(slug) {
+  const i = interests.indexOf(slug);
+  if (i >= 0) interests.splice(i, 1); else interests.push(slug);
+  const menu = document.getElementById('svc-add'); if (menu) menu.classList.remove('open');
+  renderServices();
+  try {
+    await apiFetch('/api/enquiries/' + dealId, { method:'PATCH', body: JSON.stringify({ interests }) });
+  } catch {
+    // revert on failure
+    const j = interests.indexOf(slug);
+    if (j >= 0) interests.splice(j, 1); else interests.push(slug);
+    renderServices();
+  }
+}
+
+document.addEventListener('click', e => {
+  const menu = document.getElementById('svc-add');
+  if (menu && menu.classList.contains('open') && !e.target.closest('.svc-add-wrap')) menu.classList.remove('open');
+});
+
 function renderTeam() {
-  document.getElementById('d-team').innerHTML = team.map(m => `
+  const el = document.getElementById('d-team');
+  if (!el) return;   // team UI hidden for now
+  el.innerHTML = team.map(m => `
     <div class="team-av ${assigned.has(m.id)?'on':''}" title="${escHtml(m.name)}${assigned.has(m.id)?' (assigned)':' — click to assign'}" onclick="toggleAssign(${m.id})">${initials(m.name)}</div>
-  `).join('') || '<span style="font-size:0.74rem;color:var(--text-dim)">No team</span>';
+  `).join('') || '<span style="font-size:1.1875rem;color:var(--text-dim)">No team</span>';
 }
 
 async function toggleAssign(id) {
@@ -219,12 +387,12 @@ async function toggleAssign(id) {
 }
 
 function renderCards() {
-  let html = '';
-  // Proposal cards
+  // ── Proposal section ──
+  let ph = '';
   if (proposals.length) {
     proposals.forEach(p => {
       const pdf = p.token ? `<a class="dc-btn" href="https://enquiries.incremento.co/p/${p.token}?pdf=1" target="_blank" onclick="event.stopPropagation()">PDF</a>` : '';
-      html += `
+      ph += `
         <div class="deal-card link" onclick="location.href='proposal.html?id=${p.id}'">
           <span class="dc-label">Proposal</span>
           <div class="dc-title">${escHtml(p.title||'Untitled')}</div>
@@ -233,33 +401,102 @@ function renderCards() {
         </div>`;
     });
   } else {
-    html += `<div class="deal-card dashed link" onclick="location.href='proposal.html?enquiry=${dealId}'">+ Create proposal</div>`;
+    ph += `<div class="deal-card dashed link" onclick="location.href='proposal.html?enquiry=${dealId}'">+ Create proposal</div>`;
   }
-  // Contact cards
-  contacts.forEach(c => {
-    html += `
+  document.getElementById('proposal-cards').innerHTML = ph;
+
+  // ── Contacts section ──
+  let ch = '';
+  contacts.forEach((c, i) => {
+    const meta = [c.role, c.email, c.phone].map(x => (x||'').trim()).filter(Boolean).map(escHtml).join(' · ') || 'No email or phone yet';
+    ch += `
       <div class="deal-card">
         <span class="dc-label">Contact${c.is_primary?' · primary':''}</span>
         <div class="dc-title">${escHtml(c.name)}</div>
-        <div class="dc-meta">${c.role?escHtml(c.role)+' · ':''}${escHtml(c.email||'no email')}</div>
-        <div class="dc-actions">${c.email?`<button class="dc-btn primary" onclick="openCompose('${jsStr(c.email)}','${jsStr(c.name)}')">Send message</button>`:''}</div>
+        <div class="dc-meta">${meta}</div>
+        <div class="dc-actions">
+          ${c.email?`<button class="dc-btn primary" onclick="openCompose('${jsStr(c.email)}','${jsStr(c.name)}')">Send message</button>`:''}
+          <button class="dc-btn" onclick="editContact(${i})">Edit</button>
+        </div>
       </div>`;
   });
-  // Add contact
-  html += `<div class="deal-card dashed link" onclick="addContact()">+ Add contact</div>`;
-  document.getElementById('deal-cards').innerHTML = html;
+  ch += `<div class="deal-card dashed link" onclick="addContact()">+ Add contact</div>`;
+  document.getElementById('contact-cards').innerHTML = ch;
 }
 
-async function addContact() {
-  const name = prompt('Contact name'); if (!name) return;
-  const email = prompt('Email (optional)') || '';
-  const role  = prompt('Role / title (optional)') || '';
+function updateUrlLink() {
+  const v = document.getElementById('d-company-url').value.trim();
+  const a = document.getElementById('d-url-link');
+  if (v) {
+    a.href = /^https?:\/\//i.test(v) ? v : 'https://' + v;
+    a.style.display = 'inline-flex';
+  } else {
+    a.style.display = 'none';
+  }
+}
+
+/* ── Communication language (drives emails, the AI draft & the proposal page) ── */
+function renderDealLanguage(lang) {
+  document.querySelectorAll('#deal-lang-toggle .lang-opt').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+}
+async function setDealLanguage(lang) {
+  renderDealLanguage(lang);                 // optimistic
+  if (deal) deal.language = lang;
   try {
-    await apiFetch('/api/contacts', { method:'POST', body: JSON.stringify({ enquiry_id: dealId, name, email, role }) });
+    await apiFetch('/api/enquiries/' + dealId, { method:'PATCH', body: JSON.stringify({ language: lang }) });
+  } catch { alert('Could not update the language. Please try again.'); }
+}
+
+/* ── Add / edit contact (modal) ──────────────────────────── */
+function addContact(){ openContactForm(null); }
+function editContact(idx){ openContactForm(idx); }
+function openContactForm(idx) {
+  const c = (idx != null && contacts[idx]) ? contacts[idx] : null;
+  document.getElementById('cf-idx').value   = (idx != null) ? idx : '';
+  document.getElementById('cf-title').textContent = c ? 'Edit contact' : 'Add contact';
+  document.getElementById('cf-name').value  = c ? (c.name||'')  : '';
+  document.getElementById('cf-email').value = c ? (c.email||'') : '';
+  document.getElementById('cf-role').value  = c ? (c.role||'')  : '';
+  document.getElementById('cf-phone').value = c ? (c.phone||'') : '';
+  document.getElementById('cf-primary').checked = c ? !!c.is_primary : (contacts.length === 0);
+  document.getElementById('contact-form-modal').style.display = 'flex';
+  setTimeout(() => document.getElementById('cf-name').focus(), 50);
+}
+function closeContactForm(){ document.getElementById('contact-form-modal').style.display = 'none'; }
+async function saveContactForm() {
+  const idxRaw = document.getElementById('cf-idx').value;
+  const existing = idxRaw !== '' ? contacts[parseInt(idxRaw)] : null;
+  const makePrimary = document.getElementById('cf-primary').checked;
+  const payload = {
+    name:  document.getElementById('cf-name').value.trim(),
+    email: document.getElementById('cf-email').value.trim(),
+    role:  document.getElementById('cf-role').value.trim(),
+    phone: document.getElementById('cf-phone').value.trim(),
+    is_primary: makePrimary ? 1 : 0,
+  };
+  if (!payload.name) { document.getElementById('cf-name').focus(); return; }
+  const btn = document.getElementById('cf-save'); btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    let saved;
+    if (existing && existing.id) {
+      saved = await apiFetch('/api/contacts/' + existing.id, { method:'PATCH', body: JSON.stringify(payload) });
+    } else {
+      // new contact, or promoting the deal's primary into a real editable record
+      saved = await apiFetch('/api/contacts', { method:'POST', body: JSON.stringify({ enquiry_id: dealId, ...payload }) });
+    }
+    // Only one primary per deal: clear it on the others
+    if (makePrimary && saved && saved.id) {
+      const cRes0 = await apiFetch('/api/contacts?enquiry_id=' + dealId);
+      await Promise.all((cRes0.contacts || [])
+        .filter(x => x.id !== saved.id && x.is_primary)
+        .map(x => apiFetch('/api/contacts/' + x.id, { method:'PATCH', body: JSON.stringify({ is_primary: 0 }) })));
+    }
     const cRes = await apiFetch('/api/contacts?enquiry_id=' + dealId);
-    contacts = cRes.contacts || contacts;
+    contacts = (cRes.contacts && cRes.contacts.length) ? cRes.contacts : contacts;
+    closeContactForm();
     renderCards();
-  } catch { alert('Could not add contact'); }
+  } catch { alert('Could not save the contact. Please try again.'); }
+  btn.disabled = false; btn.textContent = 'Save';
 }
 
 /* ── Compose ─────────────────────────────────────────────── */
@@ -289,12 +526,53 @@ async function sendCompose() {
     status.textContent = '✓ Sent';
     setTimeout(() => {
       closeCompose();
-      mountComms(document.getElementById('comms'), { email: deal.email, enquiry_id: deal.id });
+      mountComms(document.getElementById('comms'), { email: deal.email, enquiry_id: deal.id, hideHeading: true });
     }, 700);
   } catch {
     status.textContent = 'Send failed'; status.style.color = '#ff8a8a';
   }
   btn.disabled = false;
+}
+
+/* When an existing company is picked, auto-fill its URL if the field is empty */
+function onCompanyPick() {
+  const name = document.getElementById('d-company').value.trim().toLowerCase();
+  const urlEl = document.getElementById('d-company-url');
+  if (!urlEl.value.trim() && companyUrls[name]) urlEl.value = companyUrls[name];
+}
+
+/* Auto-save company name + URL as soon as you click out of the field
+   (so you don't have to remember the Save button for these). */
+async function autoSaveCompany() {
+  if (!dealId) return;
+  updateUrlLink();
+  const company     = document.getElementById('d-company').value.trim();
+  const company_url = document.getElementById('d-company-url').value.trim();
+  try {
+    await apiFetch('/api/enquiries/' + dealId, { method:'PATCH', body: JSON.stringify({ company, company_url }) });
+    if (deal) { deal.company = company; deal.company_url = company_url; }
+    flashSaved();
+  } catch { /* the manual Save button is still there as a fallback */ }
+}
+function flashSaved() {
+  const b = document.getElementById('btn-save'); if (!b) return;
+  const o = b.innerHTML; b.disabled = true; b.innerHTML = '✓ Saved';
+  setTimeout(() => { b.innerHTML = o; b.disabled = false; }, 1100);
+}
+
+/* ── Delete deal ─────────────────────────────────────────── */
+async function deleteDeal() {
+  const label = (deal && (deal.company || deal.name)) || 'this deal';
+  if (!confirm('Delete the deal "' + label + '"?\nThis permanently removes it and all its contacts, messages and proposals. This cannot be undone.')) return;
+  const btn = document.getElementById('btn-delete');
+  btn.disabled = true; btn.style.opacity = '0.5';
+  try {
+    await apiFetch('/api/enquiries/' + dealId, { method: 'DELETE' });
+    location.href = 'pipeline.html';
+  } catch {
+    btn.disabled = false; btn.style.opacity = '';
+    alert('Failed to delete the deal. Please try again.');
+  }
 }
 
 /* ── Save deal ───────────────────────────────────────────── */
@@ -305,6 +583,7 @@ async function saveDeal() {
     await apiFetch('/api/enquiries/' + dealId, { method:'PATCH', body: JSON.stringify({
       project_title: document.getElementById('d-title').value.trim(),
       company:       document.getElementById('d-company').value.trim(),
+      company_url:   document.getElementById('d-company-url').value.trim(),
       stage:         document.getElementById('d-stage').value,
       value:         parseInt(document.getElementById('d-value').value) || 0,
       notes:         document.getElementById('d-notes').value,

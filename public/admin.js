@@ -38,24 +38,24 @@ function loginCardHtml() {
   return `
   <div style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:40px;width:100%;max-width:380px;text-align:center">
     <svg width="36" height="36" viewBox="0 0 32 32" fill="none" style="margin:0 auto 16px"><defs><linearGradient id="lgx" x1="0" y1="32" x2="32" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#9EF54A"/><stop offset="100%" stop-color="#5EE7D8"/></linearGradient></defs><rect x="4" y="20" width="5" height="8" rx="2.5" fill="url(#lgx)" opacity="0.55"/><rect x="12" y="14" width="5" height="14" rx="2.5" fill="url(#lgx)" opacity="0.78"/><rect x="20" y="10" width="5" height="18" rx="2.5" fill="url(#lgx)"/><circle cx="22.5" cy="5.5" r="2.25" fill="url(#lgx)"/></svg>
-    <p style="font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:600;color:var(--text);margin-bottom:6px">incremento<span style="color:var(--lime)">.</span> admin</p>
+    <p style="font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:600;color:var(--text);margin-bottom:6px">incremento<span style="color:var(--lime)">.</span> admin</p>
 
     <div id="login-step-email">
-      <p style="font-size:0.78rem;color:var(--text-dim);margin-bottom:24px">Enter your email — we'll send you a sign-in code</p>
+      <p style="font-size:1.1875rem;color:var(--text-dim);margin-bottom:24px">Enter your email — we'll send you a sign-in code</p>
       <input id="login-email" type="email" placeholder="you@incremento.co" autocomplete="email"
-        style="width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;font-family:'Inter',sans-serif;font-size:0.88rem;color:var(--text);outline:none;margin-bottom:12px;box-sizing:border-box">
+        style="width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;font-family:'Inter',sans-serif;font-size:1.1875rem;color:var(--text);outline:none;margin-bottom:12px;box-sizing:border-box">
       <button id="login-send" class="btn-primary" style="width:100%;justify-content:center">Send code</button>
     </div>
 
     <div id="login-step-code" style="display:none">
-      <p style="font-size:0.78rem;color:var(--text-dim);margin-bottom:24px">We emailed a 6-digit code to <strong id="login-email-echo" style="color:var(--text)"></strong></p>
+      <p style="font-size:1.1875rem;color:var(--text-dim);margin-bottom:24px">We emailed a 6-digit code to <strong id="login-email-echo" style="color:var(--text)"></strong></p>
       <input id="login-code" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="• • • • • •" maxlength="6"
         style="width:100%;padding:12px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;font-family:'Space Grotesk',monospace;font-size:1.3rem;letter-spacing:0.4em;text-align:center;color:var(--text);outline:none;margin-bottom:12px;box-sizing:border-box">
       <button id="login-verify" class="btn-primary" style="width:100%;justify-content:center">Sign in</button>
-      <button id="login-back" style="background:none;border:none;color:var(--text-dim);font-size:0.74rem;margin-top:12px;cursor:pointer;font-family:'Inter',sans-serif">Use a different email</button>
+      <button id="login-back" style="background:none;border:none;color:var(--text-dim);font-size:1.1875rem;margin-top:12px;cursor:pointer;font-family:'Inter',sans-serif">Use a different email</button>
     </div>
 
-    <p id="login-error" style="display:none;font-size:0.76rem;color:#ef4444;margin-top:14px"></p>
+    <p id="login-error" style="display:none;font-size:1.1875rem;color:#ef4444;margin-top:14px"></p>
   </div>`;
 }
 
@@ -157,6 +157,20 @@ async function loadNavBadge() {
       badge.textContent = data.new_count;
       badge.style.display = 'inline';
     }
+    // Triage queue: only show the nav item when there's something to triage
+    const tb = document.getElementById('triage-badge');
+    if (tb) {
+      const navItem = tb.closest('.nav-item');
+      const onTriagePage = /triage\.html/.test(location.pathname);
+      if (data.triage_count > 0) {
+        tb.textContent = data.triage_count; tb.style.display = 'inline';
+        if (navItem) navItem.style.display = '';
+      } else {
+        tb.style.display = 'none';
+        // Hide the tab entirely unless we're currently viewing it
+        if (navItem && !onTriagePage) navItem.style.display = 'none';
+      }
+    }
   } catch {}
 }
 
@@ -175,31 +189,37 @@ function timeAgo(dateStr) {
 
 /* ── Stage helpers ───────────────────────────────────────── */
 const STAGE_LABELS = {
-  new:          'New',
-  proposal_sent:'Proposal Sent',
-  accepted:     'Accepted',
-  in_progress:  'In Progress',
-  completed:    'Completed',
-  on_hold:      'On Hold',
-  cancelled:    'Cancelled',
+  new:           'New',
+  meeting_booked:'Call Booked',
+  call_complete: 'Call Complete',
+  proposal_sent: 'Proposal Sent',
+  accepted:      'Accepted',
+  in_progress:   'In Progress',
+  on_hold:       'On Hold',
+  completed:     'Complete',
+  cancelled:     'Cancelled',
 };
 const STAGE_CSS = {
-  new:          'stage-new',
-  proposal_sent:'stage-proposal',
-  accepted:     'stage-accepted',
-  in_progress:  'stage-in_progress',
-  completed:    'stage-completed',
-  on_hold:      'stage-on_hold',
-  cancelled:    'stage-cancelled',
+  new:           'stage-new',
+  meeting_booked:'stage-meeting_booked',
+  call_complete: 'stage-call_complete',
+  proposal_sent: 'stage-proposal',
+  accepted:      'stage-accepted',
+  in_progress:   'stage-in_progress',
+  on_hold:       'stage-on_hold',
+  completed:     'stage-completed',
+  cancelled:     'stage-cancelled',
 };
 const STAGE_COLORS = {
-  new:          '#5EE7D8',
-  proposal_sent:'#f59e0b',
-  accepted:     '#9EF54A',
-  in_progress:  '#22c55e',
-  completed:    '#22c55e',
-  on_hold:      '#94a3b8',
-  cancelled:    '#ef4444',
+  new:           '#5EE7D8',
+  meeting_booked:'#38bdf8',
+  call_complete: '#2dd4bf',
+  proposal_sent: '#f59e0b',
+  accepted:      '#9EF54A',
+  in_progress:   '#22c55e',
+  on_hold:       '#94a3b8',
+  completed:     '#22c55e',
+  cancelled:     '#ef4444',
 };
 
 function stageBadge(stage) {
@@ -210,6 +230,35 @@ function interestPills(interests) {
   if (!interests) return '';
   const arr = typeof interests === 'string' ? JSON.parse(interests) : interests;
   return arr.map(i => `<span class="interest-pill">${i.replace(/-/g,' ')}</span>`).join(' ');
+}
+
+/* ── Shared "All Deals" list rows (pipeline + dashboard) ─────
+   Markup is identical on both pages. Rows call quickStage(id,stage) and
+   deleteDeal(id), which each page defines (with its own refresh logic). */
+const DEAL_STAGE_ORDER = ['new','meeting_booked','call_complete','proposal_sent','accepted','in_progress','on_hold','completed','cancelled'];
+function dealListHtml(list) {
+  const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return list.map(e => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 20px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.15s" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''" onclick="location.href='enquiry.html?id=${e.id}'">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:1.1875rem;font-weight:500;color:var(--text);margin-bottom:3px">${esc(e.project_title || e.company || e.name)}</div>
+        <div style="font-size:1.1875rem;color:var(--text-dim);display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span>${esc(e.contact_name || e.name)}</span>
+          <span>·</span>
+          <span>${timeAgo(e.submitted_at)}</span>
+          ${interestPills(e.interests)}
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;flex-shrink:0">
+        ${e.value>0?`<span style="font-size:1.1875rem;font-weight:600;color:var(--green)">€${Number(e.value).toLocaleString()}</span>`:''}
+        <select class="stage-select" style="width:auto;padding:5px 8px;font-size:1.1875rem" onchange="quickStage(${e.id},this.value)" onclick="event.stopPropagation()">
+          ${DEAL_STAGE_ORDER.map(s=>`<option value="${s}"${e.stage===s?' selected':''}>${STAGE_LABELS[s]}</option>`).join('')}
+        </select>
+        <button title="Delete deal" onclick="event.stopPropagation();deleteDeal(${e.id})" style="background:none;border:none;color:var(--text-dim);cursor:pointer;padding:4px;line-height:0;display:flex;border-radius:6px" onmouseover="this.style.color='#ff6b6b'" onmouseout="this.style.color='var(--text-dim)'">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+        </button>
+      </div>
+    </div>`).join('');
 }
 
 /* ── Quotes ──────────────────────────────────────────────── */
@@ -250,13 +299,13 @@ const COMMS_META = {
 
 async function mountComms(container, opts) {
   const email = (opts.email || '').trim();
-  if (!email) { container.innerHTML = ''; return; }
+  if (!email && !opts.enquiry_id) { container.innerHTML = ''; return; }
 
   container.innerHTML = `
     <div class="panel" style="padding:20px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-        <div class="detail-label" style="margin:0">Communication history</div>
-        <button class="btn-ghost" id="comms-log-toggle" style="font-size:0.72rem;padding:5px 10px">+ Log a message</button>
+        ${opts.hideHeading ? '<div></div>' : '<div class="detail-label" style="margin:0">Communication history</div>'}
+        <button class="btn-ghost" id="comms-log-toggle" style="font-size:1.1875rem;padding:5px 10px">+ Log a message</button>
       </div>
       <div id="comms-composer" style="display:none;margin-bottom:16px;padding:14px;background:var(--surface2);border:1px solid var(--border2);border-radius:10px">
         <div style="display:flex;gap:8px;margin-bottom:8px">
@@ -268,7 +317,7 @@ async function mountComms(container, opts) {
         </div>
         <textarea id="comms-body" class="notes-textarea" rows="3" placeholder="What was said…"></textarea>
         <div style="text-align:right;margin-top:8px">
-          <button class="btn-primary" id="comms-save" style="font-size:0.78rem;padding:7px 14px">Save to history</button>
+          <button class="btn-primary" id="comms-save" style="font-size:1.1875rem;padding:7px 14px">Save to history</button>
         </div>
       </div>
       <div id="comms-list"><div class="empty-state" style="padding:24px">Loading…</div></div>
@@ -278,13 +327,17 @@ async function mountComms(container, opts) {
 
   async function refresh() {
     try {
-      const data = await apiFetch('/api/messages?email=' + encodeURIComponent(email));
+      const q = opts.enquiry_id
+        ? '/api/messages?enquiry_id=' + encodeURIComponent(opts.enquiry_id)
+        : '/api/messages?email=' + encodeURIComponent(email);
+      const data = await apiFetch(q);
       const msgs = (data.messages || []);
       if (!msgs.length) {
         listEl.innerHTML = '<div class="empty-state" style="padding:24px">No messages yet</div>';
         return;
       }
-      listEl.innerHTML = msgs.map(m => {
+      // Most recent at the top
+      listEl.innerHTML = msgs.slice().reverse().map(m => {
         const meta = COMMS_META[m.kind] || COMMS_META.note;
         const inbound = m.direction === 'inbound';
         // Two-colour thread: client = cyan (left), Incremento = lime (right)
@@ -297,13 +350,13 @@ async function mountComms(container, opts) {
           <div style="display:flex;justify-content:${align};margin:10px 0">
             <div style="max-width:80%;min-width:0;background:${bg};border:1px solid ${border};border-radius:12px;padding:10px 14px">
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px">
-                <span style="font-size:0.72rem;font-weight:600;color:${accent}">${who}</span>
-                <span style="font-size:0.66rem;color:var(--text-dim)">${meta.label}</span>
-                ${m.source==='manual'?'<span style="font-size:0.62rem;color:var(--text-dim);border:1px solid var(--border2);border-radius:10px;padding:1px 6px">logged</span>':''}
-                <span style="font-size:0.66rem;color:var(--text-dim);margin-left:auto">${timeAgo(m.created_at)}</span>
+                <span style="font-size:1.1875rem;font-weight:600;color:${accent}">${who}</span>
+                <span style="font-size:1.1875rem;color:var(--text-dim)">${meta.label}</span>
+                ${m.source==='manual'?'<span style="font-size:1.1875rem;color:var(--text-dim);border:1px solid var(--border2);border-radius:10px;padding:1px 6px">logged</span>':''}
+                <span style="font-size:1.1875rem;color:var(--text-dim);margin-left:auto">${timeAgo(m.created_at)}</span>
               </div>
-              ${m.subject?`<div style="font-size:0.86rem;font-weight:500;color:var(--text)">${commsEscape(m.subject)}</div>`:''}
-              ${m.body?`<div style="font-size:0.82rem;color:var(--text-sub);line-height:1.5;white-space:pre-wrap;margin-top:2px">${commsEscape(m.body)}</div>`:''}
+              ${m.subject?`<div style="font-size:1.1875rem;font-weight:500;color:var(--text)">${commsEscape(m.subject)}</div>`:''}
+              ${m.body?`<div style="font-size:1.1875rem;color:var(--text-sub);line-height:1.5;white-space:pre-wrap;margin-top:2px">${commsEscape(m.body)}</div>`:''}
             </div>
           </div>`;
       }).join('');

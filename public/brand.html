@@ -16,21 +16,21 @@
 .asset-preview.on-light{background:#F4F6FA}
 .asset-preview img{max-width:100%;max-height:100%;object-fit:contain}
 .asset-meta{padding:14px 16px;border-top:1px solid var(--border)}
-.asset-name{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:0.9rem;color:var(--text)}
-.asset-use{font-size:0.74rem;color:var(--text-dim);margin-top:2px}
+.asset-name{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:1.1875rem;color:var(--text)}
+.asset-use{font-size:1.1875rem;color:var(--text-dim);margin-top:2px}
 .asset-dls{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
-.dl-btn{display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;font-weight:500;padding:5px 11px;border-radius:6px;border:1px solid var(--border2);color:var(--text-sub);text-decoration:none;transition:all .15s}
+.dl-btn{display:inline-flex;align-items:center;gap:5px;font-size:1.1875rem;font-weight:500;padding:5px 11px;border-radius:6px;border:1px solid var(--border2);color:var(--text-sub);text-decoration:none;transition:all .15s}
 .dl-btn:hover{border-color:var(--lime);color:var(--lime)}
 .swatch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
 .swatch{border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;transition:transform .12s}
 .swatch:hover{transform:translateY(-2px)}
 .swatch-chip{height:84px}
 .swatch-meta{padding:11px 14px}
-.swatch-name{font-weight:600;font-size:0.84rem;color:var(--text)}
-.swatch-hex{font-family:monospace;font-size:0.76rem;color:var(--text-dim);margin-top:1px}
-.swatch-use{font-size:0.7rem;color:var(--text-dim);margin-top:4px}
+.swatch-name{font-weight:600;font-size:1.1875rem;color:var(--text)}
+.swatch-hex{font-family:monospace;font-size:1.1875rem;color:var(--text-dim);margin-top:1px}
+.swatch-use{font-size:1.1875rem;color:var(--text-dim);margin-top:4px}
 .copied{color:var(--lime)!important}
-.guide-item{display:flex;gap:10px;font-size:0.84rem;color:var(--text-sub);padding:7px 0;line-height:1.5}
+.guide-item{display:flex;gap:10px;font-size:1.1875rem;color:var(--text-sub);padding:7px 0;line-height:1.5}
 .guide-item svg{flex:0 0 16px;margin-top:2px}
 </style>
 </head>
@@ -50,6 +50,7 @@
   </div>
   <nav class="sidebar-nav">
     <a class="nav-item" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a class="nav-item" href="triage.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>Triage<span class="nav-badge" id="triage-badge" style="display:none"></span></a>
     <a class="nav-item" href="pipeline.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Pipeline</a>
     <a class="nav-item" href="proposals.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Proposals</a>
     <a class="nav-item" href="contacts.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Contacts</a>
@@ -91,7 +92,7 @@
       <div style="margin-top:18px">
         <div class="detail-label" style="margin-bottom:8px">Brand gradient</div>
         <div onclick="copyText('linear-gradient(135deg, #C7F26B 0%, #7FE9E0 100%)', this)"
-             style="height:64px;border-radius:var(--radius-lg);cursor:pointer;background:linear-gradient(135deg,#C7F26B 0%,#7FE9E0 100%);display:flex;align-items:center;justify-content:center;font-family:monospace;font-size:0.78rem;color:#0F1426;font-weight:600">
+             style="height:64px;border-radius:var(--radius-lg);cursor:pointer;background:linear-gradient(135deg,#C7F26B 0%,#7FE9E0 100%);display:flex;align-items:center;justify-content:center;font-family:monospace;font-size:1.1875rem;color:#0F1426;font-weight:600">
           linear-gradient(135deg, #C7F26B 0%, #7FE9E0 100%)
         </div>
       </div>
@@ -107,7 +108,7 @@
           <div class="detail-label" style="margin-bottom:10px">Type</div>
           <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:1.4rem;color:var(--text);letter-spacing:-0.02em">Space Grotesk</div>
           <div class="asset-use">Display &amp; headings · 500–700 · −0.02em</div>
-          <div style="font-family:'Inter',sans-serif;font-size:1.1rem;color:var(--text);margin-top:14px">Inter</div>
+          <div style="font-family:'Inter',sans-serif;font-size:1.3rem;color:var(--text);margin-top:14px">Inter</div>
           <div class="asset-use">Body &amp; UI · 400–600</div>
         </div>
         <div>

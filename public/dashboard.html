@@ -21,9 +21,9 @@
       <rect x="20" y="10" width="5" height="18" rx="2.5" fill="url(#lg)"/>
       <circle cx="22.5" cy="5.5" r="2.25" fill="url(#lg)"/>
     </svg>
-    <p style="font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:600;color:var(--text);margin-bottom:6px">incremento<span style="color:var(--lime)">.</span> admin</p>
-    <p style="font-size:0.78rem;color:var(--text-dim);margin-bottom:24px">Enter your admin key to continue</p>
-    <input id="login-key" type="password" placeholder="Admin key" style="width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;font-family:'Inter',sans-serif;font-size:0.88rem;color:var(--text);outline:none;margin-bottom:12px">
+    <p style="font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:600;color:var(--text);margin-bottom:6px">incremento<span style="color:var(--lime)">.</span> admin</p>
+    <p style="font-size:1.1875rem;color:var(--text-dim);margin-bottom:24px">Enter your admin key to continue</p>
+    <input id="login-key" type="password" placeholder="Admin key" style="width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;font-family:'Inter',sans-serif;font-size:1.1875rem;color:var(--text);outline:none;margin-bottom:12px">
     <button id="login-btn" class="btn-primary" style="width:100%;justify-content:center">Unlock</button>
   </div>
 </div>
@@ -50,6 +50,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
       Dashboard
     </a>
+    <a class="nav-item" href="triage.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>Triage<span class="nav-badge" id="triage-badge" style="display:none"></span></a>
     <a class="nav-item" href="pipeline.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
       Pipeline
@@ -91,7 +92,7 @@
 
   <!-- KPI row 1: pipeline summary -->
   <div class="kpi-row kpi-row-4" id="kpi-row-1">
-    <div class="kpi-card">
+    <div class="kpi-card" onclick="location.href='pipeline.html?stage=new'" style="cursor:pointer">
       <div class="kpi-card-top">
         <div class="kpi-icon kpi-icon-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
         <div class="kpi-label">New Enquiries</div>
@@ -99,7 +100,7 @@
       <div class="kpi-value cyan" id="kpi-new">—</div>
       <div class="kpi-sub" id="kpi-new-sub">Loading…</div>
     </div>
-    <div class="kpi-card">
+    <div class="kpi-card" onclick="location.href='pipeline.html'" style="cursor:pointer">
       <div class="kpi-card-top">
         <div class="kpi-icon kpi-icon-lime"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
         <div class="kpi-label">Active Pipeline</div>
@@ -107,7 +108,7 @@
       <div class="kpi-value" id="kpi-pipeline">—</div>
       <div class="kpi-sub" id="kpi-pipeline-sub">Loading…</div>
     </div>
-    <div class="kpi-card">
+    <div class="kpi-card" onclick="location.href='pipeline.html'" style="cursor:pointer">
       <div class="kpi-card-top">
         <div class="kpi-icon kpi-icon-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
         <div class="kpi-label">Potential Revenue</div>
@@ -115,7 +116,7 @@
       <div class="kpi-value green" id="kpi-revenue">—</div>
       <div class="kpi-sub" id="kpi-revenue-sub">Active deals</div>
     </div>
-    <div class="kpi-card">
+    <div class="kpi-card" onclick="location.href='pipeline.html'" style="cursor:pointer">
       <div class="kpi-card-top">
         <div class="kpi-icon kpi-icon-amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
         <div class="kpi-label">Conversion Rate</div>
@@ -148,16 +149,31 @@
     </div>
   </div>
 
-  <!-- Enquiries by service -->
-  <div class="panel" style="margin-top:20px">
-    <div class="panel-header"><span class="panel-title">Enquiries by Service</span></div>
-    <div class="stage-bars" id="service-bars"><div style="padding:32px;text-align:center;color:var(--text-dim)">Loading…</div></div>
+  <!-- Secondary stats: half-width each -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-top:20px;align-items:start">
+    <div class="panel" style="margin:0">
+      <div class="panel-header"><span class="panel-title">Enquiries by Service</span></div>
+      <div class="stage-bars" id="service-bars"><div style="padding:32px;text-align:center;color:var(--text-dim)">Loading…</div></div>
+    </div>
+    <div class="panel" style="margin:0">
+      <div class="panel-header"><span class="panel-title">Monthly Enquiries</span></div>
+      <div id="monthly-chart" style="padding:20px 20px 10px"><div style="text-align:center;color:var(--text-dim);padding:32px">Loading…</div></div>
+    </div>
   </div>
 
-  <!-- Monthly enquiries -->
+  <!-- All deals (same list as the Pipeline page) -->
   <div class="panel" style="margin-top:20px">
-    <div class="panel-header"><span class="panel-title">Monthly Enquiries</span></div>
-    <div id="monthly-chart" style="padding:20px 20px 10px"><div style="text-align:center;color:var(--text-dim);padding:32px">Loading…</div></div>
+    <div class="panel-header">
+      <span class="panel-title" id="deals-title">All Deals</span>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="search-bar" style="max-width:220px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="deals-search" placeholder="Search…">
+        </div>
+        <a href="pipeline.html" style="font-size:1.1875rem;color:var(--cyan);text-decoration:none;white-space:nowrap">Open Pipeline →</a>
+      </div>
+    </div>
+    <div id="dash-deal-list"><div class="empty-state">Loading…</div></div>
   </div>
 
   <!-- Brand assets quick link -->
@@ -166,8 +182,8 @@
       <svg width="24" height="24" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="bg" x1="0" y1="32" x2="32" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#C7F26B"/><stop offset="100%" stop-color="#7FE9E0"/></linearGradient></defs><rect x="4" y="20" width="5" height="8" rx="2.5" fill="url(#bg)" opacity="0.55"/><rect x="12" y="14" width="5" height="14" rx="2.5" fill="url(#bg)" opacity="0.78"/><rect x="20" y="10" width="5" height="18" rx="2.5" fill="url(#bg)"/><circle cx="22.5" cy="5.5" r="2.25" fill="url(#bg)"/></svg>
     </div>
     <div style="flex:1">
-      <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:0.95rem;color:var(--text)">Brand Assets</div>
-      <div style="font-size:0.78rem;color:var(--text-dim);margin-top:1px">Logos, colours and guidelines — download SVG/PNG</div>
+      <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:1.1875rem;color:var(--text)">Brand Assets</div>
+      <div style="font-size:1.1875rem;color:var(--text-dim);margin-top:1px">Logos, colours and guidelines — download SVG/PNG</div>
     </div>
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
   </a>
@@ -194,6 +210,8 @@ async function loadDashboard() {
 
     const stats = statsRes;
     const enqs  = enquiriesRes.enquiries || [];
+    dashDeals = enqs;
+    renderDashDeals();
 
     // KPI: new
     document.getElementById('kpi-new').textContent = stats.new_count ?? '0';
@@ -264,7 +282,7 @@ async function loadDashboard() {
       const maxM = Math.max(...months.map(m=>monthly[m]), 1);
       document.getElementById('monthly-chart').innerHTML = `
         <div style="display:flex;align-items:flex-end;gap:8px;height:140px;padding-bottom:24px;position:relative">
-          ${months.map(m => { const h=Math.max((monthly[m]/maxM)*120,4); return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end;position:relative"><span style="font-size:0.68rem;color:var(--lime);font-weight:600">${monthly[m]}</span><div style="width:100%;height:${h}px;background:linear-gradient(to top,#9EF54A,#5EE7D8);border-radius:4px 4px 0 0;opacity:0.85"></div><span style="position:absolute;bottom:-20px;font-size:0.62rem;color:var(--text-dim);white-space:nowrap">${new Date(m+'-01').toLocaleDateString('en-GB',{month:'short',year:'2-digit'})}</span></div>`; }).join('')}
+          ${months.map(m => { const h=Math.max((monthly[m]/maxM)*120,4); return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end;position:relative"><span style="font-size:1.1875rem;color:var(--lime);font-weight:600">${monthly[m]}</span><div style="width:100%;height:${h}px;background:linear-gradient(to top,#9EF54A,#5EE7D8);border-radius:4px 4px 0 0;opacity:0.85"></div><span style="position:absolute;bottom:-20px;font-size:1.1875rem;color:var(--text-dim);white-space:nowrap">${new Date(m+'-01').toLocaleDateString('en-GB',{month:'short',year:'2-digit'})}</span></div>`; }).join('')}
         </div>`;
     }
   } catch(err) {
@@ -276,6 +294,52 @@ async function loadDashboard() {
 function escHtml(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
+
+/* ── All Deals list (shares dealListHtml + helpers with the Pipeline page) ── */
+let dashDeals = [];
+let dealsSearch = '';
+
+function renderDashDeals() {
+  let list = dashDeals;
+  if (dealsSearch) {
+    const q = dealsSearch.toLowerCase();
+    list = list.filter(e =>
+      (e.name||'').toLowerCase().includes(q) ||
+      (e.email||'').toLowerCase().includes(q) ||
+      (e.company||'').toLowerCase().includes(q) ||
+      (e.project_title||'').toLowerCase().includes(q)
+    );
+  }
+  document.getElementById('deals-title').textContent = 'All Deals (' + list.length + ')';
+  document.getElementById('dash-deal-list').innerHTML = list.length
+    ? dealListHtml(list)
+    : '<div class="empty-state">No deals' + (dealsSearch ? ' match your search' : ' yet') + '</div>';
+}
+
+async function quickStage(id, stage) {
+  try {
+    await apiFetch('/api/enquiries/' + id, { method:'PATCH', body: JSON.stringify({ stage }) });
+    const e = dashDeals.find(x => x.id === id);
+    if (e) e.stage = stage;
+    renderDashDeals();
+  } catch { alert('Failed to update stage'); }
+}
+
+async function deleteDeal(id) {
+  const e = dashDeals.find(x => x.id === id);
+  const name = e ? (e.company || e.name) : 'this deal';
+  if (!confirm('Delete the deal "' + name + '"?\nThis permanently removes it and all its contacts, messages and proposals. This cannot be undone.')) return;
+  try {
+    await apiFetch('/api/enquiries/' + id, { method: 'DELETE' });
+    dashDeals = dashDeals.filter(x => x.id !== id);
+    renderDashDeals();
+  } catch { alert('Failed to delete the deal. Please try again.'); }
+}
+
+document.getElementById('deals-search').addEventListener('input', e => {
+  dealsSearch = e.target.value.trim();
+  renderDashDeals();
+});
 
 loadDashboard();
 </script>

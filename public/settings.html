@@ -14,9 +14,9 @@
 <div id="login-overlay" style="display:none;position:fixed;inset:0;background:rgba(10,18,25,0.97);z-index:999;align-items:center;justify-content:center">
   <div style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:40px;width:100%;max-width:380px;text-align:center">
     <svg width="36" height="36" viewBox="0 0 32 32" fill="none" style="margin:0 auto 16px"><defs><linearGradient id="lg" x1="0" y1="32" x2="32" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#9EF54A"/><stop offset="100%" stop-color="#5EE7D8"/></linearGradient></defs><rect x="4" y="20" width="5" height="8" rx="2.5" fill="url(#lg)" opacity="0.55"/><rect x="12" y="14" width="5" height="14" rx="2.5" fill="url(#lg)" opacity="0.78"/><rect x="20" y="10" width="5" height="18" rx="2.5" fill="url(#lg)"/><circle cx="22.5" cy="5.5" r="2.25" fill="url(#lg)"/></svg>
-    <p style="font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:600;color:var(--text);margin-bottom:6px">incremento<span style="color:var(--lime)">.</span> admin</p>
-    <p style="font-size:0.78rem;color:var(--text-dim);margin-bottom:24px">Enter your admin key to continue</p>
-    <input id="login-key" type="password" placeholder="Admin key" style="width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;font-family:'Inter',sans-serif;font-size:0.88rem;color:var(--text);outline:none;margin-bottom:12px">
+    <p style="font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:600;color:var(--text);margin-bottom:6px">incremento<span style="color:var(--lime)">.</span> admin</p>
+    <p style="font-size:1.1875rem;color:var(--text-dim);margin-bottom:24px">Enter your admin key to continue</p>
+    <input id="login-key" type="password" placeholder="Admin key" style="width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;font-family:'Inter',sans-serif;font-size:1.1875rem;color:var(--text);outline:none;margin-bottom:12px">
     <button id="login-btn" class="btn-primary" style="width:100%;justify-content:center">Unlock</button>
   </div>
 </div>
@@ -31,6 +31,7 @@
   </div>
   <nav class="sidebar-nav">
     <a class="nav-item" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a class="nav-item" href="triage.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>Triage<span class="nav-badge" id="triage-badge" style="display:none"></span></a>
     <a class="nav-item" href="pipeline.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Pipeline</a>
     <a class="nav-item" href="proposals.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Proposals</a>
     <a class="nav-item" href="contacts.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Contacts</a>
@@ -49,53 +50,6 @@
   </div>
 
   <div style="max-width:640px">
-
-    <!-- Admin Access -->
-    <div class="panel" style="margin-bottom:20px">
-      <div class="panel-header"><span class="panel-title">Admin Access</span></div>
-      <div style="padding:20px">
-        <div class="settings-section">
-          <div class="settings-row">
-            <div>
-              <div class="settings-row-label">Admin Key</div>
-              <div class="settings-row-sub">Used to authenticate API requests from this dashboard</div>
-            </div>
-            <div style="display:flex;gap:8px;align-items:center">
-              <input type="password" id="key-input" class="settings-input" style="min-width:160px" placeholder="Enter new key">
-              <button class="btn-primary" onclick="saveKey()">Save</button>
-            </div>
-          </div>
-          <div class="settings-row" style="border-bottom:none">
-            <div>
-              <div class="settings-row-label">Current Session</div>
-              <div class="settings-row-sub" id="key-status">Checking…</div>
-            </div>
-            <button class="btn-ghost" onclick="sessionStorage.removeItem('inc_admin_key');localStorage.removeItem('inc_admin_token');location.reload()">Clear &amp; Re-enter</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Notifications -->
-    <div class="panel" style="margin-bottom:20px">
-      <div class="panel-header"><span class="panel-title">Notifications</span></div>
-      <div style="padding:20px">
-        <div class="settings-row">
-          <div>
-            <div class="settings-row-label">Email notifications</div>
-            <div class="settings-row-sub">New enquiries sent to robin@incremento.co via Resend</div>
-          </div>
-          <span style="font-size:0.78rem;color:var(--green);background:var(--green-pale);padding:3px 10px;border-radius:20px;font-weight:500">Active</span>
-        </div>
-        <div class="settings-row" style="border-bottom:none">
-          <div>
-            <div class="settings-row-label">Worker URL</div>
-            <div class="settings-row-sub">Cloudflare Worker handling form submissions + API</div>
-          </div>
-          <span style="font-size:0.72rem;color:var(--text-dim);font-family:monospace">enquiries.incremento.co</span>
-        </div>
-      </div>
-    </div>
 
     <!-- Quick links -->
     <div class="panel" style="margin-bottom:20px">
@@ -116,21 +70,67 @@
       </div>
     </div>
 
+    <!-- Access & sign-in (hidden) -->
+    <div class="panel" style="margin-bottom:20px;display:none">
+      <div class="panel-header"><span class="panel-title">Access &amp; sign-in</span></div>
+      <div style="padding:20px">
+        <p class="settings-row-sub" style="margin-bottom:18px;line-height:1.65">This dashboard is private. You sign in with your email - we send a 6-digit code, and you stay signed in on this device for about 7 days. There's nothing to set up here day to day.</p>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">This device</div>
+            <div class="settings-row-sub" id="key-status">Checking…</div>
+          </div>
+          <button class="btn-ghost" onclick="signOut()">Sign out</button>
+        </div>
+        <div class="settings-row" style="border-bottom:none;align-items:flex-start">
+          <div style="max-width:62%">
+            <div class="settings-row-label">Backup access key <span style="color:var(--text-dim);font-weight:400">· advanced</span></div>
+            <div class="settings-row-sub">An alternative to email sign-in: a single secret key (the server's <code style="color:var(--lime)">ADMIN_KEY</code>) that authorises this browser. Only needed if email sign-in is ever unavailable - you can ignore it otherwise.</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="password" id="key-input" class="settings-input" style="min-width:140px" placeholder="Paste key">
+            <button class="btn-ghost" onclick="saveKey()">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="panel" style="margin-bottom:20px">
+      <div class="panel-header"><span class="panel-title">Notifications</span></div>
+      <div style="padding:20px">
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Email notifications</div>
+            <div class="settings-row-sub">New enquiries sent to robin@incremento.co via Resend</div>
+          </div>
+          <span style="font-size:1.1875rem;color:var(--green);background:var(--green-pale);padding:3px 10px;border-radius:20px;font-weight:500">Active</span>
+        </div>
+        <div class="settings-row" style="border-bottom:none">
+          <div>
+            <div class="settings-row-label">Worker URL</div>
+            <div class="settings-row-sub">Cloudflare Worker handling form submissions + API</div>
+          </div>
+          <span style="font-size:1.1875rem;color:var(--text-dim);font-family:monospace">enquiries.incremento.co</span>
+        </div>
+      </div>
+    </div>
+
     <!-- About -->
     <div class="panel">
       <div class="panel-header"><span class="panel-title">About</span></div>
       <div style="padding:20px">
         <div class="settings-row">
           <div class="settings-row-label">Version</div>
-          <span style="font-size:0.8rem;color:var(--text-dim)">1.0.0</span>
+          <span style="font-size:1.1875rem;color:var(--text-dim)">1.0.0</span>
         </div>
         <div class="settings-row">
           <div class="settings-row-label">Stack</div>
-          <span style="font-size:0.8rem;color:var(--text-dim)">Cloudflare Workers · D1 · Pages</span>
+          <span style="font-size:1.1875rem;color:var(--text-dim)">Cloudflare Workers · D1 · Pages</span>
         </div>
         <div class="settings-row" style="border-bottom:none">
           <div class="settings-row-label">Built for</div>
-          <span style="font-size:0.8rem;color:var(--lime)">incremento.co</span>
+          <span style="font-size:1.1875rem;color:var(--lime)">incremento.co</span>
         </div>
       </div>
     </div>
@@ -140,18 +140,27 @@
 
 <script src="admin.js"></script>
 <script>
+function signOut() {
+  sessionStorage.removeItem('inc_admin_key');
+  localStorage.removeItem('inc_admin_token');
+  location.reload();
+}
 function saveKey() {
   const key = document.getElementById('key-input').value.trim();
   if (!key) return;
   sessionStorage.setItem('inc_admin_key', key);
-  document.getElementById('key-status').textContent = 'Key saved for this session';
   document.getElementById('key-input').value = '';
+  refreshStatus();
 }
-
-const stored = sessionStorage.getItem('inc_admin_key');
-document.getElementById('key-status').textContent = stored
-  ? 'Key set (session active — ends when tab closes)'
-  : 'No key — enter one below';
+function refreshStatus() {
+  const hasToken = !!localStorage.getItem('inc_admin_token');
+  const hasKey   = !!sessionStorage.getItem('inc_admin_key');
+  document.getElementById('key-status').textContent =
+    hasToken ? 'Signed in with your email (this device)'
+    : hasKey ? 'Signed in with the backup key (this tab)'
+    : 'Not signed in';
+}
+refreshStatus();
 </script>
 </body>
 </html>
