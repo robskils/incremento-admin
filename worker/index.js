@@ -12,6 +12,8 @@
    ─ POST /p/:token/accept  → client accepts the proposal (no auth)
    ═══════════════════════════════════════════════════════════ */
 
+import PostalMime from 'postal-mime';
+
 const PUBLIC_ORIGINS = ['https://incremento.co', 'https://www.incremento.co'];
 
 function corsHeaders(request) {
@@ -41,6 +43,22 @@ function escHtml(str) {
 
 /* ── Entry point ─────────────────────────────────────────── */
 export default {
+  // Cloudflare Email Routing → capture BCC'd / routed mail into the comms timeline.
+  // Replaces the Mailgun inbound webhook (handleInboundEmail); same recording logic.
+  async email(message, env, ctx) {
+    try {
+      const parsed = await new PostalMime().parse(message.raw);
+      await recordInboundMessage(env, {
+        fromAddr: (parsed.from && parsed.from.address) || message.from || '',
+        toAddr:   (parsed.to && parsed.to[0] && parsed.to[0].address) || '',
+        subject:  parsed.subject || '(no subject)',
+        body:     parsed.text || stripHtml(parsed.html || ''),
+      });
+    } catch (e) {
+      console.error('email() handler error:', e);
+    }
+  },
+
   async fetch(request, env) {
     const cors = corsHeaders(request);
 
@@ -506,18 +524,30 @@ async function handleInboundEmail(request, env, url, cors) {
     return json({ error: 'Invalid payload', detail: e.message }, 400, cors);
   }
 
-  const fromAddr = f['sender'] || f['from'] || '';
-  const toAddr   = f['To'] || f['recipient'] || '';
-  const subject  = f['subject'] || '(no subject)';
-  let body = f['body-plain'] || f['stripped-text'] || stripHtml(f['body-html'] || '');
+  const r = await recordInboundMessage(env, {
+    fromAddr: f['sender'] || f['from'] || '',
+    toAddr:   f['To'] || f['recipient'] || '',
+    subject:  f['subject'] || '(no subject)',
+    body:     f['body-plain'] || f['stripped-text'] || stripHtml(f['body-html'] || ''),
+  });
+  return json(r, r.error ? 400 : 200, cors);
+}
+
+/* Shared inbound-email recorder — used by both the Cloudflare email() handler
+   and the legacy Mailgun webhook. Detects direction, matches the contact,
+   dedupes, and logs to the comms timeline. Returns a plain result object. */
+async function recordInboundMessage(env, { fromAddr, toAddr, subject, body }) {
+  if (!env.DB) return { error: 'Database not configured' };
+  subject = subject || '(no subject)';
+  body = body || '';
   if (body.length > 6000) body = body.slice(0, 6000) + '\n\n[…truncated]';
 
   const isOutbound  = INC_SENDERS.includes(extractAddress(fromAddr));
   const direction   = isOutbound ? 'outbound' : 'inbound';
   const clientEmail = isOutbound ? extractAddress(toAddr) : extractAddress(fromAddr);
-  if (!clientEmail) return json({ error: 'Could not identify client email' }, 400, cors);
+  if (!clientEmail) return { error: 'Could not identify client email' };
   // Ignore mail between our own addresses (e.g. admin notifications)
-  if (INC_SENDERS.includes(clientEmail)) return json({ ok: true, ignored: true }, 200, cors);
+  if (INC_SENDERS.includes(clientEmail)) return { ok: true, ignored: true };
 
   // Match latest enquiry + proposal for this contact
   let enquiry_id = null, proposal_id = null;
@@ -534,14 +564,14 @@ async function handleInboundEmail(request, env, url, cors) {
     const dup = await env.DB.prepare(
       'SELECT id FROM messages WHERE contact_email=? AND subject=? AND created_at>? LIMIT 1'
     ).bind(clientEmail, subject, since).first();
-    if (dup) return json({ ok: true, duplicate: true }, 200, cors);
+    if (dup) return { ok: true, duplicate: true };
   } catch {}
 
   await logMessage(env, {
     contact_email: clientEmail, enquiry_id, proposal_id,
     direction, kind: 'mail', subject, body, source: 'email',
   });
-  return json({ ok: true, direction, client: clientEmail }, 200, cors);
+  return { ok: true, direction, client: clientEmail };
 }
 
 /* ── Communication log ───────────────────────────────────── */
