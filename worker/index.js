@@ -48,14 +48,16 @@ export default {
   async email(message, env, ctx) {
     try {
       const parsed = await new PostalMime().parse(message.raw);
-      await recordInboundMessage(env, {
-        fromAddr: (parsed.from && parsed.from.address) || message.from || '',
-        toAddr:   (parsed.to && parsed.to[0] && parsed.to[0].address) || '',
-        subject:  parsed.subject || '(no subject)',
-        body:     parsed.text || stripHtml(parsed.html || ''),
+      const fromAddr = (parsed.from && parsed.from.address) || message.from || '';
+      const toAddr   = (parsed.to && parsed.to[0] && parsed.to[0].address) || '';
+      const subject  = parsed.subject || '(no subject)';
+      const result = await recordInboundMessage(env, {
+        fromAddr, toAddr, subject,
+        body: parsed.text || stripHtml(parsed.html || ''),
       });
+      console.log('EMAIL_IN', JSON.stringify({ envelopeTo: message.to, from: fromAddr, to: toAddr, subject, result }));
     } catch (e) {
-      console.error('email() handler error:', e);
+      console.error('EMAIL_IN handler error:', (e && e.stack) || e);
     }
   },
 
