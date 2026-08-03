@@ -376,6 +376,14 @@ async function handleAdmin(request, env, url, cors) {
   if (path === '/api/contact-meta' && method === 'PUT')    return upsertContactMeta(request, env, cors);
   if (path === '/api/contact-meta' && method === 'DELETE') return deleteContactMeta(url, env, cors);
 
+  // Invoices
+  const invId = path.match(/^\/api\/invoices\/(\d+)$/);
+  if (path === '/api/invoices' && method === 'GET')  return listInvoices(env, cors);
+  if (path === '/api/invoices' && method === 'POST') return createInvoice(request, env, cors);
+  if (invId && method === 'GET')    return getInvoice(parseInt(invId[1]), env, cors);
+  if (invId && method === 'PATCH')  return updateInvoice(parseInt(invId[1]), request, env, cors);
+  if (invId && method === 'DELETE') return deleteInvoice(parseInt(invId[1]), env, cors);
+
   // Team + deal assignees
   const asgMatch = path.match(/^\/api\/enquiries\/(\d+)\/assignees$/);
   if (path === '/api/team' && method === 'GET') return listTeam(env, cors);
@@ -949,6 +957,91 @@ async function deleteContactMeta(url, env, cors) {
     await env.DB.prepare('DELETE FROM contact_meta WHERE email = ?').bind(email).run();
     return json({ ok: true }, 200, cors);
   } catch (e) { console.error('deleteContactMeta', e); return json({ error: 'Database error' }, 500, cors); }
+}
+
+// ── Invoices ────────────────────────────────────────────────────────────────
+function round2(n) { return Math.round((Number(n) || 0) * 100) / 100; }
+function invoiceTotals(items, taxRate) {
+  const subtotal = (items || []).reduce((s, it) => s + (Number(it.qty) || 0) * (Number(it.unit_price) || 0), 0);
+  const tax = subtotal * (Number(taxRate) || 0) / 100;
+  return { subtotal: round2(subtotal), tax_amount: round2(tax), total: round2(subtotal + tax) };
+}
+async function nextInvoiceNumber(env) {
+  const year = new Date().getFullYear();
+  let seq = 1;
+  try {
+    const row = await env.DB.prepare("SELECT number FROM invoices WHERE number LIKE ? ORDER BY id DESC LIMIT 1").bind(year + '-%').first();
+    if (row && row.number) { const m = String(row.number).match(/(\d+)$/); if (m) seq = parseInt(m[1], 10) + 1; }
+  } catch (e) { console.error('nextInvoiceNumber', e); }
+  return `${year}-${String(seq).padStart(3, '0')}`;
+}
+
+async function listInvoices(env, cors) {
+  if (!env.DB) return json({ invoices: [] }, 200, cors);
+  try { const r = await env.DB.prepare('SELECT * FROM invoices ORDER BY id DESC').all(); return json({ invoices: r.results || [] }, 200, cors); }
+  catch (e) { console.error('listInvoices', e); return json({ invoices: [] }, 200, cors); }
+}
+async function getInvoice(id, env, cors) {
+  if (!env.DB) return json({ error: 'Database not configured' }, 503, cors);
+  try { const row = await env.DB.prepare('SELECT * FROM invoices WHERE id = ?').bind(id).first(); return row ? json(row, 200, cors) : json({ error: 'Not found' }, 404, cors); }
+  catch (e) { console.error('getInvoice', e); return json({ error: 'Database error' }, 500, cors); }
+}
+async function createInvoice(request, env, cors) {
+  if (!env.DB) return json({ error: 'Database not configured' }, 503, cors);
+  let b; try { b = await request.json(); } catch { return json({ error: 'Invalid JSON' }, 400, cors); }
+  const items = Array.isArray(b.items) ? b.items : [];
+  const t = invoiceTotals(items, b.tax_rate || 0);
+  const now = new Date().toISOString();
+  const number = await nextInvoiceNumber(env);
+  try {
+    const res = await env.DB.prepare(`INSERT INTO invoices
+      (number,status,enquiry_id,client_name,client_email,client_company,client_address,client_nif,issue_date,due_date,currency,items,subtotal,tax_rate,tax_amount,total,notes,created_at,updated_at)
+      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(
+      number, b.status || 'draft', b.enquiry_id || null,
+      b.client_name || '', b.client_email || '', b.client_company || '', b.client_address || '', b.client_nif || '',
+      b.issue_date || now.slice(0, 10), b.due_date || '', b.currency || 'EUR',
+      JSON.stringify(items), t.subtotal, b.tax_rate || 0, t.tax_amount, t.total, b.notes || '', now, now
+    ).run();
+    const row = await env.DB.prepare('SELECT * FROM invoices WHERE id = ?').bind(res.meta.last_row_id).first();
+    return json(row, 201, cors);
+  } catch (e) { console.error('createInvoice', e); return json({ error: 'Database error' }, 500, cors); }
+}
+async function updateInvoice(id, request, env, cors) {
+  if (!env.DB) return json({ error: 'Database not configured' }, 503, cors);
+  let b; try { b = await request.json(); } catch { return json({ error: 'Invalid JSON' }, 400, cors); }
+  const cur = await env.DB.prepare('SELECT * FROM invoices WHERE id = ?').bind(id).first();
+  if (!cur) return json({ error: 'Not found' }, 404, cors);
+  const fields = ['status','enquiry_id','client_name','client_email','client_company','client_address','client_nif','issue_date','due_date','currency','notes','tax_rate'];
+  const set = [], args = [];
+  for (const f of fields) if (b[f] !== undefined) { set.push(`${f} = ?`); args.push(b[f]); }
+  if (b.items !== undefined) {
+    const items = Array.isArray(b.items) ? b.items : [];
+    const rate = b.tax_rate !== undefined ? b.tax_rate : cur.tax_rate;
+    const t = invoiceTotals(items, rate);
+    set.push('items = ?');      args.push(JSON.stringify(items));
+    set.push('subtotal = ?');   args.push(t.subtotal);
+    set.push('tax_amount = ?');  args.push(t.tax_amount);
+    set.push('total = ?');      args.push(t.total);
+  } else if (b.tax_rate !== undefined) {
+    let items = []; try { items = JSON.parse(cur.items || '[]'); } catch {}
+    const t = invoiceTotals(items, b.tax_rate);
+    set.push('subtotal = ?');   args.push(t.subtotal);
+    set.push('tax_amount = ?');  args.push(t.tax_amount);
+    set.push('total = ?');      args.push(t.total);
+  }
+  if (b.status === 'paid' && cur.status !== 'paid') { set.push('paid_at = ?'); args.push(new Date().toISOString()); }
+  set.push('updated_at = ?'); args.push(new Date().toISOString());
+  args.push(id);
+  try {
+    await env.DB.prepare(`UPDATE invoices SET ${set.join(', ')} WHERE id = ?`).bind(...args).run();
+    const row = await env.DB.prepare('SELECT * FROM invoices WHERE id = ?').bind(id).first();
+    return json(row, 200, cors);
+  } catch (e) { console.error('updateInvoice', e); return json({ error: 'Database error' }, 500, cors); }
+}
+async function deleteInvoice(id, env, cors) {
+  if (!env.DB) return json({ error: 'Database not configured' }, 503, cors);
+  try { await env.DB.prepare('DELETE FROM invoices WHERE id = ?').bind(id).run(); return json({ ok: true }, 200, cors); }
+  catch (e) { console.error('deleteInvoice', e); return json({ error: 'Database error' }, 500, cors); }
 }
 
 /* ── Team + deal assignees ───────────────────────────────── */

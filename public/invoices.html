@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invoices — Incremento Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="admin.css">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<style>
+  .status-tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px }
+  .status-tab { display:inline-flex; align-items:center; gap:7px; padding:7px 14px; background:var(--surface2); border:1px solid var(--border2); border-radius:20px; color:var(--text-dim); font-size:1.0625rem; cursor:pointer; transition:all .16s }
+  .status-tab:hover { color:var(--text); border-color:var(--lime) }
+  .status-tab.active { color:var(--bg); background:var(--lime); border-color:var(--lime); font-weight:600 }
+  .st-count { font-size:.9375rem; opacity:.7 }
+  .inv-badge { display:inline-block; padding:2px 10px; border-radius:11px; font-size:.9375rem; font-weight:500 }
+  .st-draft { color:#94A3B8; background:#94A3B822; border:1px solid #94A3B855 }
+  .st-sent  { color:#5EE7D8; background:#5EE7D822; border:1px solid #5EE7D855 }
+  .st-paid  { color:#9EF54A; background:#9EF54A22; border:1px solid #9EF54A55 }
+  .inv-row { display:flex; align-items:center; gap:16px; padding:15px 18px; border-bottom:1px solid var(--border); cursor:pointer; transition:background .12s }
+  .inv-row:hover { background:var(--surface2) }
+  .inv-num { font-family:'Space Grotesk',sans-serif; font-weight:600; color:var(--text); min-width:96px }
+  .inv-cli { flex:1; min-width:0 }
+  .inv-cli .n { color:var(--text); font-size:1.125rem }
+  .inv-cli .d { color:var(--text-dim); font-size:1.0625rem }
+  .inv-tot { font-family:'Space Grotesk',sans-serif; font-weight:600; color:var(--text); text-align:right; min-width:110px }
+  /* editor */
+  .field-lbl { display:block; color:var(--text-dim); font-size:1.0625rem; letter-spacing:.03em; text-transform:uppercase; margin:15px 0 6px }
+  .field-in { width:100%; padding:10px 13px; background:var(--surface2); border:1px solid var(--border2); border-radius:8px; font-family:'Inter',sans-serif; font-size:1.125rem; color:var(--text); outline:none }
+  .field-in:focus { border-color:var(--lime) }
+  textarea.field-in { resize:vertical; min-height:60px; line-height:1.6 }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px }
+  .li-row { display:grid; grid-template-columns:1fr 70px 110px 100px 30px; gap:8px; align-items:center; margin-bottom:8px }
+  .li-row .field-in { padding:8px 10px; font-size:1.0625rem }
+  .li-amt { text-align:right; color:var(--text); font-size:1.0625rem; padding-right:4px }
+  .li-del { background:none; border:none; color:#f87171; cursor:pointer; font-size:1.3rem; line-height:1 }
+  .li-head { display:grid; grid-template-columns:1fr 70px 110px 100px 30px; gap:8px; color:var(--text-dim); font-size:.9375rem; text-transform:uppercase; letter-spacing:.03em; margin-bottom:6px }
+  .tot-line { display:flex; justify-content:flex-end; gap:24px; padding:5px 34px 5px 0; font-size:1.125rem }
+  .tot-line .lbl { color:var(--text-dim) }
+  .tot-line.grand { font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.35rem; color:var(--lime); border-top:1px solid var(--border2); margin-top:6px; padding-top:12px }
+
+  /* ── Invoice preview overlay + print document ── */
+  #invoice-preview { display:none; position:fixed; inset:0; z-index:800; background:rgba(6,12,16,.9); overflow:auto; padding:26px 0 60px }
+  .preview-chrome { display:flex; gap:10px; align-items:center; max-width:820px; margin:0 auto 16px; padding:0 20px; flex-wrap:wrap }
+  .invoice-doc { max-width:820px; margin:0 auto; background:#fff; color:#101820; padding:56px 60px; border-radius:6px; font-family:'Inter',sans-serif; font-size:15px; line-height:1.55 }
+  .invoice-doc .doc-top { display:flex; justify-content:space-between; align-items:flex-start; gap:30px; margin-bottom:44px }
+  .invoice-doc .issuer-name { font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:700; color:#101820; display:flex; align-items:center; gap:9px }
+  .invoice-doc .issuer-meta { color:#5b6b78; font-size:13.5px; margin-top:8px; line-height:1.7 }
+  .invoice-doc .doc-title { font-family:'Space Grotesk',sans-serif; font-size:30px; font-weight:700; letter-spacing:.02em; text-align:right; color:#101820 }
+  .invoice-doc .doc-meta { text-align:right; color:#5b6b78; font-size:13.5px; margin-top:10px; line-height:1.8 }
+  .invoice-doc .doc-meta b { color:#101820; font-weight:600 }
+  .invoice-doc .billto-lbl { font-size:11.5px; letter-spacing:.09em; text-transform:uppercase; color:#8a97a2; margin-bottom:6px }
+  .invoice-doc .billto { font-size:14.5px; line-height:1.65; margin-bottom:38px }
+  .invoice-doc .billto .cn { font-weight:600; font-size:16px; color:#101820 }
+  .invoice-doc table { width:100%; border-collapse:collapse; margin-bottom:26px }
+  .invoice-doc thead th { text-align:left; font-size:11.5px; letter-spacing:.07em; text-transform:uppercase; color:#8a97a2; border-bottom:2px solid #101820; padding:0 0 10px }
+  .invoice-doc thead th.r { text-align:right }
+  .invoice-doc tbody td { padding:12px 0; border-bottom:1px solid #eef1f3; vertical-align:top }
+  .invoice-doc tbody td.r { text-align:right; white-space:nowrap }
+  .invoice-doc tbody td .desc { color:#101820 }
+  .invoice-doc .tot { margin-left:auto; width:280px }
+  .invoice-doc .tot .row { display:flex; justify-content:space-between; padding:7px 0; font-size:14.5px; color:#5b6b78 }
+  .invoice-doc .tot .row.grand { border-top:2px solid #101820; margin-top:6px; padding-top:13px; font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:700; color:#101820 }
+  .invoice-doc .foot { margin-top:46px; padding-top:20px; border-top:1px solid #eef1f3; color:#5b6b78; font-size:13px; line-height:1.75 }
+  .invoice-doc .foot b { color:#101820 }
+  .invoice-doc .accent { height:4px; background:linear-gradient(90deg,#9EF54A,#5EE7D8); border-radius:3px; margin-bottom:34px }
+
+  @media print {
+    body > *:not(#invoice-preview) { display:none !important; }
+    #invoice-preview { position:static; background:#fff; padding:0; overflow:visible; display:block !important; }
+    .preview-chrome { display:none !important; }
+    .invoice-doc { max-width:100%; margin:0; padding:0; border-radius:0; font-size:12.5pt }
+    @page { margin:1.6cm }
+  }
+</style>
+</head>
+<body>
+
+<div id="login-overlay" style="display:none;position:fixed;inset:0;background:rgba(10,18,25,0.97);z-index:999;align-items:center;justify-content:center">
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:40px;width:100%;max-width:380px;text-align:center">
+    <p style="font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:600;color:var(--text);margin-bottom:6px">incremento<span style="color:var(--lime)">.</span> admin</p>
+    <p style="font-size:1.1875rem;color:var(--text-dim);margin-bottom:24px">Enter your admin key to continue</p>
+    <input id="login-key" type="password" placeholder="Admin key" style="width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;font-family:'Inter',sans-serif;font-size:1.1875rem;color:var(--text);outline:none;margin-bottom:12px">
+    <button id="login-btn" class="btn-primary" style="width:100%;justify-content:center">Unlock</button>
+  </div>
+</div>
+
+<aside class="sidebar">
+  <div class="sidebar-top">
+    <div class="sidebar-brand" style="cursor:pointer" onclick="if(!event.target.closest('.sidebar-brand-link'))location.href='dashboard.html'">
+      <svg width="26" height="26" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="sg" x1="0" y1="32" x2="32" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#9EF54A"/><stop offset="100%" stop-color="#5EE7D8"/></linearGradient></defs><rect x="4" y="20" width="5" height="8" rx="2.5" fill="url(#sg)" opacity="0.55"/><rect x="12" y="14" width="5" height="14" rx="2.5" fill="url(#sg)" opacity="0.78"/><rect x="20" y="10" width="5" height="18" rx="2.5" fill="url(#sg)"/><circle cx="22.5" cy="5.5" r="2.25" fill="url(#sg)"/></svg>
+      <span class="sidebar-brand-name">incremento<span class="dot">.</span></span>
+      <a class="sidebar-brand-link" href="https://incremento.co" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <a class="nav-item" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a class="nav-item" href="triage.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>Triage<span class="nav-badge" id="triage-badge" style="display:none"></span></a>
+    <a class="nav-item" href="pipeline.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Pipeline</a>
+    <a class="nav-item" href="proposals.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Proposals</a>
+    <a class="nav-item active" href="invoices.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1z"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="14" y2="13"/></svg>Invoices</a>
+    <a class="nav-item" href="contacts.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Contacts</a>
+    <div class="nav-divider"></div>
+    <a class="nav-item" href="brand.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="19" cy="13" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="10" cy="20" r="2.5"/><path d="M11 4.5A8 8 0 104 14"/></svg>Brand</a>
+    <a class="nav-item" href="settings.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Settings</a>
+  </nav>
+  <div class="sidebar-footer">
+    <a class="nav-item" href="#" onclick="sessionStorage.removeItem('inc_admin_key');localStorage.removeItem('inc_admin_token');location.reload()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sign Out</a>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Invoices</div>
+      <div class="page-sub" id="inv-sub"></div>
+    </div>
+    <button class="btn-primary" onclick="newInvoice()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      New invoice
+    </button>
+  </div>
+
+  <div class="status-tabs" id="status-tabs"></div>
+
+  <div class="panel">
+    <div id="inv-list"><div class="empty-state">Loading…</div></div>
+  </div>
+</main>
+
+<!-- ── EDITOR MODAL ─────────────────────────────────────────── -->
+<div class="modal-overlay" id="editor" style="display:none" onclick="if(event.target===this)closeEditor()">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:720px">
+    <div class="modal-header">
+      <div class="modal-title" id="editor-title">New invoice</div>
+      <button class="modal-close" onclick="closeEditor()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <span class="field-lbl">Bill to</span>
+      <select class="field-in" id="e-contact" onchange="prefillFromContact()" style="margin-bottom:10px">
+        <option value="">— Pick a contact or enter manually —</option>
+      </select>
+      <div class="grid2">
+        <input class="field-in" id="e-name" placeholder="Client name">
+        <input class="field-in" id="e-company" placeholder="Company">
+      </div>
+      <div class="grid2" style="margin-top:10px">
+        <input class="field-in" id="e-email" placeholder="Email">
+        <input class="field-in" id="e-nif" placeholder="Client NIF (optional)">
+      </div>
+      <input class="field-in" id="e-address" placeholder="Client address" style="margin-top:10px">
+
+      <div class="grid2">
+        <div><span class="field-lbl">Issue date</span><input class="field-in" id="e-issue" type="date"></div>
+        <div><span class="field-lbl">Due date (optional)</span><input class="field-in" id="e-due" type="date"></div>
+      </div>
+
+      <span class="field-lbl">Line items</span>
+      <div class="li-head"><span>Description</span><span>Qty</span><span>Unit €</span><span style="text-align:right">Amount</span><span></span></div>
+      <div id="li-rows"></div>
+      <button class="btn-ghost" onclick="addLine()" style="margin-top:4px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add line</button>
+
+      <div style="margin-top:18px">
+        <div class="tot-line"><span class="lbl">Subtotal</span><span id="e-subtotal">€0.00</span></div>
+        <div class="tot-line" id="e-tax-line" style="display:none"><span class="lbl">IVA (<span id="e-rate-lbl">0</span>%)</span><span id="e-tax">€0.00</span></div>
+        <div class="tot-line grand"><span class="lbl" style="color:var(--text-dim)">Total</span><span id="e-total">€0.00</span></div>
+      </div>
+
+      <span class="field-lbl">Notes (optional)</span>
+      <textarea class="field-in" id="e-notes" placeholder="Anything to add to the invoice…"></textarea>
+
+      <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;align-items:center">
+        <button class="btn-primary" onclick="saveInvoice()">Save</button>
+        <button class="btn-ghost" onclick="saveInvoice(true)">Save &amp; preview</button>
+        <button class="btn-ghost" id="e-delete" style="margin-left:auto;color:#f87171;border-color:#f8717155;display:none" onclick="deleteInvoice()">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PREVIEW / PDF ────────────────────────────────────────── -->
+<div id="invoice-preview">
+  <div class="preview-chrome">
+    <button class="btn-primary" onclick="window.print()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>Download PDF</button>
+    <button class="btn-ghost" onclick="editFromPreview()">Edit</button>
+    <button class="btn-ghost" id="pv-sent" onclick="setStatus('sent')">Mark sent</button>
+    <button class="btn-ghost" id="pv-paid" onclick="setStatus('paid')">Mark paid</button>
+    <button class="btn-ghost" style="margin-left:auto" onclick="closePreview()">Close</button>
+  </div>
+  <div class="invoice-doc" id="invoice-doc"></div>
+</div>
+
+<script src="admin.js"></script>
+<script>
+let invoices = [], contacts = [], issuer = {}, currentFilter = 'all';
+let editing = null;     // invoice being edited (or null for new)
+let lines = [];         // [{description, qty, unit_price}]
+let previewInv = null;
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function money(n){ return '€' + (Number(n)||0).toLocaleString('en-IE',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtDate(d){ if(!d) return ''; const dt=new Date(d); return isNaN(dt)?d:dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }
+function taxRate(){ return Number(issuer.invoice_tax_rate)||0; }
+
+async function loadAll(){
+  try {
+    const [iRes, sRes, eRes, mRes] = await Promise.all([
+      apiFetch('/api/invoices').catch(()=>({invoices:[]})),
+      apiFetch('/api/settings').catch(()=>({})),
+      apiFetch('/api/enquiries?limit=500').catch(()=>({enquiries:[]})),
+      apiFetch('/api/contact-meta').catch(()=>({meta:[]})),
+    ]);
+    invoices = iRes.invoices || [];
+    issuer = sRes || {};
+    // Build a contact picker from deals + standalone contacts (dedup by email)
+    const byEmail = {};
+    (eRes.enquiries||[]).forEach(e => { const k=(e.email||'').toLowerCase(); if(k&&!byEmail[k]) byEmail[k]={name:e.name||'',email:e.email||'',company:e.company||''}; });
+    (mRes.meta||[]).forEach(m => { const k=(m.email||'').toLowerCase(); if(k) byEmail[k]={name:m.name||byEmail[k]?.name||'',email:m.email||'',company:m.company||byEmail[k]?.company||''}; });
+    contacts = Object.values(byEmail).sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+    renderTabs(); renderList();
+  } catch { document.getElementById('inv-list').innerHTML='<div class="empty-state">Failed to load</div>'; }
+}
+
+function renderTabs(){
+  const c = { all:invoices.length, draft:0, sent:0, paid:0 };
+  invoices.forEach(i => { if(c[i.status]!==undefined) c[i.status]++; });
+  const tab = (k,l)=>`<button class="status-tab${currentFilter===k?' active':''}" onclick="setFilter('${k}')">${l}<span class="st-count">${c[k]||0}</span></button>`;
+  document.getElementById('status-tabs').innerHTML = tab('all','All')+tab('draft','Draft')+tab('sent','Sent')+tab('paid','Paid');
+  document.getElementById('inv-sub').textContent = invoices.length+' invoice'+(invoices.length===1?'':'s');
+}
+function setFilter(k){ currentFilter=k; renderTabs(); renderList(); }
+
+function renderList(){
+  let list = invoices;
+  if (currentFilter!=='all') list = list.filter(i=>i.status===currentFilter);
+  if (!list.length){ document.getElementById('inv-list').innerHTML='<div class="empty-state">No invoices here yet</div>'; return; }
+  document.getElementById('inv-list').innerHTML = list.map(i=>`
+    <div class="inv-row" onclick="openPreview(${i.id})">
+      <div class="inv-num">${esc(i.number||'—')}</div>
+      <div class="inv-cli">
+        <div class="n">${esc(i.client_name||i.client_company||'—')}</div>
+        <div class="d">${esc(i.client_company&&i.client_name?i.client_company+' · ':'')}${fmtDate(i.issue_date)}</div>
+      </div>
+      <div class="inv-tot">${money(i.total)}</div>
+      <span class="inv-badge st-${i.status}">${i.status[0].toUpperCase()+i.status.slice(1)}</span>
+    </div>`).join('');
+}
+
+/* ── Editor ── */
+function newInvoice(){
+  editing = null; lines = [{description:'',qty:1,unit_price:0}];
+  document.getElementById('editor-title').textContent = 'New invoice';
+  document.getElementById('e-delete').style.display = 'none';
+  fillContactPicker();
+  ['e-name','e-company','e-email','e-nif','e-address','e-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('e-contact').value='';
+  document.getElementById('e-issue').value = new Date().toISOString().slice(0,10);
+  document.getElementById('e-due').value='';
+  renderLines();
+  document.getElementById('editor').style.display='flex';
+}
+function editInvoice(inv){
+  editing = inv;
+  try { lines = JSON.parse(inv.items||'[]'); } catch { lines=[]; }
+  if (!lines.length) lines=[{description:'',qty:1,unit_price:0}];
+  document.getElementById('editor-title').textContent = 'Invoice '+(inv.number||'');
+  document.getElementById('e-delete').style.display = '';
+  fillContactPicker();
+  document.getElementById('e-contact').value='';
+  document.getElementById('e-name').value = inv.client_name||'';
+  document.getElementById('e-company').value = inv.client_company||'';
+  document.getElementById('e-email').value = inv.client_email||'';
+  document.getElementById('e-nif').value = inv.client_nif||'';
+  document.getElementById('e-address').value = inv.client_address||'';
+  document.getElementById('e-issue').value = (inv.issue_date||'').slice(0,10);
+  document.getElementById('e-due').value = (inv.due_date||'').slice(0,10);
+  document.getElementById('e-notes').value = inv.notes||'';
+  renderLines();
+  document.getElementById('editor').style.display='flex';
+}
+function fillContactPicker(){
+  const sel = document.getElementById('e-contact');
+  sel.innerHTML = '<option value="">— Pick a contact or enter manually —</option>' +
+    contacts.map((c,idx)=>`<option value="${idx}">${esc(c.name||c.email)}${c.company?' · '+esc(c.company):''}</option>`).join('');
+}
+function prefillFromContact(){
+  const idx = document.getElementById('e-contact').value;
+  if (idx==='') return;
+  const c = contacts[parseInt(idx)]; if(!c) return;
+  document.getElementById('e-name').value = c.name||'';
+  document.getElementById('e-company').value = c.company||'';
+  document.getElementById('e-email').value = c.email||'';
+}
+function renderLines(){
+  document.getElementById('li-rows').innerHTML = lines.map((l,i)=>`
+    <div class="li-row">
+      <input class="field-in" placeholder="Description" value="${esc(l.description)}" oninput="lines[${i}].description=this.value">
+      <input class="field-in" type="number" min="0" step="0.5" value="${l.qty}" oninput="lines[${i}].qty=this.value;recalc()">
+      <input class="field-in" type="number" min="0" step="0.01" value="${l.unit_price}" oninput="lines[${i}].unit_price=this.value;recalc()">
+      <span class="li-amt" id="li-amt-${i}">${money((Number(l.qty)||0)*(Number(l.unit_price)||0))}</span>
+      <button class="li-del" onclick="lines.splice(${i},1);renderLines();recalc()" title="Remove">×</button>
+    </div>`).join('');
+  recalc();
+}
+function addLine(){ lines.push({description:'',qty:1,unit_price:0}); renderLines(); }
+function recalc(){
+  let sub=0;
+  lines.forEach((l,i)=>{ const a=(Number(l.qty)||0)*(Number(l.unit_price)||0); sub+=a; const el=document.getElementById('li-amt-'+i); if(el) el.textContent=money(a); });
+  const rate=taxRate(); const tax=sub*rate/100;
+  document.getElementById('e-subtotal').textContent = money(sub);
+  document.getElementById('e-total').textContent = money(sub+tax);
+  const tl=document.getElementById('e-tax-line');
+  if (rate>0){ tl.style.display='flex'; document.getElementById('e-rate-lbl').textContent=rate; document.getElementById('e-tax').textContent=money(tax); }
+  else tl.style.display='none';
+}
+function closeEditor(){ document.getElementById('editor').style.display='none'; }
+
+async function saveInvoice(thenPreview){
+  const clean = lines.map(l=>({description:(l.description||'').trim(),qty:Number(l.qty)||0,unit_price:Number(l.unit_price)||0})).filter(l=>l.description||l.qty||l.unit_price);
+  const body = {
+    client_name: document.getElementById('e-name').value.trim(),
+    client_company: document.getElementById('e-company').value.trim(),
+    client_email: document.getElementById('e-email').value.trim(),
+    client_nif: document.getElementById('e-nif').value.trim(),
+    client_address: document.getElementById('e-address').value.trim(),
+    issue_date: document.getElementById('e-issue').value,
+    due_date: document.getElementById('e-due').value,
+    notes: document.getElementById('e-notes').value.trim(),
+    items: clean, tax_rate: taxRate(), currency:'EUR',
+  };
+  if (!body.client_name && !body.client_company){ alert('Add a client name or company.'); return; }
+  try {
+    let saved;
+    if (editing) saved = await apiFetch('/api/invoices/'+editing.id, { method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+    else saved = await apiFetch('/api/invoices', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+    closeEditor();
+    await loadAll();
+    if (thenPreview && saved && saved.id) openPreview(saved.id);
+  } catch { alert('Save failed - please try again.'); }
+}
+async function deleteInvoice(){
+  if (!editing) return;
+  if (!confirm('Delete invoice '+(editing.number||'')+'? This cannot be undone.')) return;
+  try { await apiFetch('/api/invoices/'+editing.id, { method:'DELETE' }); closeEditor(); await loadAll(); }
+  catch { alert('Delete failed.'); }
+}
+
+/* ── Preview / PDF ── */
+function openPreview(id){
+  const inv = invoices.find(x=>x.id===id); if(!inv) return;
+  previewInv = inv;
+  document.getElementById('invoice-doc').innerHTML = renderDoc(inv);
+  document.getElementById('pv-sent').style.display = inv.status==='draft' ? '' : 'none';
+  document.getElementById('pv-paid').style.display = inv.status==='paid' ? 'none' : '';
+  document.getElementById('invoice-preview').style.display='block';
+  window.scrollTo(0,0);
+}
+function closePreview(){ document.getElementById('invoice-preview').style.display='none'; previewInv=null; }
+function editFromPreview(){ const inv=previewInv; closePreview(); editInvoice(inv); }
+async function setStatus(status){
+  if (!previewInv) return;
+  try { await apiFetch('/api/invoices/'+previewInv.id, { method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status}) });
+    await loadAll(); const fresh=invoices.find(x=>x.id===previewInv.id); if(fresh) openPreview(fresh.id); }
+  catch { alert('Update failed.'); }
+}
+
+function renderDoc(inv){
+  let items=[]; try{ items=JSON.parse(inv.items||'[]'); }catch{}
+  const label = issuer.invoice_doc_label || 'INVOICE';
+  const name = issuer.invoice_issuer_name || 'Incremento';
+  const meta = [issuer.invoice_nif?('NIF '+issuer.invoice_nif):'', issuer.invoice_address||'', issuer.invoice_iban?('IBAN '+issuer.invoice_iban):''].filter(Boolean);
+  const client = [
+    inv.client_name?`<span class="cn">${esc(inv.client_name)}</span>`:'',
+    inv.client_company||'', inv.client_address||'',
+    inv.client_nif?('NIF '+esc(inv.client_nif)):'', inv.client_email||''
+  ].filter(Boolean).map(esc).join('<br>');
+  const rows = items.map(it=>`<tr>
+    <td class="desc">${esc(it.description||'')}</td>
+    <td class="r">${Number(it.qty)||0}</td>
+    <td class="r">${money(it.unit_price)}</td>
+    <td class="r">${money((Number(it.qty)||0)*(Number(it.unit_price)||0))}</td></tr>`).join('') || `<tr><td colspan="4" style="color:#8a97a2;padding:16px 0">No line items</td></tr>`;
+  const rate = Number(inv.tax_rate)||0;
+  const taxRow = rate>0 ? `<div class="row"><span>IVA (${rate}%)</span><span>${money(inv.tax_amount)}</span></div>` : '';
+  const ivaNote = issuer.invoice_iva_note || '';
+  return `
+    <div class="accent"></div>
+    <div class="doc-top">
+      <div>
+        <div class="issuer-name">
+          <svg width="24" height="24" viewBox="0 0 32 32" fill="none"><rect x="4" y="20" width="5" height="8" rx="2.5" fill="#101820" opacity="0.55"/><rect x="12" y="14" width="5" height="14" rx="2.5" fill="#101820" opacity="0.78"/><rect x="20" y="10" width="5" height="18" rx="2.5" fill="#101820"/><circle cx="22.5" cy="5.5" r="2.25" fill="#101820"/></svg>
+          ${esc(name)}
+        </div>
+        <div class="issuer-meta">${meta.map(esc).join('<br>')}</div>
+      </div>
+      <div>
+        <div class="doc-title">${esc(label)}</div>
+        <div class="doc-meta">
+          <div><b>№ ${esc(inv.number||'—')}</b></div>
+          <div>Issued: ${fmtDate(inv.issue_date)}</div>
+          ${inv.due_date?`<div>Due: ${fmtDate(inv.due_date)}</div>`:''}
+        </div>
+      </div>
+    </div>
+
+    <div class="billto-lbl">Bill to</div>
+    <div class="billto">${client||'—'}</div>
+
+    <table>
+      <thead><tr><th>Description</th><th class="r">Qty</th><th class="r">Unit</th><th class="r">Amount</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+
+    <div class="tot">
+      <div class="row"><span>Subtotal</span><span>${money(inv.subtotal)}</span></div>
+      ${taxRow}
+      <div class="row grand"><span>Total</span><span>${money(inv.total)}</span></div>
+    </div>
+
+    <div class="foot">
+      ${issuer.invoice_terms?`<div><b>Terms:</b> ${esc(issuer.invoice_terms)}</div>`:''}
+      ${ivaNote?`<div>${esc(ivaNote)}</div>`:''}
+      ${inv.notes?`<div style="margin-top:8px">${esc(inv.notes)}</div>`:''}
+      <div style="margin-top:12px">Thank you.</div>
+    </div>`;
+}
+
+loadAll();
+</script>
+</body>
+</html>
