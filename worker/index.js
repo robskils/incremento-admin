@@ -371,6 +371,11 @@ async function handleAdmin(request, env, url, cors) {
   if (contactId && method === 'PATCH')  return updateContact(parseInt(contactId[1]), request, env, cors);
   if (contactId && method === 'DELETE') return deleteContact(parseInt(contactId[1]), env, cors);
 
+  // Contact CRM overlay (category/notes, keyed by email)
+  if (path === '/api/contact-meta' && method === 'GET')    return listContactMeta(env, cors);
+  if (path === '/api/contact-meta' && method === 'PUT')    return upsertContactMeta(request, env, cors);
+  if (path === '/api/contact-meta' && method === 'DELETE') return deleteContactMeta(url, env, cors);
+
   // Team + deal assignees
   const asgMatch = path.match(/^\/api\/enquiries\/(\d+)\/assignees$/);
   if (path === '/api/team' && method === 'GET') return listTeam(env, cors);
@@ -896,6 +901,54 @@ async function deleteContact(id, env, cors) {
   if (!env.DB) return json({ error: 'Database not configured' }, 503, cors);
   try { await env.DB.prepare('DELETE FROM contacts WHERE id = ?').bind(id).run(); return json({ ok: true }, 200, cors); }
   catch (e) { console.error('deleteContact', e); return json({ error: 'Database error' }, 500, cors); }
+}
+
+// ── Contact CRM overlay (category/notes, keyed by email) ────────────────────
+async function listContactMeta(env, cors) {
+  if (!env.DB) return json({ meta: [] }, 200, cors);
+  try {
+    const r = await env.DB.prepare('SELECT * FROM contact_meta').all();
+    return json({ meta: r.results || [] }, 200, cors);
+  } catch (e) { console.error('listContactMeta', e); return json({ meta: [] }, 200, cors); }
+}
+
+async function upsertContactMeta(request, env, cors) {
+  if (!env.DB) return json({ error: 'Database not configured' }, 503, cors);
+  let b; try { b = await request.json(); } catch { return json({ error: 'Invalid JSON' }, 400, cors); }
+  const email = (b.email || '').toLowerCase().trim();
+  if (!email) return json({ error: 'email required' }, 400, cors);
+  const now = new Date().toISOString();
+  try {
+    // Straight overwrite - the card always sends the contact's full current state.
+    // standalone is sticky (once manual, stays manual).
+    await env.DB.prepare(`
+      INSERT INTO contact_meta (email, name, company, phone, category, notes, standalone, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(email) DO UPDATE SET
+        name       = excluded.name,
+        company    = excluded.company,
+        phone      = excluded.phone,
+        category   = excluded.category,
+        notes      = excluded.notes,
+        standalone = MAX(contact_meta.standalone, excluded.standalone),
+        updated_at = excluded.updated_at
+    `).bind(
+      email, b.name || null, b.company || null, b.phone || null,
+      b.category || '', b.notes || null, b.standalone ? 1 : 0, now, now
+    ).run();
+    const row = await env.DB.prepare('SELECT * FROM contact_meta WHERE email = ?').bind(email).first();
+    return json(row, 200, cors);
+  } catch (e) { console.error('upsertContactMeta', e); return json({ error: 'Database error' }, 500, cors); }
+}
+
+async function deleteContactMeta(url, env, cors) {
+  if (!env.DB) return json({ error: 'Database not configured' }, 503, cors);
+  const email = (url.searchParams.get('email') || '').toLowerCase().trim();
+  if (!email) return json({ error: 'email required' }, 400, cors);
+  try {
+    await env.DB.prepare('DELETE FROM contact_meta WHERE email = ?').bind(email).run();
+    return json({ ok: true }, 200, cors);
+  } catch (e) { console.error('deleteContactMeta', e); return json({ error: 'Database error' }, 500, cors); }
 }
 
 /* ── Team + deal assignees ───────────────────────────────── */

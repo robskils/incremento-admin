@@ -8,6 +8,25 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="admin.css">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
+<style>
+  /* ── Category tabs ── */
+  .cat-tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px }
+  .cat-tab { display:inline-flex; align-items:center; gap:7px; padding:7px 14px; background:var(--surface2); border:1px solid var(--border2); border-radius:20px; color:var(--text-dim); font-family:'Inter',sans-serif; font-size:1.0625rem; cursor:pointer; transition:all .16s; white-space:nowrap }
+  .cat-tab:hover { color:var(--text); border-color:var(--lime) }
+  .cat-tab.active { color:var(--bg); background:var(--lime); border-color:var(--lime); font-weight:600 }
+  .cat-count { font-size:0.9375rem; opacity:.7 }
+  .cat-tab.active .cat-count { opacity:.9 }
+  /* ── Category pills (badges) ── */
+  .cat-pill { display:inline-block; padding:2px 9px; border-radius:11px; font-size:0.9375rem; font-weight:500; letter-spacing:.01em; line-height:1.5; margin-right:5px }
+  /* ── Edit modal bits ── */
+  .field-lbl { display:block; color:var(--text-dim); font-size:1.0625rem; letter-spacing:.03em; text-transform:uppercase; margin:16px 0 7px }
+  .field-in { width:100%; padding:10px 13px; background:var(--surface2); border:1px solid var(--border2); border-radius:8px; font-family:'Inter',sans-serif; font-size:1.125rem; color:var(--text); outline:none }
+  .field-in:focus { border-color:var(--lime) }
+  textarea.field-in { resize:vertical; min-height:74px; line-height:1.6 }
+  .pill-pick { display:flex; gap:8px; flex-wrap:wrap }
+  .pill-opt { padding:7px 14px; border-radius:20px; border:1.5px solid var(--border2); background:transparent; color:var(--text-dim); font-family:'Inter',sans-serif; font-size:1.0625rem; cursor:pointer; transition:all .15s }
+  .pill-opt.on { color:var(--bg); font-weight:600 }
+</style>
 </head>
 <body>
 
@@ -50,7 +69,13 @@
       <div class="page-title">Contacts</div>
       <div class="page-sub" id="contacts-sub"></div>
     </div>
+    <button class="btn-primary" onclick="newContact()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add contact
+    </button>
   </div>
+
+  <div class="cat-tabs" id="cat-tabs"></div>
 
   <div class="topbar-row">
     <div class="search-bar">
@@ -68,7 +93,7 @@
 <div class="modal-overlay" id="contact-modal" style="display:none" onclick="if(event.target===this)closeContact()">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-header">
-      <div class="modal-title">Contact</div>
+      <div class="modal-title" id="modal-title">Contact</div>
       <button class="modal-close" onclick="closeContact()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body" id="contact-card-body"></div>
@@ -77,30 +102,58 @@
 
 <script src="admin.js"></script>
 <script>
+/* ── Categories ─────────────────────────────────────────────── */
+const CATEGORIES = [
+  { key:'lead',        label:'Lead',        color:'#9EF54A' },
+  { key:'prospect',    label:'Prospect',    color:'#5EE7D8' },
+  { key:'client',      label:'Client',      color:'#F5C451' },
+  { key:'past_client', label:'Past Client', color:'#94A3B8' },
+  { key:'partner',     label:'Partner',     color:'#C4A6FF' },
+];
+const CAT_BY = Object.fromEntries(CATEGORIES.map(c => [c.key, c]));
+
 let people = [];          // one record per person (by email)
 let peopleByKey = {};
 let searchTerm = '';
-function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function jsStr(s) { return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
-function initials(name) { return (name||'?').split(' ').map(p=>p[0]||'').slice(0,2).join('').toUpperCase(); }
+let currentCat = 'all';
+let edit = null;          // active edit-state in the modal
 
-async function loadContacts() {
+function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function jsStr(s){ return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+function initials(name){ return (name||'?').split(' ').map(p=>p[0]||'').slice(0,2).join('').toUpperCase(); }
+
+/* Which category keys apply to a person: saved meta wins, else derived from deals. */
+function derivedCat(p){
+  if (p.deals.some(d => d.stage === 'completed')) return 'client';
+  if (p.deals.length) return 'lead';
+  return 'lead';
+}
+function catKeys(p){
+  const saved = (p.category||'').split(',').map(s=>s.trim()).filter(Boolean).filter(k=>CAT_BY[k]);
+  return saved.length ? saved : [derivedCat(p)];
+}
+function catPill(key){
+  const c = CAT_BY[key]; if (!c) return '';
+  return `<span class="cat-pill" style="color:${c.color};background:${c.color}22;border:1px solid ${c.color}66">${c.label}</span>`;
+}
+
+async function loadContacts(){
   try {
-    // A person = one email, built from BOTH the enquiries (deal owners) and the
-    // contacts table (people added to deals, with role/phone). Merge the two.
-    const [eRes, cRes] = await Promise.all([
+    const [eRes, cRes, mRes] = await Promise.all([
       apiFetch('/api/enquiries?limit=500').catch(()=>({enquiries:[]})),
       apiFetch('/api/contacts').catch(()=>({contacts:[]})),
+      apiFetch('/api/contact-meta').catch(()=>({meta:[]})),
     ]);
     const enquiries = eRes.enquiries || [];
     const allContacts = cRes.contacts || [];
+    const meta = mRes.meta || [];
     const byId = {}; enquiries.forEach(e => { byId[e.id] = e; });
 
     const map = {};
     const ensure = (email, name) => {
       const k = (email||'').toLowerCase().trim();
       if (!k) return null;
-      if (!map[k]) map[k] = { key:k, email:email, name:name||'', role:'', phone:'', company:'', deals:[], _ids:{}, last:null };
+      if (!map[k]) map[k] = { key:k, email:email, name:name||'', role:'', phone:'', company:'', category:'', notes:'', standalone:0, deals:[], _ids:{}, last:null };
       return map[k];
     };
     const addDeal = (p, e) => {
@@ -122,31 +175,57 @@ async function loadContacts() {
       if (c.role && !p.role)  p.role = c.role;
       if (c.phone && !p.phone) p.phone = c.phone;
       const e = byId[c.enquiry_id];
-      if (e) { if (!p.company && e.company) p.company = e.company; addDeal(p, e); }
+      if (e){ if (!p.company && e.company) p.company = e.company; addDeal(p, e); }
+    });
+    // Overlay CRM meta (also creates standalone people that have no deal)
+    meta.forEach(m => {
+      const p = ensure(m.email, m.name); if (!p) return;
+      if (m.name) p.name = m.name;
+      if (m.company) p.company = m.company;
+      if (m.phone) p.phone = m.phone;
+      if (m.category) p.category = m.category;
+      if (m.notes) p.notes = m.notes;
+      p.standalone = m.standalone || 0;
     });
 
-    people = Object.values(map).sort((a,b) => new Date(b.last||0) - new Date(a.last||0));
+    people = Object.values(map).sort((a,b) => (a.name||'').localeCompare(b.name||''));
     peopleByKey = map;
     document.getElementById('contacts-sub').textContent = people.length + ' contact' + (people.length===1?'':'s');
+    renderTabs();
     renderContacts();
   } catch {
     document.getElementById('contacts-list').innerHTML = '<div class="empty-state">Failed to load</div>';
   }
 }
 
-function renderContacts() {
+function renderTabs(){
+  const counts = { all: people.length };
+  CATEGORIES.forEach(c => counts[c.key] = 0);
+  people.forEach(p => catKeys(p).forEach(k => { if (counts[k] !== undefined) counts[k]++; }));
+  const tab = (key, label, color) =>
+    `<button class="cat-tab${currentCat===key?' active':''}"${currentCat===key&&color?` style="background:${color};border-color:${color}"`:''} onclick="setCat('${key}')">${label}<span class="cat-count">${counts[key]||0}</span></button>`;
+  document.getElementById('cat-tabs').innerHTML =
+    tab('all','All') + CATEGORIES.map(c => tab(c.key, c.label, c.color)).join('');
+}
+function setCat(key){ currentCat = key; renderTabs(); renderContacts(); }
+
+function visibleList(){
   let list = people;
-  if (searchTerm) {
+  if (currentCat !== 'all') list = list.filter(p => catKeys(p).includes(currentCat));
+  if (searchTerm){
     const q = searchTerm.toLowerCase();
     list = list.filter(p =>
       (p.name||'').toLowerCase().includes(q) ||
       (p.email||'').toLowerCase().includes(q) ||
-      (p.company||'').toLowerCase().includes(q) ||
-      (p.role||'').toLowerCase().includes(q)
-    );
+      (p.company||'').toLowerCase().includes(q));
   }
-  if (list.length === 0) {
-    document.getElementById('contacts-list').innerHTML = '<div class="empty-state">No contacts found</div>';
+  return list;
+}
+
+function renderContacts(){
+  const list = visibleList();
+  if (list.length === 0){
+    document.getElementById('contacts-list').innerHTML = '<div class="empty-state">No contacts here yet</div>';
     return;
   }
   document.getElementById('contacts-list').innerHTML = list.map(p => `
@@ -154,7 +233,7 @@ function renderContacts() {
       <div class="contact-avatar">${escHtml(initials(p.name))}</div>
       <div class="contact-info">
         <div class="contact-name">${escHtml(p.name)}${p.company?` <span style="color:var(--text-dim);font-size:1.1875rem;font-weight:400">· ${escHtml(p.company)}</span>`:''}</div>
-        <div class="contact-detail">${escHtml(p.email)}${p.role?' · '+escHtml(p.role):''} · ${p.deals.length} deal${p.deals.length===1?'':'s'} · Last: ${timeAgo(p.last)}</div>
+        <div class="contact-detail">${catKeys(p).map(catPill).join('')}${escHtml(p.email)}${p.deals.length?` · ${p.deals.length} deal${p.deals.length===1?'':'s'}`:''}${p.last?' · '+timeAgo(p.last):''}</div>
       </div>
       <div class="contact-actions">
         <a class="contact-btn" href="mailto:${escHtml(p.email)}?subject=Following up - Incremento" onclick="event.stopPropagation()">
@@ -162,49 +241,107 @@ function renderContacts() {
           Email
         </a>
         <button class="contact-btn" onclick="event.stopPropagation();openContact('${jsStr(p.key)}')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          Open
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4z"/></svg>
+          Edit
         </button>
       </div>
     </div>`).join('');
 }
 
-/* ── Contact card (full person record) ─────────────────────── */
-function openContact(key) {
+/* ── Edit / view card ───────────────────────────────────────── */
+function openContact(key){
   const p = peopleByKey[key]; if (!p) return;
-  const mailto = `mailto:${escHtml(p.email)}?subject=Following up - Incremento`;
-  const row = (label, val) => val ? `<div style="display:flex;gap:16px;padding:11px 0;border-bottom:1px solid var(--border)">
-      <span style="flex:0 0 120px;color:var(--text-dim);font-size:1.0625rem;letter-spacing:0.04em;text-transform:uppercase">${label}</span>
-      <span style="flex:1;color:var(--text);min-width:0;overflow-wrap:anywhere">${val}</span></div>` : '';
-  const deals = p.deals.slice().sort((a,b) => new Date(b.submitted_at) - new Date(a.submitted_at));
-  const dealSummary = deals.length
-    ? deals.map(d => `<div style="margin-bottom:5px"><a href="enquiry.html?id=${d.id}" style="color:var(--cyan);text-decoration:none">${escHtml(d.title)}</a> ${stageBadge(d.stage)}</div>`).join('')
-    : '<span style="color:var(--text-dim)">No deal yet</span>';
-  const phoneVal = p.phone
-    ? `<a href="tel:${escHtml(p.phone)}" style="color:var(--cyan);text-decoration:none">${escHtml(p.phone)}</a>`
-    : '<span style="color:var(--text-dim)">Not on file</span>';
-  document.getElementById('contact-card-body').innerHTML = `
-    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
-      <div class="contact-avatar" style="width:54px;height:54px;font-size:1.4rem;flex:0 0 auto">${escHtml(initials(p.name))}</div>
-      <div style="min-width:0">
-        <div style="font-family:'Space Grotesk',sans-serif;font-size:1.45rem;font-weight:600;color:var(--text)">${escHtml(p.name)}</div>
-        ${p.company?`<div style="color:var(--text-dim);font-size:1.1875rem">${escHtml(p.company)}</div>`:''}
-      </div>
-    </div>
-    ${row('Email', `<a href="${mailto}" style="color:var(--cyan);text-decoration:none">${escHtml(p.email||'-')}</a>`)}
-    ${row('Phone', phoneVal)}
-    ${row('Role', p.role ? escHtml(p.role) : '')}
-    ${row('Last contact', timeAgo(p.last))}
-    ${row(deals.length>1?'Deals':'Deal', dealSummary)}
-    <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap">
-      <a class="btn-ghost" href="${mailto}">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        Email
-      </a>
-    </div>`;
+  edit = {
+    key, email:p.email, name:p.name, company:p.company||'', phone:p.phone||'',
+    notes:p.notes||'', cats:new Set(catKeys(p)), standalone:p.standalone||0,
+    isNew:false, deals:p.deals,
+  };
+  document.getElementById('modal-title').textContent = 'Contact';
+  renderCard();
   document.getElementById('contact-modal').style.display = 'flex';
 }
-function closeContact(){ document.getElementById('contact-modal').style.display = 'none'; }
+function newContact(){
+  edit = { key:null, email:'', name:'', company:'', phone:'', notes:'', cats:new Set(['lead']), standalone:1, isNew:true, deals:[] };
+  document.getElementById('modal-title').textContent = 'New contact';
+  renderCard();
+  document.getElementById('contact-modal').style.display = 'flex';
+}
+function toggleCat(key){
+  if (edit.cats.has(key)) edit.cats.delete(key); else edit.cats.add(key);
+  renderCard();
+}
+function renderCard(){
+  const e = edit;
+  const pills = CATEGORIES.map(c => {
+    const on = e.cats.has(c.key);
+    const style = on ? `background:${c.color};border-color:${c.color}` : '';
+    return `<button class="pill-opt${on?' on':''}" style="${style}" onclick="toggleCat('${c.key}')">${c.label}</button>`;
+  }).join('');
+  const deals = (e.deals||[]).slice().sort((a,b)=>new Date(b.submitted_at)-new Date(a.submitted_at));
+  const dealBlock = deals.length ? `
+    <span class="field-lbl">${deals.length>1?'Deals':'Deal'}</span>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      ${deals.map(d=>`<div><a href="enquiry.html?id=${d.id}" style="color:var(--cyan);text-decoration:none">${escHtml(d.title)}</a> ${stageBadge(d.stage)}</div>`).join('')}
+    </div>` : '';
+  document.getElementById('contact-card-body').innerHTML = `
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px">
+      <div class="contact-avatar" style="width:54px;height:54px;font-size:1.4rem;flex:0 0 auto">${escHtml(initials(e.name||e.email))}</div>
+      <div style="min-width:0;flex:1">
+        <input class="field-in" id="f-name" placeholder="Full name" value="${escHtml(e.name)}" style="font-size:1.25rem;font-weight:600">
+      </div>
+    </div>
+
+    <span class="field-lbl">Category</span>
+    <div class="pill-pick">${pills}</div>
+
+    <span class="field-lbl">Email</span>
+    <input class="field-in" id="f-email" type="email" placeholder="name@company.com" value="${escHtml(e.email)}" ${e.isNew?'':'readonly style="opacity:.7"'}>
+
+    <span class="field-lbl">Company</span>
+    <input class="field-in" id="f-company" placeholder="Company" value="${escHtml(e.company)}">
+
+    <span class="field-lbl">Phone</span>
+    <input class="field-in" id="f-phone" placeholder="+351 …" value="${escHtml(e.phone)}">
+
+    <span class="field-lbl">Notes</span>
+    <textarea class="field-in" id="f-notes" placeholder="Anything worth remembering…">${escHtml(e.notes)}</textarea>
+    ${dealBlock}
+
+    <div style="display:flex;gap:10px;margin-top:22px;flex-wrap:wrap;align-items:center">
+      <button class="btn-primary" onclick="saveContact()">Save</button>
+      ${e.email?`<a class="btn-ghost" href="mailto:${escHtml(e.email)}?subject=Following up - Incremento"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Email</a>`:''}
+      ${e.standalone && !e.isNew ? `<button class="btn-ghost" style="margin-left:auto;color:#f87171;border-color:#f8717155" onclick="removeContact()">Delete</button>` : ''}
+    </div>`;
+}
+
+async function saveContact(){
+  const email = (document.getElementById('f-email').value||'').trim().toLowerCase();
+  const name  = (document.getElementById('f-name').value||'').trim();
+  if (!email){ alert('An email is needed - it is how a contact is identified.'); return; }
+  const body = {
+    email, name,
+    company: document.getElementById('f-company').value.trim(),
+    phone:   document.getElementById('f-phone').value.trim(),
+    category: [...edit.cats].join(','),
+    notes:   document.getElementById('f-notes').value.trim(),
+    standalone: edit.standalone || (edit.isNew ? 1 : 0),
+  };
+  try {
+    await apiFetch('/api/contact-meta', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    closeContact();
+    await loadContacts();
+  } catch { alert('Save failed - please try again.'); }
+}
+async function removeContact(){
+  if (!edit || !edit.email) return;
+  if (!confirm('Delete this contact? This only removes the manual contact, not any deals.')) return;
+  try {
+    await apiFetch('/api/contact-meta?email=' + encodeURIComponent(edit.email), { method:'DELETE' });
+    closeContact();
+    await loadContacts();
+  } catch { alert('Delete failed - please try again.'); }
+}
+function closeContact(){ document.getElementById('contact-modal').style.display = 'none'; edit = null; }
 
 document.getElementById('search-input').addEventListener('input', e => {
   searchTerm = e.target.value.trim();
