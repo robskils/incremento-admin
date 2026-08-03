@@ -370,11 +370,13 @@ function renderDoc(inv){
   const label = issuer.invoice_doc_label || 'INVOICE';
   const name = issuer.invoice_issuer_name || 'Incremento';
   const meta = [issuer.invoice_nif?('NIF '+issuer.invoice_nif):'', issuer.invoice_address||'', issuer.invoice_iban?('IBAN '+issuer.invoice_iban):''].filter(Boolean);
-  const client = [
-    inv.client_name?`<span class="cn">${esc(inv.client_name)}</span>`:'',
-    inv.client_company||'', inv.client_address||'',
-    inv.client_nif?('NIF '+esc(inv.client_nif)):'', inv.client_email||''
-  ].filter(Boolean).map(esc).join('<br>');
+  const cparts = [];
+  if (inv.client_name)    cparts.push(`<span class="cn">${esc(inv.client_name)}</span>`);
+  if (inv.client_company) cparts.push(esc(inv.client_company));
+  if (inv.client_address) cparts.push(esc(inv.client_address));
+  if (inv.client_nif)     cparts.push('NIF ' + esc(inv.client_nif));
+  if (inv.client_email)   cparts.push(esc(inv.client_email));
+  const client = cparts.join('<br>');
   const rows = items.map(it=>`<tr>
     <td class="desc">${esc(it.description||'')}</td>
     <td class="r">${Number(it.qty)||0}</td>
