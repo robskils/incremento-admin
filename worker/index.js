@@ -253,12 +253,12 @@ async function authVerify(request, env, cors) {
 
   const row = await env.DB.prepare(`SELECT code, expires_at FROM otp_codes WHERE email = ?`)
     .bind(email).first();
-  if (!row) return json({ error: 'No code found — request a new one' }, 400, cors);
+  if (!row) return json({ error: 'No code found - request a new one' }, 400, cors);
 
   const now = Math.floor(Date.now() / 1000);
   if (now > row.expires_at) {
     await env.DB.prepare(`DELETE FROM otp_codes WHERE email = ?`).bind(email).run();
-    return json({ error: 'Code expired — request a new one' }, 400, cors);
+    return json({ error: 'Code expired - request a new one' }, 400, cors);
   }
   if (row.code !== code) return json({ error: 'Incorrect code' }, 400, cors);
 
@@ -1144,7 +1144,7 @@ async function sendEmail(request, env, cors) {
       replyTo: from,
       subject: subject || '(no subject)',
       html: buildSentEmailHtml(bodyText, sig),
-      text: bodyText + '\n\n— ' + sig.name + '\nincremento.eu',
+      text: bodyText + '\n\n- ' + sig.name + '\nincremento.eu',
     });
     if (!sent.ok) {
       return json({ error: 'Send failed', detail: sent.error }, 502, cors);
