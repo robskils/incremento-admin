@@ -29,6 +29,12 @@ ADMIN_EMAILS = "robin@lumley-savile.com,robin@incremento.eu,robin@incremento.co"
 # SETUP: Run `wrangler d1 create incremento-admin` then paste the ID below
 # Then:  wrangler d1 execute incremento-admin --file worker/schema.sql --remote
 # Then:  wrangler deploy
+# ── Cloudflare Email Sending (replaces Resend) ────────────────────────
+# Enable the sending domain once, before first deploy:
+#   wrangler email sending enable incremento.eu
+[[send_email]]
+name = "EMAIL"
+
 [[d1_databases]]
 binding       = "DB"
 database_name = "incremento-admin"
