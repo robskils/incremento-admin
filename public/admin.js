@@ -2,8 +2,8 @@
 
 /* On admin.incremento.co the API is same-origin (no CORS); anywhere
    else (pages.dev) it goes to the worker's own domain. */
-const SAME_ORIGIN = location.hostname === 'admin.incremento.co';
-const WORKER = SAME_ORIGIN ? '' : 'https://enquiries.incremento.co';
+const SAME_ORIGIN = location.hostname === 'admin.incremento.eu' || location.hostname === 'admin.incremento.co';
+const WORKER = SAME_ORIGIN ? '' : 'https://enquiries.incremento.eu';
 
 /* Auth: email OTP login → 7-day session token in localStorage.
    Legacy X-Admin-Key (sessionStorage) still works as a fallback. */
@@ -42,7 +42,7 @@ function loginCardHtml() {
 
     <div id="login-step-email">
       <p style="font-size:1.1875rem;color:var(--text-dim);margin-bottom:24px">Enter your email — we'll send you a sign-in code</p>
-      <input id="login-email" type="email" placeholder="you@incremento.co" autocomplete="email"
+      <input id="login-email" type="email" placeholder="you@incremento.eu" autocomplete="email"
         style="width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;font-family:'Inter',sans-serif;font-size:1.1875rem;color:var(--text);outline:none;margin-bottom:12px;box-sizing:border-box">
       <button id="login-send" class="btn-primary" style="width:100%;justify-content:center">Send code</button>
     </div>

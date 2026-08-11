@@ -14,7 +14,7 @@
 
 import PostalMime from 'postal-mime';
 
-const PUBLIC_ORIGINS = ['https://incremento.co', 'https://www.incremento.co'];
+const PUBLIC_ORIGINS = ['https://incremento.eu', 'https://www.incremento.eu', 'https://incremento.co', 'https://www.incremento.co'];
 
 function corsHeaders(request) {
   const origin = request.headers.get('Origin') || '*';
@@ -225,7 +225,7 @@ async function authRequestCode(request, env, cors) {
         </tr>
         <tr>
           <td style="padding:18px 36px;border-top:1px solid #1c2d40">
-            <p style="margin:0;font-size:11px;color:#5a7186">Incremento · Lisbon · <a href="https://incremento.co" style="color:#5EE7D8;text-decoration:none">incremento.co</a></p>
+            <p style="margin:0;font-size:11px;color:#5a7186">Incremento · Lisbon · <a href="https://incremento.eu" style="color:#5EE7D8;text-decoration:none">incremento.eu</a></p>
           </td>
         </tr>
       </table>
@@ -390,7 +390,7 @@ async function handleAdmin(request, env, url, cors) {
   if (asgMatch && method === 'GET')  return listAssignees(parseInt(asgMatch[1]), env, cors);
   if (asgMatch && method === 'POST') return setAssignees(parseInt(asgMatch[1]), request, env, cors);
 
-  // Send an email to a contact (from a chosen incremento.co address, with signature, logged)
+  // Send an email to a contact (from a chosen incremento.eu address, with signature, logged)
   if (path === '/api/send-email' && method === 'POST') return sendEmail(request, env, cors);
 
   // Settings (editable proposal email template, etc.)
@@ -490,10 +490,15 @@ async function updateSettings(request, env, cors) {
 }
 
 /* ── Inbound email capture (Mailgun webhook) ─────────────────
-   Robin BCCs log@mg.incremento.co when sending; client replies routed
+   Robin BCCs log@mg.incremento.eu when sending; client replies routed
    the same way. Mailgun parses and POSTs multipart/form-data here.
    We detect direction, match the contact, dedupe, and log to messages. */
 const INC_SENDERS = [
+  // .eu (new primary) and .co (kept through the migration overlap)
+  'enquiries@incremento.eu',
+  'contact@incremento.eu',
+  'robin@incremento.eu',
+  'hello@incremento.eu',
   'enquiries@incremento.co',
   'contact@incremento.co',
   'robin@incremento.co',
@@ -1074,8 +1079,14 @@ async function setAssignees(eid, request, env, cors) {
   } catch (e) { console.error('setAssignees', e); return json({ error: 'Database error' }, 500, cors); }
 }
 
-/* ── Send email from a chosen incremento.co address ──────── */
+/* ── Send email from a chosen incremento address (.eu primary; .co kept
+   through the migration overlap - whichever domain Resend has verified
+   is the one that actually sends) ──────── */
 const SEND_SIGS = {
+  'robin@incremento.eu':   { fromName: 'Robin Savile', name: 'Robin Savile', role: 'Founder, Incremento', tagline: 'Your complete digital solution' },
+  'contact@incremento.eu': { fromName: 'Incremento',   name: 'Incremento',    role: '',                    tagline: 'Your complete digital solution' },
+  'contacto@incremento.eu':{ fromName: 'Incremento',   name: 'Incremento',    role: '',                    tagline: 'A sua solução digital completa' },
+  'help@incremento.eu':    { fromName: 'Incremento Support', name: 'Incremento Support', role: '',          tagline: 'Here to help' },
   'robin@incremento.co':   { fromName: 'Robin Savile', name: 'Robin Savile', role: 'Founder, Incremento', tagline: 'Your complete digital solution' },
   'contact@incremento.co': { fromName: 'Incremento',   name: 'Incremento',    role: '',                    tagline: 'Your complete digital solution' },
   'contacto@incremento.co':{ fromName: 'Incremento',   name: 'Incremento',    role: '',                    tagline: 'A sua solução digital completa' },
@@ -1093,7 +1104,7 @@ function buildSentEmailHtml(bodyText, sig) {
       <div style="margin-top:10px;font-size:15px;color:#ffffff;font-weight:bold">${escEmail(sig.name)}</div>
       ${sig.role ? `<div style="font-size:12px;color:#9fb3c6;margin-top:1px">${escEmail(sig.role)}</div>` : ''}
       <div style="margin-top:9px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#5EE7D8">${escEmail(sig.tagline)}</div>
-      <div style="margin-top:9px;font-size:12px"><a href="https://incremento.co" style="color:#9EF54A;text-decoration:none">incremento.co</a></div>
+      <div style="margin-top:9px;font-size:12px"><a href="https://incremento.eu" style="color:#9EF54A;text-decoration:none">incremento.eu</a></div>
     </td></tr></table>
   </div>`;
 }
@@ -1101,7 +1112,7 @@ function buildSentEmailHtml(bodyText, sig) {
 async function sendEmail(request, env, cors) {
   if (!env.RESEND_API_KEY) return json({ error: 'Email not configured' }, 503, cors);
   let b; try { b = await request.json(); } catch { return json({ error: 'Invalid JSON' }, 400, cors); }
-  const from = SEND_SIGS[(b.from || '').toLowerCase()] ? b.from.toLowerCase() : 'contact@incremento.co';
+  const from = SEND_SIGS[(b.from || '').toLowerCase()] ? b.from.toLowerCase() : 'contact@incremento.eu';
   const to = (b.to || '').trim();
   const subject = (b.subject || '').trim();
   const bodyText = (b.body || '').trim();
@@ -1118,7 +1129,7 @@ async function sendEmail(request, env, cors) {
         reply_to: from,
         subject: subject || '(no subject)',
         html: buildSentEmailHtml(bodyText, sig),
-        text: bodyText + '\n\n— ' + sig.name + '\nincremento.co',
+        text: bodyText + '\n\n— ' + sig.name + '\nincremento.eu',
       }),
     });
     if (!res.ok) {
@@ -1645,7 +1656,7 @@ Robin's direction for this draft (FOLLOW THIS CLOSELY - it reflects what was dis
 ${direction}
 """` : '';
 
-  const prompt = `Draft a project proposal for this enquiry received via incremento.co:
+  const prompt = `Draft a project proposal for this enquiry received via incremento.eu:
 
 Client name: ${enquiry.name}
 Company: ${enquiry.company || 'not given'}
@@ -1876,7 +1887,7 @@ async function deleteEnquiry(id, env, cors) {
 async function buildProposalEmailPayload(p, env) {
   const lang = normLang(p.language);
   const tpl  = await getEmailTemplate(env, lang);
-  const link = `${env.PROPOSALS_URL || 'https://enquiries.incremento.co'}/p/${p.token}`;
+  const link = `${env.PROPOSALS_URL || 'https://enquiries.incremento.eu'}/p/${p.token}`;
   const fp   = (str) => fillTokensPlain(str, p);
   return {
     from:     `Robin at Incremento <${env.FROM_EMAIL}>`,
@@ -2377,7 +2388,7 @@ ${previewBanner}
   </div>
 
   <footer>
-    <p>incremento<span style="color:var(--lime)">.</span> · ${L.preparedByVal.split('·').pop().trim()} · <a href="https://incremento.co">incremento.co</a></p>
+    <p>incremento<span style="color:var(--lime)">.</span> · ${L.preparedByVal.split('·').pop().trim()} · <a href="https://incremento.eu">incremento.eu</a></p>
   </footer>
 </div>
 <script>
@@ -2523,7 +2534,7 @@ function buildProposalEmailHtml(p, link, tpl = {}) {
         </tr>
         <tr>
           <td style="padding:16px 36px;border-top:1px solid rgba(255,255,255,0.06);text-align:center">
-            <p style="margin:0;font-size:11px;color:rgba(255,255,255,0.25)"><a href="https://incremento.co" style="color:rgba(255,255,255,0.35);text-decoration:none">incremento.co</a></p>
+            <p style="margin:0;font-size:11px;color:rgba(255,255,255,0.25)"><a href="https://incremento.eu" style="color:rgba(255,255,255,0.35);text-decoration:none">incremento.eu</a></p>
           </td>
         </tr>
       </table>

@@ -1,13 +1,13 @@
 # Incremento Admin Dashboard
 
-Admin panel for incremento.co enquiry management — pipeline, contacts, analytics.
+Admin panel for incremento.eu enquiry management — pipeline, contacts, analytics.
 
 ## Stack
 - **Frontend:** Plain HTML/CSS/JS in `public/` — deployed to Cloudflare Pages
-- **Backend:** Cloudflare Worker at `enquiries.incremento.co`
+- **Backend:** Cloudflare Worker at `enquiries.incremento.eu`
 - **Database:** Cloudflare D1 (`incremento-admin`)
 - **Email:** Resend API
-- **Auth:** Built-in email OTP login (6-digit code via Resend → 7-day HS256 JWT signed with ADMIN_KEY, sent as `Authorization: Bearer`). Allowed emails in `ADMIN_EMAILS` var in wrangler.toml. Legacy `X-Admin-Key` header still accepted. Auth endpoints: `POST /auth/request-code`, `POST /auth/verify`. OTP codes in D1 `otp_codes` table (10-min expiry). Admin API also routed same-origin at `admin.incremento.co/api/*`.
+- **Auth:** Built-in email OTP login (6-digit code via Resend → 7-day HS256 JWT signed with ADMIN_KEY, sent as `Authorization: Bearer`). Allowed emails in `ADMIN_EMAILS` var in wrangler.toml. Legacy `X-Admin-Key` header still accepted. Auth endpoints: `POST /auth/request-code`, `POST /auth/verify`. OTP codes in D1 `otp_codes` table (10-min expiry). Admin API also routed same-origin at `admin.incremento.eu/api/*`.
 
 ## Design System
 - Background: `#0e1820` (dark midnight)
@@ -55,7 +55,7 @@ public/
 - `GET /api/companies` → distinct company names (+ representative company_url) for the deal company picker
 - `GET/POST /api/proposal-blocks` + `PATCH/DELETE /api/proposal-blocks/:id` → component library. Table `proposal_blocks` (kind, **service**, **section_id**, title, body, price, extra). `section_id` maps a component to a `proposal_sections` row.
 - `GET/POST /api/proposal-sections` + `PATCH/DELETE /api/proposal-sections/:id` → proposal structure. Table `proposal_sections` (position, title, description, shared_content, created_at). DELETE returns 409 `{error:'has_components'}` if any component still references the section (UI warns + blocks the delete). Seeded with 7 default sections (worker/migrate-sections.sql). The library (Proposals hub → Component Library tab) is grouped by **service/speciality** (`service` ∈ web-design, web-development, seo, ai, analytics, infrastructure, email, ecommerce, ux, paid, general). Each row is a reusable client-facing component (e.g. seo→"On-page optimisation"). Seeded from `worker/seed-library.sql` (~58 components, on-brand, incl. the "free hosting up to 100k hits/day" line; AI components mirror the how-to-use-ai-in-web-projects blog). SERVICES list lives in proposals.html.
-- `POST /api/send-email` → send a branded email to a contact from a chosen incremento.co address (signature varies by sender), logged outbound
+- `POST /api/send-email` → send a branded email to a contact from a chosen incremento.eu address (signature varies by sender), logged outbound
 - `GET /api/messages?email=` or `?enquiry_id=` → communication timeline. `enquiry_id` spans the whole deal (enquiry email + every contact on it); merges enquiries + logged messages
 - `POST /api/messages` → manually log a message (direction, subject, body)
 - `GET/PATCH /api/settings` → key/value settings. Email template is **per language**: keys `proposal_email_{greeting,intro,closing,signature}_{en,pt}` (tokens {name}=first name, {title}, {company}). Defaults in worker `EMAIL_TEMPLATE_DEFAULTS.{en,pt}` (also hold the localized `subject`). Edited in Proposals → Email with an EN/PT toggle (saves both).
@@ -73,7 +73,7 @@ Form submissions are NOT auto-deals. `handleEnquiry` (POST /) inserts the enquir
 - `POST /api/triage/:id/merge` {target_enquiry_id} → adds sender as a contact on the target deal + logs the message into its comms, then marks the pending item `dismissed`.
 - `POST /api/triage/:id/dismiss` → `triage_state='dismissed'` (sales/spam/not-a-deal).
 `listEnquiries`, `getStats` only count `(triage_state IS NULL OR ='deal')`. `getStats` also returns `triage_count` (drives the sidebar Triage badge via `loadNavBadge`).
-Auto-logged: enquiry (inbound), proposal email (outbound), acceptance (inbound). Manual: "Log a message" composer on enquiry.html + proposal.html (shared `mountComms()` in admin.js). Keyed by contact_email. Inbound capture: `POST /api/inbound-email?token=INBOUND_SECRET` (Mailgun webhook, multipart/form-data) — same pattern as lst-pp-admin. Detects direction (INC_SENDERS → outbound), matches contact by email, dedupes, logs kind='mail'. Robin BCCs log@mg.incremento.co / routes replies there via Mailgun. INBOUND_SECRET is a wrangler secret.
+Auto-logged: enquiry (inbound), proposal email (outbound), acceptance (inbound). Manual: "Log a message" composer on enquiry.html + proposal.html (shared `mountComms()` in admin.js). Keyed by contact_email. Inbound capture: `POST /api/inbound-email?token=INBOUND_SECRET` (Mailgun webhook, multipart/form-data) — same pattern as lst-pp-admin. Detects direction (INC_SENDERS → outbound), matches contact by email, dedupes, logs kind='mail'. Robin BCCs log@mg.incremento.eu / routes replies there via Mailgun. INBOUND_SECRET is a wrangler secret.
 
 ## Proposal statuses
 `draft` → `sent` → `viewed` → `accepted` / `declined`
@@ -103,7 +103,7 @@ wrangler pages deploy ./public --project-name incremento-admin --branch y --comm
 ## Deploy
 ```bash
 wrangler deploy                                                              # worker
-wrangler pages deploy ./public --project-name incremento-admin --branch y --commit-dirty=true  # pages (production branch is literally named "y" — without --branch y the deploy lands in Preview and admin.incremento.co won't update)
+wrangler pages deploy ./public --project-name incremento-admin --branch y --commit-dirty=true  # pages (production branch is literally named "y" — without --branch y the deploy lands in Preview and admin.incremento.eu won't update)
 ```
 
 ## Related
@@ -111,5 +111,5 @@ wrangler pages deploy ./public --project-name incremento-admin --branch y --comm
 - `lst-pp-admin` — LST/PP admin (reference implementation)
 
 ## Admin URL
-Set up `admin.incremento.co` as custom domain for the Pages project in Cloudflare dashboard.
-Add `https://admin.incremento.co` to `ADMIN_ORIGINS` array in `worker/index.js` after setup.
+Set up `admin.incremento.eu` as custom domain for the Pages project in Cloudflare dashboard.
+Add `https://admin.incremento.eu` to `ADMIN_ORIGINS` array in `worker/index.js` after setup.
