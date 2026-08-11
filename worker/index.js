@@ -1619,7 +1619,7 @@ const PROPOSAL_CONTENT_SCHEMA = {
 /* ── POST /api/proposals/draft → AI-draft from enquiry ───── */
 async function draftProposal(request, env, cors) {
   if (!env.DB) return json({ error: 'Database not configured' }, 503, cors);
-  if (!env.ANTHROPIC_API_KEY) return json({ error: 'ANTHROPIC_API_KEY not set — run: wrangler secret put ANTHROPIC_API_KEY' }, 503, cors);
+  if (!env.ANTHROPIC_API_KEY) return json({ error: 'ANTHROPIC_API_KEY not set - run: wrangler secret put ANTHROPIC_API_KEY' }, 503, cors);
 
   let body;
   try { body = await request.json(); }
