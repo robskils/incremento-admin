@@ -6,8 +6,8 @@ Admin panel for incremento.eu enquiry management — pipeline, contacts, analyti
 - **Frontend:** Plain HTML/CSS/JS in `public/` — deployed to Cloudflare Pages
 - **Backend:** Cloudflare Worker at `enquiries.incremento.eu`
 - **Database:** Cloudflare D1 (`incremento-admin`)
-- **Email:** Cloudflare Email Sending (`send_email` binding, env.EMAIL)
-- **Auth:** Built-in email OTP login (6-digit code via Cloudflare Email Sending → 7-day HS256 JWT signed with ADMIN_KEY, sent as `Authorization: Bearer`). Allowed emails in `ADMIN_EMAILS` var in wrangler.toml. Legacy `X-Admin-Key` header still accepted. Auth endpoints: `POST /auth/request-code`, `POST /auth/verify`. OTP codes in D1 `otp_codes` table (10-min expiry). Admin API also routed same-origin at `admin.incremento.eu/api/*`.
+- **Email:** Resend API
+- **Auth:** Built-in email OTP login (6-digit code via Resend → 7-day HS256 JWT signed with ADMIN_KEY, sent as `Authorization: Bearer`). Allowed emails in `ADMIN_EMAILS` var in wrangler.toml. Legacy `X-Admin-Key` header still accepted. Auth endpoints: `POST /auth/request-code`, `POST /auth/verify`. OTP codes in D1 `otp_codes` table (10-min expiry). Admin API also routed same-origin at `admin.incremento.eu/api/*`.
 
 ## Design System
 - Background: `#0e1820` (dark midnight)
@@ -49,7 +49,7 @@ public/
 - `GET /api/stats`          → dashboard KPIs (total, new_count, stage_counts, potential_revenue)
 - `POST /api/proposals/draft` → AI-draft proposal from enquiry (body: {enquiry_id, components?[]}; needs ANTHROPIC_API_KEY secret). New flow: `proposal.html?enquiry=N` shows a **scoping step** first — Robin picks library components in the picker ('draft' mode), then Claude assembles the proposal AROUND them (each component → tailored scope workstream + pricing line); "draft from enquiry alone" skips the picker. System prompt enforces no-em-dash.
 - `GET/POST /api/proposals` (`?archived=1` lists archived; default excludes them) + `GET/PATCH/DELETE /api/proposals/:id` → proposal CRUD. **Archive** is soft (column `archived` 0/1 on proposals, set via PATCH {archived}); **Delete** is hard (cascade). Both surfaced on proposals.html rows (+ "Show archived" toggle with Restore) and on the proposal.html editor header.
-- `POST /api/proposals/:id/send` → email proposal link to client via Cloudflare Email Sending
+- `POST /api/proposals/:id/send` → email proposal link to client via Resend
 - `GET /p/:token` (public) → branded proposal page (records view). `?preview=1` = admin preview (works for drafts, banner, hides Accept, no view recorded). `?pdf=1` = auto-download. Download PDF button uses html2pdf to keep the dark theme; @media print also preserves dark colors.
 - `POST /p/:token/accept` (public) → client accepts; emails Robin; enquiry stage → accepted; logs inbound message
 - `GET /api/companies` → distinct company names (+ representative company_url) for the deal company picker
@@ -90,7 +90,7 @@ wrangler d1 create incremento-admin
 wrangler d1 execute incremento-admin --file worker/schema.sql --remote
 
 # 3. Set secrets
-wrangler email sending enable incremento.eu
+wrangler secret put RESEND_API_KEY
 wrangler secret put ADMIN_KEY
 
 # 4. Deploy worker
