@@ -2016,7 +2016,7 @@ async function acceptProposal(token, request, env, cors) {
       body: JSON.stringify({
         from: `Incremento Proposals <${env.FROM_EMAIL}>`,
         to: [env.TO_EMAIL],
-        subject: `🎉 Proposal accepted: ${p.title} — ${p.client_name}`,
+        subject: `🎉 Proposal accepted: ${p.title} - ${p.client_name}`,
         text: `${p.client_name}${p.client_company ? ` (${p.client_company})` : ''} accepted "${p.title}" (€${Number(p.total_value).toLocaleString()}).\n\nSigned by: ${signedName}\nAccepted at: ${now}`,
       }),
     });
@@ -2058,7 +2058,7 @@ async function declineProposal(token, request, env, cors) {
       body: JSON.stringify({
         from: `Incremento Proposals <${env.FROM_EMAIL}>`,
         to: [env.TO_EMAIL],
-        subject: `Proposal declined: ${p.title} — ${p.client_name}`,
+        subject: `Proposal declined: ${p.title} - ${p.client_name}`,
         text: `${p.client_name}${p.client_company ? ` (${p.client_company})` : ''} declined "${p.title}".${reason ? `\n\nReason: ${reason}` : ''}\n\nDeclined at: ${now}`,
       }),
     });
