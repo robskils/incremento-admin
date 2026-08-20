@@ -193,9 +193,12 @@ async function authRequestCode(request, env, cors) {
      ON CONFLICT(email) DO UPDATE SET code = excluded.code, expires_at = excluded.expires_at`
   ).bind(email, code, expiresAt).run();
 
-  const sent = await sendMail(env, {
-      fromName: 'Incremento Admin',
-      to: email,
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${env.RESEND_API_KEY}` },
+    body: JSON.stringify({
+      from: `Incremento Admin <${env.FROM_EMAIL}>`,
+      to: [email],
       subject: `${code} is your Incremento Admin code`,
       html: `<!DOCTYPE html>
 <html>
@@ -231,10 +234,11 @@ async function authRequestCode(request, env, cors) {
 </body>
 </html>`,
       text: `Your Incremento Admin sign-in code is ${code}. It expires in 10 minutes.`,
+    }),
   });
 
-  if (!sent.ok) {
-    console.error('OTP email error:', sent.error);
+  if (!res.ok) {
+    console.error('OTP email error:', await res.text());
     return json({ error: 'Failed to send code' }, 502, cors);
   }
   return json({ ok: true }, 200, cors);
@@ -1089,27 +1093,6 @@ const SEND_SIGS = {
   'help@incremento.co':    { fromName: 'Incremento Support', name: 'Incremento Support', role: '',          tagline: 'Here to help' },
 };
 
-/* Send transactional email via Cloudflare Email Sending (the send_email
-   binding). Replaces Resend. The binding throws on failure, so we normalise
-   to { ok, messageId } | { ok:false, error } for the call sites. */
-async function sendMail(env, { to, fromEmail, fromName, replyTo, subject, html, text }) {
-  if (!env.EMAIL) return { ok: false, error: 'Email binding not configured' };
-  try {
-    const r = await env.EMAIL.send({
-      to: Array.isArray(to) ? to : [to],
-      from: { email: fromEmail || env.FROM_EMAIL, name: fromName || 'Incremento' },
-      ...(replyTo ? { replyTo } : {}),
-      subject: subject || '(no subject)',
-      ...(html ? { html } : {}),
-      ...(text ? { text } : {}),
-    });
-    return { ok: true, messageId: r && r.messageId };
-  } catch (e) {
-    console.error('sendMail error:', (e && e.message) || e);
-    return { ok: false, error: (e && e.message) || 'send failed' };
-  }
-}
-
 function escEmail(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function buildSentEmailHtml(bodyText, sig) {
@@ -1127,7 +1110,7 @@ function buildSentEmailHtml(bodyText, sig) {
 }
 
 async function sendEmail(request, env, cors) {
-  if (!env.EMAIL) return json({ error: 'Email not configured' }, 503, cors);
+  if (!env.RESEND_API_KEY) return json({ error: 'Email not configured' }, 503, cors);
   let b; try { b = await request.json(); } catch { return json({ error: 'Invalid JSON' }, 400, cors); }
   const from = SEND_SIGS[(b.from || '').toLowerCase()] ? b.from.toLowerCase() : 'contact@incremento.eu';
   const to = (b.to || '').trim();
@@ -1137,17 +1120,21 @@ async function sendEmail(request, env, cors) {
   if (!bodyText) return json({ error: 'Message body required' }, 400, cors);
   const sig = SEND_SIGS[from];
   try {
-    const sent = await sendMail(env, {
-      fromEmail: from,
-      fromName: sig.fromName,
-      to,
-      replyTo: from,
-      subject: subject || '(no subject)',
-      html: buildSentEmailHtml(bodyText, sig),
-      text: bodyText + '\n\n- ' + sig.name + '\nincremento.eu',
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: `${sig.fromName} <${from}>`,
+        to: [to],
+        reply_to: from,
+        subject: subject || '(no subject)',
+        html: buildSentEmailHtml(bodyText, sig),
+        text: bodyText + '\n\n- ' + sig.name + '\nincremento.eu',
+      }),
     });
-    if (!sent.ok) {
-      return json({ error: 'Send failed', detail: sent.error }, 502, cors);
+    if (!res.ok) {
+      const detail = await res.text().catch(() => '');
+      return json({ error: 'Send failed', detail }, 502, cors);
     }
     await logMessage(env, {
       contact_email: to, enquiry_id: b.enquiry_id || null,
@@ -1200,17 +1187,25 @@ async function handleEnquiry(request, env, cors) {
   const html = buildEmailHtml({ name, email, company, phone, interestList, message, submitted });
   const plain = `New enquiry from ${name} (${email})${company ? ` · ${company}` : ''}${phone ? ` · ${phone}` : ''}\n\nInterested in: ${interestList}\n\nMessage:\n${message || '(no message provided)'}\n\nSubmitted: ${submitted}`;
 
-  const sent = await sendMail(env, {
-    fromName: 'Incremento Enquiries',
-    to:       env.TO_EMAIL,
-    replyTo:  email,
-    subject:  `New enquiry from ${name}${company ? ` · ${company}` : ''}`,
-    html,
-    text: plain,
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${env.RESEND_API_KEY}`,
+    },
+    body: JSON.stringify({
+      from:     `Incremento Enquiries <${env.FROM_EMAIL}>`,
+      to:       [env.TO_EMAIL],
+      reply_to: email,
+      subject:  `New enquiry from ${name}${company ? ` · ${company}` : ''}`,
+      html,
+      text: plain,
+    }),
   });
 
-  if (!sent.ok) {
-    console.error('Enquiry email error:', sent.error);
+  if (!res.ok) {
+    const err = await res.text();
+    console.error('Resend error:', err);
     return json({ error: 'Failed to send email' }, 502, cors);
   }
 
@@ -1927,17 +1922,25 @@ async function sendProposal(id, env, cors) {
 
   const e = await buildProposalEmailPayload(p, env);
 
-  const sent = await sendMail(env, {
-    fromName: 'Robin at Incremento',
-    to:       e.to,
-    replyTo:  e.reply_to,
-    subject:  e.subject,
-    html:     e.html,
-    text:     e.text,
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${env.RESEND_API_KEY}`,
+    },
+    body: JSON.stringify({
+      from:     e.from,
+      to:       [e.to],
+      reply_to: e.reply_to,
+      subject:  e.subject,
+      html:     e.html,
+      text:     e.text,
+    }),
   });
 
-  if (!sent.ok) {
-    console.error('Proposal send error:', sent.error);
+  if (!res.ok) {
+    const err = await res.text();
+    console.error('Resend proposal error:', err);
     return json({ error: 'Failed to send email' }, 502, cors);
   }
 
@@ -2007,11 +2010,15 @@ async function acceptProposal(token, request, env, cors) {
 
   // Notify Robin
   try {
-    await sendMail(env, {
-      fromName: 'Incremento Proposals',
-      to: env.TO_EMAIL,
-      subject: `🎉 Proposal accepted: ${p.title} - ${p.client_name}`,
-      text: `${p.client_name}${p.client_company ? ` (${p.client_company})` : ''} accepted "${p.title}" (€${Number(p.total_value).toLocaleString()}).\n\nSigned by: ${signedName}\nAccepted at: ${now}`,
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${env.RESEND_API_KEY}` },
+      body: JSON.stringify({
+        from: `Incremento Proposals <${env.FROM_EMAIL}>`,
+        to: [env.TO_EMAIL],
+        subject: `🎉 Proposal accepted: ${p.title} — ${p.client_name}`,
+        text: `${p.client_name}${p.client_company ? ` (${p.client_company})` : ''} accepted "${p.title}" (€${Number(p.total_value).toLocaleString()}).\n\nSigned by: ${signedName}\nAccepted at: ${now}`,
+      }),
     });
   } catch (e) { console.error('Accept notify error:', e); }
 
@@ -2045,11 +2052,15 @@ async function declineProposal(token, request, env, cors) {
   });
 
   try {
-    await sendMail(env, {
-      fromName: 'Incremento Proposals',
-      to: env.TO_EMAIL,
-      subject: `Proposal declined: ${p.title} - ${p.client_name}`,
-      text: `${p.client_name}${p.client_company ? ` (${p.client_company})` : ''} declined "${p.title}".${reason ? `\n\nReason: ${reason}` : ''}\n\nDeclined at: ${now}`,
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${env.RESEND_API_KEY}` },
+      body: JSON.stringify({
+        from: `Incremento Proposals <${env.FROM_EMAIL}>`,
+        to: [env.TO_EMAIL],
+        subject: `Proposal declined: ${p.title} — ${p.client_name}`,
+        text: `${p.client_name}${p.client_company ? ` (${p.client_company})` : ''} declined "${p.title}".${reason ? `\n\nReason: ${reason}` : ''}\n\nDeclined at: ${now}`,
+      }),
     });
   } catch (e) { console.error('Decline notify error:', e); }
 
