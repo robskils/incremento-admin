@@ -193,10 +193,7 @@ async function authRequestCode(request, env, cors) {
      ON CONFLICT(email) DO UPDATE SET code = excluded.code, expires_at = excluded.expires_at`
   ).bind(email, code, expiresAt).run();
 
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${env.RESEND_API_KEY}` },
-    body: JSON.stringify({
+  const res = await sendViaCloudflare(env, {
       from: `Incremento Admin <${env.FROM_EMAIL}>`,
       to: [email],
       subject: `${code} is your Incremento Admin code`,
@@ -234,7 +231,6 @@ async function authRequestCode(request, env, cors) {
 </body>
 </html>`,
       text: `Your Incremento Admin sign-in code is ${code}. It expires in 10 minutes.`,
-    }),
   });
 
   if (!res.ok) {
@@ -1109,8 +1105,38 @@ function buildSentEmailHtml(bodyText, sig) {
   </div>`;
 }
 
+/* ── Transactional email via Cloudflare Email Sending ─────────
+   Drop-in for the old Resend fetch: accepts a Resend-style payload
+   (from "Name <addr>", to [addr]|addr, reply_to, subject, html, text)
+   and returns a { ok, status, text() } shape so the call sites
+   below keep working unchanged. */
+async function sendViaCloudflare(env, payload) {
+  const raw = String(payload.from || env.FROM_EMAIL || '');
+  const m = raw.match(/^\s*(.*?)\s*<([^>]+)>\s*$/);
+  const fromEmail = (m ? m[2] : raw).trim();
+  const fromName  = m ? m[1].trim() : '';
+  const toArr = (Array.isArray(payload.to) ? payload.to : [payload.to]).filter(Boolean);
+  const msg = {
+    to: toArr.length === 1 ? toArr[0] : toArr,
+    from: fromName ? { email: fromEmail, name: fromName } : { email: fromEmail },
+    subject: payload.subject || '(no subject)',
+  };
+  if (payload.html) msg.html = payload.html;
+  if (payload.text) msg.text = payload.text;
+  const replyTo = payload.reply_to || payload.replyTo;
+  if (replyTo) msg.replyTo = replyTo;
+  try {
+    const r = await env.EMAIL.send(msg);
+    return { ok: true, status: 200, id: r && r.messageId, async text() { return ''; } };
+  } catch (e) {
+    const detail = [e && e.code, e && e.message].filter(Boolean).join(' ') || String(e);
+    console.error('CF email send error:', detail);
+    return { ok: false, status: 502, async text() { return detail; } };
+  }
+}
+
 async function sendEmail(request, env, cors) {
-  if (!env.RESEND_API_KEY) return json({ error: 'Email not configured' }, 503, cors);
+  if (!env.EMAIL) return json({ error: 'Email not configured' }, 503, cors);
   let b; try { b = await request.json(); } catch { return json({ error: 'Invalid JSON' }, 400, cors); }
   const from = SEND_SIGS[(b.from || '').toLowerCase()] ? b.from.toLowerCase() : 'contact@incremento.eu';
   const to = (b.to || '').trim();
@@ -1120,17 +1146,13 @@ async function sendEmail(request, env, cors) {
   if (!bodyText) return json({ error: 'Message body required' }, 400, cors);
   const sig = SEND_SIGS[from];
   try {
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    const res = await sendViaCloudflare(env, {
         from: `${sig.fromName} <${from}>`,
         to: [to],
         reply_to: from,
         subject: subject || '(no subject)',
         html: buildSentEmailHtml(bodyText, sig),
         text: bodyText + '\n\n- ' + sig.name + '\nincremento.eu',
-      }),
     });
     if (!res.ok) {
       const detail = await res.text().catch(() => '');
@@ -1187,20 +1209,13 @@ async function handleEnquiry(request, env, cors) {
   const html = buildEmailHtml({ name, email, company, phone, interestList, message, submitted });
   const plain = `New enquiry from ${name} (${email})${company ? ` · ${company}` : ''}${phone ? ` · ${phone}` : ''}\n\nInterested in: ${interestList}\n\nMessage:\n${message || '(no message provided)'}\n\nSubmitted: ${submitted}`;
 
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${env.RESEND_API_KEY}`,
-    },
-    body: JSON.stringify({
+  const res = await sendViaCloudflare(env, {
       from:     `Incremento Enquiries <${env.FROM_EMAIL}>`,
       to:       [env.TO_EMAIL],
       reply_to: email,
       subject:  `New enquiry from ${name}${company ? ` · ${company}` : ''}`,
       html,
       text: plain,
-    }),
   });
 
   if (!res.ok) {
@@ -1922,20 +1937,13 @@ async function sendProposal(id, env, cors) {
 
   const e = await buildProposalEmailPayload(p, env);
 
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${env.RESEND_API_KEY}`,
-    },
-    body: JSON.stringify({
+  const res = await sendViaCloudflare(env, {
       from:     e.from,
       to:       [e.to],
       reply_to: e.reply_to,
       subject:  e.subject,
       html:     e.html,
       text:     e.text,
-    }),
   });
 
   if (!res.ok) {
@@ -2010,15 +2018,11 @@ async function acceptProposal(token, request, env, cors) {
 
   // Notify Robin
   try {
-    await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${env.RESEND_API_KEY}` },
-      body: JSON.stringify({
+    await sendViaCloudflare(env, {
         from: `Incremento Proposals <${env.FROM_EMAIL}>`,
         to: [env.TO_EMAIL],
         subject: `🎉 Proposal accepted: ${p.title} - ${p.client_name}`,
         text: `${p.client_name}${p.client_company ? ` (${p.client_company})` : ''} accepted "${p.title}" (€${Number(p.total_value).toLocaleString()}).\n\nSigned by: ${signedName}\nAccepted at: ${now}`,
-      }),
     });
   } catch (e) { console.error('Accept notify error:', e); }
 
@@ -2052,15 +2056,11 @@ async function declineProposal(token, request, env, cors) {
   });
 
   try {
-    await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${env.RESEND_API_KEY}` },
-      body: JSON.stringify({
+    await sendViaCloudflare(env, {
         from: `Incremento Proposals <${env.FROM_EMAIL}>`,
         to: [env.TO_EMAIL],
         subject: `Proposal declined: ${p.title} - ${p.client_name}`,
         text: `${p.client_name}${p.client_company ? ` (${p.client_company})` : ''} declined "${p.title}".${reason ? `\n\nReason: ${reason}` : ''}\n\nDeclined at: ${now}`,
-      }),
     });
   } catch (e) { console.error('Decline notify error:', e); }
 

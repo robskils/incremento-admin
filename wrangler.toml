@@ -2,6 +2,9 @@ name = "incremento-admin"
 main = "worker/index.js"
 compatibility_date = "2024-09-23"
 
+# ── Email: Cloudflare Email Sending (transactional) ──────────────────
+send_email = [ { name = "EMAIL" } ]
+
 [[routes]]
 pattern = "enquiries.incremento.eu"
 custom_domain = true
@@ -16,6 +19,19 @@ zone_name = "incremento.eu"
 [[routes]]
 pattern = "admin.incremento.eu/auth/*"
 zone_name = "incremento.eu"
+
+# ── Overlap: keep the old .co endpoints alive during the migration ───
+[[routes]]
+pattern = "enquiries.incremento.co"
+custom_domain = true
+
+[[routes]]
+pattern = "admin.incremento.co/api/*"
+zone_name = "incremento.co"
+
+[[routes]]
+pattern = "admin.incremento.co/auth/*"
+zone_name = "incremento.co"
 
 [vars]
 TO_EMAIL   = "robin@incremento.eu"
