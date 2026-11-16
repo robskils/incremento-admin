@@ -54,3 +54,9 @@ database_id   = "52531b1e-0b83-4321-b4d7-03a95288a002"
 # wrangler secret put ADMIN_KEY        ← choose any strong secret string
 # Email uses the EMAIL send_email binding above (Cloudflare Email Sending),
 # so there is no email API key secret.
+
+# ── Cron: the blog ────────────────────────────────────────────────────
+# Fires daily; blog.js decides whether today is a writing day, so changing
+# the rhythm or stopping it is a setting rather than a deploy.
+[triggers]
+crons = ["0 9 * * *"]

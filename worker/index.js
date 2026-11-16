@@ -61,6 +61,24 @@ export default {
     }
   },
 
+  /* Twice a week, write the next one - and every time, ask the web whether
+     the ones already written have actually arrived. maybeWrite decides
+     whether today is a writing day, so the rhythm is a setting rather than
+     this schedule. */
+  async scheduled(event, env, ctx) {
+    try {
+      const { checkLive } = await import('./blog.js');
+      const seen = await checkLive(env);
+      if (seen.live) console.log('blog: now live', seen.live);
+    } catch (e) { console.error('blog checkLive:', e && e.message); }
+
+    try {
+      const { maybeWrite } = await import('./blog.js');
+      const r = await maybeWrite(env);
+      console.log('blog cron:', JSON.stringify(r));
+    } catch (e) { console.error('blog cron:', e && e.message); }
+  },
+
   async fetch(request, env) {
     const cors = corsHeaders(request);
 
@@ -87,6 +105,21 @@ export default {
       if (request.method === 'POST' && pubMatch[2] === '/decline') {
         return declineProposal(pubMatch[1], request, env, cors);
       }
+    }
+
+    // Public: the blog feed. The site's GitHub Action reads this at build
+    // time and has no admin key - nor should it, for a list of posts that
+    // are about to be on the public web anyway.
+    if (request.method === 'GET' && url.pathname === '/api/blog-feed') {
+      const { publishedPosts } = await import('./blog.js');
+      const posts = await publishedPosts(env);
+      return new Response(JSON.stringify({ ok: true, posts }), {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Cache-Control': 'public, max-age=300',
+        },
+      });
     }
 
     // Public: inbound email capture (Mailgun webhook, secured by ?token=)
@@ -361,6 +394,25 @@ async function handleAdmin(request, env, url, cors) {
 
   // Contacts (people on a deal)
   const contactId = path.match(/^\/api\/contacts\/(\d+)$/);
+  // ── BLOG ──────────────────────────────────────────────────────────────
+  // The queue, the schedule, and the feed the site's build reads.
+  if (path.startsWith('/api/blog-posts')) {
+    const { handleBlogPosts } = await import('./blog.js');
+    return handleBlogPosts(request, env, url, cors);
+  }
+  if (path === '/api/blog-schedule') {
+    const { loadSchedule, saveSchedule } = await import('./blog.js');
+    if (method === 'POST') {
+      const b = await request.json().catch(() => ({}));
+      return json({ ok: true, schedule: await saveSchedule(env, b) }, 200, cors);
+    }
+    return json({ ok: true, schedule: await loadSchedule(env) }, 200, cors);
+  }
+  if (path === '/api/blog-write-next' && method === 'POST') {
+    const { publishNext } = await import('./blog.js');
+    return json(await publishNext(env), 200, cors);
+  }
+
   if (path === '/api/companies' && method === 'GET') return listCompanies(env, cors);
   if (path === '/api/contacts' && method === 'GET')  return listContacts(env, url, cors);
   if (path === '/api/contacts' && method === 'POST') return createContact(request, env, cors);
