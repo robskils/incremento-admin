@@ -77,6 +77,15 @@ export default {
       const r = await maybeWrite(env);
       console.log('blog cron:', JSON.stringify(r));
     } catch (e) { console.error('blog cron:', e && e.message); }
+
+    /* Every day, not only on writing days: a language that failed on Tuesday
+       is retried on Wednesday rather than waiting until Friday. On a day when
+       nothing is missing this does nothing and costs nothing. */
+    try {
+      const { fillAllTranslations } = await import('./blog.js');
+      const t = await fillAllTranslations(env);
+      if (t.length) console.log('blog translations:', JSON.stringify(t));
+    } catch (e) { console.error('blog translations:', e && e.message); }
   },
 
   async fetch(request, env) {
@@ -528,6 +537,12 @@ async function handleAdmin(request, env, url, cors) {
       return json({ ok: true, schedule: await saveSchedule(env, b) }, 200, cors);
     }
     return json({ ok: true, schedule: await loadSchedule(env) }, 200, cors);
+  }
+  if (path === '/api/blog-translate' && method === 'POST') {
+    const { fillTranslations, fillAllTranslations } = await import('./blog.js');
+    const b = await request.json().catch(() => ({}));
+    return json(b.id ? await fillTranslations(env, parseInt(b.id, 10))
+                     : await fillAllTranslations(env, 3), 200, cors);
   }
   if (path === '/api/blog-write-next' && method === 'POST') {
     const { publishNext } = await import('./blog.js');

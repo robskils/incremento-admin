@@ -46,6 +46,26 @@ agency's own blog is the worst possible advertisement for its judgement.
 End with a plain invitation to get in touch - no hard sell.
 `;
 
+/* ── THE OTHER FOUR ────────────────────────────────────────────────────────
+   Robin: "incremento writes in english but translates into all the languages
+   of the blog - several."
+
+   Five in all. The English is written first and is the source; the rest are
+   translations of it. Each gets its own page at its own localised slug -
+   /pt/blog/seo-lisboa/ beside /blog/seo-lisbon/ - which is how the sixteen
+   posts already on the site are built, and the reason a slug cannot simply
+   be reused across languages.
+
+   Portuguese here is European Portuguese. Not Brazilian: the readers are in
+   Portugal, and the difference is obvious to every one of them. */
+const LANGS = [
+  { code: 'pt', path: '/pt/blog/', name: 'European Portuguese (Portugal, not Brazil)' },
+  { code: 'es', path: '/es/blog/', name: 'Spanish (Spain)' },
+  { code: 'fr', path: '/fr/blog/', name: 'French (France)' },
+  { code: 'de', path: '/de/blog/', name: 'German (Germany)' },
+];
+export const BLOG_LANGS = LANGS;
+
 export function slugify(t) {
   return String(t || '')
     .toLowerCase()
@@ -107,6 +127,114 @@ Never at the cost of a sentence reading badly.`;
   return { body: out.html, meta_desc: String(out.meta || '').slice(0, 300) };
 }
 
+/**
+ * Translate one written post into one language. Returns
+ * { title, slug, meta, body } or throws.
+ *
+ * One call per language rather than one call for all four: four hundred
+ * words of HTML times four is a lot to ask for in a single reply, and a
+ * truncated one would cost every language instead of one. Each is
+ * independent, so German failing cannot take Portuguese with it.
+ */
+export async function translatePost(env, post, lang) {
+  if (!env.ANTHROPIC_API_KEY) throw new Error('No ANTHROPIC_API_KEY');
+
+  const prompt = `Translate this blog post into ${lang.name}.
+
+This is a translation for a digital agency's own website, read by people
+deciding whether to hire them. It has to read as though it were written in
+${lang.name} - not as English with the words changed. Rework idiom and
+sentence shape where a literal rendering would read as translated.
+
+Keep every HTML tag exactly as it is. Translate the text between them.
+Do not add, remove or reorder anything.
+
+Leave untranslated: the company name Incremento, product and tool names, and
+place names that are not normally translated. Lisbon is Lisboa in Portuguese,
+Lisbonne in French, Lissabon in German, Lisboa in Spanish - use the local form
+where there is one.
+
+Give the post a slug in the target language, lowercase with hyphens, no
+accents, built from the words somebody in that language would actually search
+for. The English slug is "${post.slug}" - do not reuse it.
+
+Return ONLY a JSON object, no other text:
+{
+  "title": "the headline in ${lang.name}",
+  "slug":  "the-localised-slug",
+  "meta":  "the meta description in ${lang.name}, under 155 characters",
+  "body":  "the post body, same HTML, translated"
+}
+
+TITLE: ${post.title}
+META: ${post.meta_desc || ''}
+BODY:
+${post.body}`;
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'x-api-key': env.ANTHROPIC_API_KEY,
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify({
+      model: MODEL, max_tokens: 6000,
+      messages: [{ role: 'user', content: prompt }],
+    }),
+  });
+  if (!res.ok) throw new Error('Anthropic ' + res.status + ' ' + (await res.text()).slice(0, 200));
+
+  const data = await res.json();
+  const text = (data.content || []).map(c => c.text || '').join('').trim();
+  const raw  = text.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
+  let out;
+  try { out = JSON.parse(raw); }
+  catch (e) { throw new Error('Could not read the ' + lang.code + ' reply as JSON'); }
+  if (!out.body || out.body.length < 300) throw new Error(lang.code + ' came back too short');
+  const slug = slugify(out.slug || out.title);
+  if (!slug) throw new Error(lang.code + ' produced no slug');
+  return {
+    title: String(out.title || post.title),
+    slug,
+    meta:  String(out.meta || '').slice(0, 300),
+    body:  out.body,
+  };
+}
+
+/**
+ * Translate a post into whichever languages it is still missing.
+ *
+ * Separate from writing on purpose: the English is the thing that has to
+ * work, and a German failure must not leave a post unwritten. Anything that
+ * fails here simply stays missing and is tried again on the next run, so the
+ * set fills in over a few days rather than all-or-nothing in one.
+ */
+export async function fillTranslations(env, id) {
+  const post = await env.DB.prepare('SELECT * FROM blog_posts WHERE id = ?').bind(id).first();
+  if (!post || !post.body) return { skipped: 'nothing written yet' };
+
+  let have = {};
+  try { have = JSON.parse(post.translations || '{}') || {}; } catch (e) {}
+
+  const done = [], failed = {};
+  for (const lang of LANGS) {
+    if (have[lang.code] && have[lang.code].body) continue;
+    try {
+      have[lang.code] = await translatePost(env, post, lang);
+      done.push(lang.code);
+    } catch (e) {
+      failed[lang.code] = String(e && e.message || e).slice(0, 200);
+      console.error('blog: translation', lang.code, e && e.message);
+    }
+  }
+  if (done.length) {
+    await env.DB.prepare('UPDATE blog_posts SET translations = ? WHERE id = ?')
+      .bind(JSON.stringify(have), id).run();
+  }
+  return { done, failed, have: Object.keys(have) };
+}
+
 /* ── THE SCHEDULE ──────────────────────────────────────────────────────────
  * Which days, until when, on or off. The cron still fires; this decides
  * whether anything happens when it does, so changing the rhythm or stopping
@@ -165,6 +293,35 @@ export async function maybeWrite(env) {
 }
 
 /**
+ * Catch up the translations on everything already written.
+ *
+ * Runs every day, not only on writing days: a language that failed on
+ * Tuesday is retried on Wednesday rather than waiting until Friday, and the
+ * set fills in on its own. Only ever looks at posts that are short of one,
+ * so on a normal day it does nothing and costs nothing.
+ */
+export async function fillAllTranslations(env, limit = 2) {
+  const { results } = await env.DB.prepare(
+    `SELECT id, translations FROM blog_posts
+      WHERE body IS NOT NULL AND status IN ('written', 'published')
+      ORDER BY id DESC LIMIT 20`
+  ).all().catch(() => ({ results: [] }));
+
+  const out = [];
+  for (const row of (results || [])) {
+    let have = {};
+    try { have = JSON.parse(row.translations || '{}') || {}; } catch (e) {}
+    const missing = LANGS.filter(l => !(have[l.code] && have[l.code].body));
+    if (!missing.length) continue;
+    out.push({ id: row.id, ...(await fillTranslations(env, row.id)) });
+    /* A couple per run. Five languages on a backlog of sixteen would be
+       eighty calls in one cron, which is a bill and a timeout. */
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
+/**
  * Write the next idea in the running order. One at a time: a failure costs
  * one post and the queue is untouched, and a run that wrote three would empty
  * eight weeks of ideas in a fortnight.
@@ -199,7 +356,13 @@ export async function publishNext(env) {
       } catch (e) { console.error('blog: deploy hook', e && e.message); }
     }
     console.log('blog: wrote', slug);
-    return { ok: true, id: post.id, slug, title: post.title, built, written: true };
+    /* The other four, now, while the post is fresh. Anything that fails here
+       is picked up by the daily catch-up rather than lost. */
+    let translated = null;
+    try { translated = await fillTranslations(env, post.id); }
+    catch (e) { console.error('blog: translations', e && e.message); }
+
+    return { ok: true, id: post.id, slug, title: post.title, built, written: true, translated };
   } catch (e) {
     /* Stays an idea, with the reason on it, so it is tried again next time
        rather than lost - and so Robin can see why if it keeps failing. */
@@ -236,12 +399,19 @@ export async function checkLive(env) {
 /** Everything written, newest first. PUBLIC: this is what the site reads. */
 export async function publishedPosts(env) {
   const { results } = await env.DB.prepare(
-    `SELECT slug, title, meta_desc, body, published_at, written_at
+    `SELECT slug, title, meta_desc, body, published_at, written_at, translations
        FROM blog_posts
       WHERE status IN ('written', 'published') AND slug IS NOT NULL
       ORDER BY COALESCE(published_at, written_at) DESC`
   ).all().catch(() => ({ results: [] }));
-  return results || [];
+  /* Handed over as an object rather than a string of JSON, so the site's
+     build does not have to know it was ever stored as text. */
+  return (results || []).map(r => {
+    let t = {};
+    try { t = JSON.parse(r.translations || '{}') || {}; } catch (e) {}
+    const { translations, ...rest } = r;
+    return { ...rest, langs: t };
+  });
 }
 
 /** The admin's own list, and the edits it makes. */
@@ -263,7 +433,8 @@ export async function handleBlogPosts(request, env, url, cors) {
     const { results } = await env.DB.prepare(
       `SELECT id, title, slug, status, keyword, angle, meta_desc, sort,
               created_at, written_at, published_at, error,
-              CASE WHEN body IS NULL THEN 0 ELSE length(body) END AS words
+              CASE WHEN body IS NULL THEN 0 ELSE length(body) END AS words,
+              (SELECT group_concat(key) FROM json_each(blog_posts.translations)) AS langs
          FROM blog_posts ORDER BY (status = 'published'), sort, id`
     ).all().catch(() => ({ results: [] }));
     return json({ ok: true, posts: results || [], site: SITE + PATH });
