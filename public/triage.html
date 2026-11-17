@@ -75,6 +75,7 @@
       <div class="page-title">Triage</div>
       <div class="page-sub" id="tr-sub">New form submissions waiting to be sorted</div>
     </div>
+    <button id="tr-dismiss-all" onclick="dismissAll(this)" style="display:none;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:0.9rem;color:var(--text-sub);background:transparent;border:1px solid var(--border2);padding:9px 16px;border-radius:8px;cursor:pointer;white-space:nowrap">Dismiss all</button>
   </div>
 
   <div id="tr-list"><div class="empty-state">Loading…</div></div>
@@ -105,6 +106,8 @@ function render() {
     : 'Nothing to triage — you are all caught up';
   const badge = document.getElementById('triage-badge');
   if (badge) { if (items.length){badge.textContent=items.length;badge.style.display='inline';} else badge.style.display='none'; }
+  const da = document.getElementById('tr-dismiss-all');
+  if (da) { if (items.length){ da.style.display='inline-block'; da.textContent='Dismiss all ('+items.length+')'; } else da.style.display='none'; }
 
   if (!items.length) {
     document.getElementById('tr-list').innerHTML = `
@@ -173,6 +176,23 @@ async function doDismiss(id, btn) {
   busy(btn);
   try { await apiFetch('/api/triage/' + id + '/dismiss', { method:'POST' }); removeCard(id); }
   catch { alert('Could not dismiss. Please try again.'); render(); }
+}
+
+async function dismissAll(btn){
+  const ids = items.map(x => x.id);
+  if (!ids.length) return;
+  if (!(await uiConfirm('All ' + ids.length + ' pending submission' + (ids.length===1?'':'s') + ' will be archived and removed from the queue.',
+      { title: 'Dismiss all as not a deal', okText: 'Dismiss all', danger: false }))) return;
+  btn.disabled = true;
+  let done = 0, failed = 0;
+  for (const id of ids){
+    try { await apiFetch('/api/triage/' + id + '/dismiss', { method:'POST' }); items = items.filter(x => x.id !== id); done++; }
+    catch { failed++; }
+    btn.textContent = 'Dismissing… ' + (done+failed) + '/' + ids.length;
+  }
+  btn.disabled = false;
+  render();
+  if (failed) alert(failed + ' could not be dismissed. Please try again.');
 }
 
 loadTriage();
