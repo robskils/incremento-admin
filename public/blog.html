@@ -61,6 +61,10 @@
 .bl-chip.s-published{background:var(--green-pale);color:var(--green)}
 .bl-view{font-family:'Space Grotesk',sans-serif;font-size:0.78rem;font-weight:600;letter-spacing:.04em;color:var(--cyan);border:1px solid var(--border2);border-radius:7px;padding:6px 11px;text-decoration:none;white-space:nowrap;transition:var(--trans);background:transparent;cursor:pointer}
 .bl-view:hover{border-color:var(--cyan)}
+.bl-langs{display:inline-flex;gap:3px}
+.bl-lang{font-size:0.62rem;font-weight:700;letter-spacing:.05em;padding:2px 5px;border-radius:4px;border:1px solid var(--border2);color:var(--text-dim)}
+.bl-lang.has{background:rgba(94,231,216,.14);border-color:transparent;color:var(--cyan)}
+.bl-lang.not{opacity:.4;text-decoration:line-through}
 .bl-empty{color:var(--text-dim);font-size:0.98rem;padding:34px;text-align:center;background:var(--surface);border:1px dashed var(--border2);border-radius:var(--radius-lg)}
 .bl-read-ov{position:fixed;inset:0;z-index:900;background:rgba(6,12,20,.62);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;padding:20px}
 .bl-read-ov.open{display:flex}
@@ -280,16 +284,17 @@ function renderList(){
       return '<div class="bl-row">'
         + '<div class="info" onclick="readPost(' + p.id + ')">'
         +   '<div class="t">' + esc(p.title) + '</div>'
-        +   '<div class="m"><span class="bl-chip s-written">Written</span><span>' + (p.words||0) + ' chars</span>' + (p.written_at?'<span>' + fmtDate(p.written_at) + '</span>':'') + '</div>'
+        +   '<div class="m"><span class="bl-chip s-written">Written</span>' + langChips(p) + '<span>' + (p.words||0) + ' chars</span>' + (p.written_at?'<span>' + fmtDate(p.written_at) + '</span>':'') + '</div>'
         + '</div>'
-        + '<div class="acts"><button class="bl-view" onclick="readPost(' + p.id + ')">Read</button></div></div>';
+        + '<div class="acts">' + (fullyTranslated(p)?'':'<button class="bl-view" onclick="translateOne(' + p.id + ',this)">Translate</button>') + '<button class="bl-view" onclick="readPost(' + p.id + ')">Read</button></div></div>';
     }
     return '<div class="bl-row">'
       + '<div class="info" onclick="readPost(' + p.id + ')">'
       +   '<div class="t">' + esc(p.title) + '</div>'
-      +   '<div class="m"><span class="bl-chip s-published">Live</span>' + (p.published_at?'<span>' + fmtDate(p.published_at) + '</span>':'') + '</div>'
+      +   '<div class="m"><span class="bl-chip s-published">Live</span>' + langChips(p) + (p.published_at?'<span>' + fmtDate(p.published_at) + '</span>':'') + '</div>'
       + '</div>'
       + '<div class="acts">'
+      +   (fullyTranslated(p)?'':'<button class="bl-view" onclick="translateOne(' + p.id + ',this)">Translate</button>')
       +   '<button class="bl-view" onclick="readPost(' + p.id + ')">Read</button>'
       +   (p.slug?'<a class="bl-view" href="' + esc(SITE) + esc(p.slug) + '/" target="_blank">View live →</a>':'')
       + '</div></div>';
@@ -338,6 +343,20 @@ async function writeNext(btn){
         setTab(r && r.status==='written' ? 'written' : TAB); }
   catch(e){ alert('Could not write the post. Please try again.'); }
   btn.disabled = false; btn.textContent = t0;
+}
+
+function langChips(p){
+  const done = new Set(String(p.langs||'').split(',').filter(Boolean));
+  return '<span class="bl-langs">' + ['EN','PT','ES','FR','DE'].map(L=>{
+    const has = L==='EN' || done.has(L.toLowerCase());
+    return '<span class="bl-lang ' + (has?'has':'not') + '" title="' + (has?('In '+L):('Not yet in '+L)) + '">' + L + '</span>';
+  }).join('') + '</span>';
+}
+function fullyTranslated(p){ const done=new Set(String(p.langs||'').split(',').filter(Boolean)); return ['pt','es','fr','de'].every(l=>done.has(l)); }
+async function translateOne(id, btn){
+  btn.disabled=true; const t0=btn.textContent; btn.textContent='Translating…';
+  try{ await apiFetch('/api/blog-translate',{ method:'POST', body:JSON.stringify({ id }) }); await load(); }
+  catch(e){ alert('Could not translate. Please try again.'); btn.disabled=false; btn.textContent=t0; }
 }
 
 async function readPost(id){
