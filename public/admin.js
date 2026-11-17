@@ -438,19 +438,14 @@ function uiConfirm(message, opts = {}) {
     card.append(h, p, row);
     back.appendChild(card);
     document.body.appendChild(back);
-    void back.offsetWidth; // commit opacity:0 so the open transition runs
-    back.classList.add('show');
 
     let done = false;
     const close = (val) => {
       if (done) return;
       done = true;
-      back.classList.remove('show');
       document.removeEventListener('keydown', onKey);
-      setTimeout(() => {
-        back.remove();
-        try { if (prev && prev.focus) prev.focus(); } catch (e) {}
-      }, 170);
+      back.remove();
+      try { if (prev && prev.focus) prev.focus(); } catch (e) {}
       resolve(val);
     };
     const onKey = (e) => {
