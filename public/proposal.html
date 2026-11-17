@@ -569,7 +569,7 @@ async function persist() {
 /* ── Archive / delete ─────────────────────────────────────── */
 async function archiveProposalEditor() {
   if (!proposalId) { alert('Save the proposal first, then you can archive it.'); return; }
-  if (!confirm('Archive this proposal? It will be hidden from the active list but kept and recoverable under "Show archived".')) return;
+  if (!(await uiConfirm('It will be hidden from the active list but kept and recoverable under "Show archived".', { title: 'Archive proposal', okText: 'Archive', danger: false }))) return;
   try {
     await apiFetch('/api/proposals/' + proposalId, { method:'PATCH', body: JSON.stringify({ archived: 1 }) });
     location.href = 'proposals.html';
@@ -577,7 +577,7 @@ async function archiveProposalEditor() {
 }
 async function deleteProposalEditor() {
   if (!proposalId) { location.href = 'proposals.html'; return; }
-  if (!confirm('Permanently delete this proposal?\nThis cannot be undone. (To keep it but hide it, use Archive instead.)')) return;
+  if (!(await uiConfirm('This cannot be undone. To keep it but hide it, use Archive instead.', { title: 'Delete proposal', okText: 'Delete' }))) return;
   try {
     await apiFetch('/api/proposals/' + proposalId, { method:'DELETE' });
     location.href = 'proposals.html';

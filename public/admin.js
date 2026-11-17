@@ -394,3 +394,73 @@ async function mountComms(container, opts) {
 
   await refresh();
 }
+
+// ── On-brand confirm dialog (replaces native confirm()) ──────────────
+// uiConfirm(message, { title, okText, cancelText, danger }) -> Promise<boolean>
+function uiConfirm(message, opts = {}) {
+  const {
+    title = 'Please confirm',
+    okText = 'Confirm',
+    cancelText = 'Cancel',
+    danger = true,
+  } = opts;
+  return new Promise((resolve) => {
+    const prev = document.activeElement;
+    const back = document.createElement('div');
+    back.className = 'ui-confirm-back';
+    const card = document.createElement('div');
+    card.className = 'ui-confirm-card';
+    card.setAttribute('role', 'alertdialog');
+    card.setAttribute('aria-modal', 'true');
+
+    const h = document.createElement('h3');
+    h.className = 'ui-confirm-title';
+    h.textContent = title;
+
+    const p = document.createElement('p');
+    p.className = 'ui-confirm-msg';
+    p.textContent = message;
+
+    const row = document.createElement('div');
+    row.className = 'ui-confirm-actions';
+
+    const cancel = document.createElement('button');
+    cancel.type = 'button';
+    cancel.className = 'ui-confirm-btn ui-confirm-cancel';
+    cancel.textContent = cancelText;
+
+    const ok = document.createElement('button');
+    ok.type = 'button';
+    ok.className = 'ui-confirm-btn ui-confirm-ok' + (danger ? ' danger' : '');
+    ok.textContent = okText;
+
+    row.append(cancel, ok);
+    card.append(h, p, row);
+    back.appendChild(card);
+    document.body.appendChild(back);
+    requestAnimationFrame(() => back.classList.add('show'));
+
+    let done = false;
+    const close = (val) => {
+      if (done) return;
+      done = true;
+      back.classList.remove('show');
+      document.removeEventListener('keydown', onKey);
+      setTimeout(() => {
+        back.remove();
+        try { if (prev && prev.focus) prev.focus(); } catch (e) {}
+      }, 170);
+      resolve(val);
+    };
+    const onKey = (e) => {
+      if (e.key === 'Escape') { e.preventDefault(); close(false); }
+      else if (e.key === 'Enter') { e.preventDefault(); close(true); }
+    };
+    document.addEventListener('keydown', onKey);
+    back.addEventListener('mousedown', (e) => { if (e.target === back) close(false); });
+    cancel.addEventListener('click', () => close(false));
+    ok.addEventListener('click', () => close(true));
+    ok.focus();
+  });
+}
+window.uiConfirm = uiConfirm;

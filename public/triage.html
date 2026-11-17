@@ -168,7 +168,7 @@ async function doMerge(id, target, btn) {
   catch { alert('Could not add to the deal. Please try again.'); render(); }
 }
 async function doDismiss(id, btn) {
-  if (!confirm('Dismiss this as not a deal? It will be archived and removed from the queue.')) return;
+  if (!(await uiConfirm('It will be archived and removed from the queue.', { title: 'Dismiss as not a deal', okText: 'Dismiss', danger: false }))) return;
   busy(btn);
   try { await apiFetch('/api/triage/' + id + '/dismiss', { method:'POST' }); removeCard(id); }
   catch { alert('Could not dismiss. Please try again.'); render(); }

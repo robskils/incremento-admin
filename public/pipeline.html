@@ -172,7 +172,7 @@ function renderList() {
 async function deleteDeal(id) {
   const e = allEnquiries.find(x => x.id === id);
   const name = e ? (e.company || e.name) : 'this deal';
-  if (!confirm('Delete the deal "' + name + '"?\nThis permanently removes it and all its contacts, messages and proposals. This cannot be undone.')) return;
+  if (!(await uiConfirm('"' + name + '" and all its contacts, messages and proposals will be permanently removed. This cannot be undone.', { title: 'Delete deal', okText: 'Delete' }))) return;
   try {
     await apiFetch('/api/enquiries/' + id, { method: 'DELETE' });
     allEnquiries = allEnquiries.filter(x => x.id !== id);

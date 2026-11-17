@@ -434,7 +434,7 @@ function restoreProposal(id){ setArchived(id, 0); }
 
 async function deleteProposal(id) {
   const p = proposals.find(x => x.id === id);
-  if (!confirm('Permanently delete the proposal "' + (p ? p.title : '') + '"?\nThis cannot be undone. (To keep it but hide it, use Archive instead.)')) return;
+  if (!(await uiConfirm('"' + (p ? p.title : '') + '" will be permanently deleted. This cannot be undone. To keep it but hide it, use Archive instead.', { title: 'Delete proposal', okText: 'Delete' }))) return;
   try {
     await apiFetch('/api/proposals/' + id, { method: 'DELETE' });
     proposals = proposals.filter(x => x.id !== id);
@@ -578,7 +578,7 @@ async function saveBlock() {
 
 async function deleteBlock(id) {
   const b = blocks.find(x => x.id === id);
-  if (!confirm('Delete "' + (b?b.title:'') + '" from the library?')) return;
+  if (!(await uiConfirm('"' + (b?b.title:'') + '" will be removed from the library.', { title: 'Delete component', okText: 'Delete' }))) return;
   try { await apiFetch('/api/proposal-blocks/' + id, { method:'DELETE' }); blocks = blocks.filter(x=>x.id!==id); renderLibrary(); }
   catch { alert('Failed to delete.'); }
 }
@@ -684,7 +684,7 @@ async function removeSection(id) {
     alert(`"${s ? s.title : 'This section'}" still has ${n} component${n===1?'':'s'} attached.\n\nReassign or delete ${n===1?'it':'them'} in the Components tab before removing this section.`);
     return;
   }
-  if (!confirm(`Remove the section "${s ? s.title : ''}"? This cannot be undone.`)) return;
+  if (!(await uiConfirm(`"${s ? s.title : ''}" will be removed. This cannot be undone.`, { title: 'Remove section', okText: 'Remove' }))) return;
   try {
     const r = await apiFetch('/api/proposal-sections/' + id, { method:'DELETE' });
     if (r && r.error) { alert(r.message || 'Could not remove the section.'); return; }

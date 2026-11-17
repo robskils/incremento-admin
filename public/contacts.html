@@ -335,7 +335,7 @@ async function saveContact(){
 }
 async function removeContact(){
   if (!edit || !edit.email) return;
-  if (!confirm('Delete this contact? This only removes the manual contact, not any deals.')) return;
+  if (!(await uiConfirm('This only removes the manual contact, not any deals.', { title: 'Delete contact', okText: 'Delete' }))) return;
   try {
     await apiFetch('/api/contact-meta?email=' + encodeURIComponent(edit.email), { method:'DELETE' });
     closeContact();

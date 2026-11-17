@@ -341,7 +341,7 @@ async function saveInvoice(thenPreview){
 }
 async function deleteInvoice(){
   if (!editing) return;
-  if (!confirm('Delete invoice '+(editing.number||'')+'? This cannot be undone.')) return;
+  if (!(await uiConfirm('Invoice ' + (editing.number || '') + ' will be permanently deleted. This cannot be undone.', { title: 'Delete invoice', okText: 'Delete' }))) return;
   try { await apiFetch('/api/invoices/'+editing.id, { method:'DELETE' }); closeEditor(); await loadAll(); }
   catch { alert('Delete failed.'); }
 }
