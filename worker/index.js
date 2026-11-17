@@ -305,6 +305,124 @@ async function authVerify(request, env, cors) {
 }
 
 /* ── Admin router ────────────────────────────────────────── */
+// ── Analytics: proxy Cloudflare's GraphQL Analytics API ──────────────
+const CF_ACCOUNT  = '6d4a87fb23031dfb622a6a0d4aa7681a';
+const CF_ZONE_EU  = '65ae9be9b2d4ebe3032f00d471b8bbc5';
+const CF_SCRIPT   = 'incremento-admin';
+const CF_GQL      = 'https://api.cloudflare.com/client/v4/graphql';
+
+const ZONE_Q = `query Zone($zone:String!,$from:String!,$to:String!){
+  viewer{ zones(filter:{zoneTag:$zone}){
+    httpRequests1dGroups(limit:60, filter:{date_geq:$from, date_leq:$to}, orderBy:[date_ASC]){
+      dimensions{ date }
+      uniq{ uniques }
+      sum{ requests bytes pageViews threats
+        countryMap{ clientCountryName requests }
+        responseStatusMap{ edgeResponseStatus requests } }
+    } } } }`;
+
+const WORKER_TOTALS_Q = `query WT($acct:String!,$from:String!,$to:String!,$script:String!){
+  viewer{ accounts(filter:{accountTag:$acct}){
+    workersInvocationsAdaptive(limit:1, filter:{datetime_geq:$from, datetime_leq:$to, scriptName:$script}){
+      sum{ requests errors }
+      quantiles{ cpuTimeP50 cpuTimeP99 }
+    } } } }`;
+
+const WORKER_DAILY_Q = `query WD($acct:String!,$from:String!,$to:String!,$script:String!){
+  viewer{ accounts(filter:{accountTag:$acct}){
+    workersInvocationsAdaptive(limit:100, filter:{datetime_geq:$from, datetime_leq:$to, scriptName:$script}, orderBy:[date_ASC]){
+      dimensions{ date }
+      sum{ requests errors }
+    } } } }`;
+
+let REGION_NAMES = null;
+function countryName(code) {
+  try {
+    if (!REGION_NAMES) REGION_NAMES = new Intl.DisplayNames(['en'], { type: 'region' });
+    return REGION_NAMES.of(code) || code;
+  } catch (e) { return code; }
+}
+
+async function getAnalytics(env, url, cors) {
+  const token = env.CF_ANALYTICS_TOKEN;
+  if (!token) return json({ error: 'Analytics is not configured yet (CF_ANALYTICS_TOKEN is not set).' }, 200, cors);
+
+  let days = parseInt(url.searchParams.get('days') || '7', 10);
+  if (days !== 30) days = 7;
+  const fromD = new Date(Date.now() - (days - 1) * 86400000).toISOString().slice(0, 10);
+  const toD   = new Date().toISOString().slice(0, 10);
+  const fromDT = fromD + 'T00:00:00Z';
+  const toDT   = toD + 'T23:59:59Z';
+
+  const gql = async (query, variables) => {
+    const r = await fetch(CF_GQL, {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, variables }),
+    });
+    const j = await r.json().catch(() => null);
+    if (!j) throw new Error('GraphQL HTTP ' + r.status);
+    if (j.errors && j.errors.length) throw new Error(j.errors.map(e => e.message).join('; '));
+    return j.data || {};
+  };
+
+  const out = { range: { days, from: fromD, to: toD } };
+
+  // ── Site (zone) ──
+  try {
+    const d = await gql(ZONE_Q, { zone: CF_ZONE_EU, from: fromD, to: toD });
+    const rows = ((((d.viewer || {}).zones || [])[0]) || {}).httpRequests1dGroups || [];
+    const daily = rows.map(g => ({
+      date: g.dimensions.date,
+      requests: g.sum.requests || 0,
+      uniques: (g.uniq && g.uniq.uniques) || 0,
+      pageViews: g.sum.pageViews || 0,
+      bytes: g.sum.bytes || 0,
+    }));
+    const totals = daily.reduce((a, x) => ({
+      requests: a.requests + x.requests, uniques: a.uniques + x.uniques,
+      pageViews: a.pageViews + x.pageViews, bytes: a.bytes + x.bytes,
+    }), { requests: 0, uniques: 0, pageViews: 0, bytes: 0 });
+    totals.threats = rows.reduce((a, g) => a + (g.sum.threats || 0), 0);
+    const cmap = {};
+    rows.forEach(g => (g.sum.countryMap || []).forEach(c => {
+      cmap[c.clientCountryName] = (cmap[c.clientCountryName] || 0) + (c.requests || 0);
+    }));
+    const countries = Object.keys(cmap).map(k => ({ country: countryName(k), requests: cmap[k] }))
+      .sort((a, b) => b.requests - a.requests).slice(0, 6);
+    const smap = {};
+    rows.forEach(g => (g.sum.responseStatusMap || []).forEach(s => {
+      smap[s.edgeResponseStatus] = (smap[s.edgeResponseStatus] || 0) + (s.requests || 0);
+    }));
+    const status = Object.keys(smap).map(k => ({ status: String(k), requests: smap[k] }))
+      .sort((a, b) => b.requests - a.requests).slice(0, 6);
+    out.site = { totals, daily, countries, status };
+  } catch (e) {
+    return json({ error: 'Cloudflare analytics error: ' + (e && e.message || e), range: out.range }, 200, cors);
+  }
+
+  // ── Worker ──
+  const worker = { totals: {}, daily: [] };
+  try {
+    const d = await gql(WORKER_TOTALS_Q, { acct: CF_ACCOUNT, from: fromDT, to: toDT, script: CF_SCRIPT });
+    const g = (((((d.viewer || {}).accounts || [])[0]) || {}).workersInvocationsAdaptive || [])[0];
+    if (g) worker.totals = {
+      requests: g.sum.requests || 0,
+      errors: g.sum.errors || 0,
+      cpuP50: g.quantiles ? (g.quantiles.cpuTimeP50 || 0) / 1000 : null,
+      cpuP99: g.quantiles ? (g.quantiles.cpuTimeP99 || 0) / 1000 : null,
+    };
+  } catch (e) { worker.error = String(e && e.message || e); }
+  try {
+    const d = await gql(WORKER_DAILY_Q, { acct: CF_ACCOUNT, from: fromDT, to: toDT, script: CF_SCRIPT });
+    const rows = (((((d.viewer || {}).accounts || [])[0]) || {}).workersInvocationsAdaptive) || [];
+    worker.daily = rows.map(g => ({ date: g.dimensions.date, requests: g.sum.requests || 0, errors: g.sum.errors || 0 }));
+  } catch (e) { if (!worker.error) worker.error = String(e && e.message || e); }
+  out.worker = worker;
+
+  return json(out, 200, cors);
+}
+
 async function handleAdmin(request, env, url, cors) {
   if (!(await isAdmin(request, env))) {
     return json({ error: 'Unauthorized' }, 401, cors);
@@ -328,6 +446,9 @@ async function handleAdmin(request, env, url, cors) {
   }
   if (path === '/api/stats' && method === 'GET') {
     return getStats(env, cors);
+  }
+  if (path === '/api/analytics' && method === 'GET') {
+    return getAnalytics(env, url, cors);
   }
 
   // Triage — pending inbound submissions awaiting a new-deal / merge / dismiss decision
