@@ -438,7 +438,8 @@ function uiConfirm(message, opts = {}) {
     card.append(h, p, row);
     back.appendChild(card);
     document.body.appendChild(back);
-    requestAnimationFrame(() => back.classList.add('show'));
+    void back.offsetWidth; // commit opacity:0 so the open transition runs
+    back.classList.add('show');
 
     let done = false;
     const close = (val) => {

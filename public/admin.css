@@ -782,6 +782,7 @@ select.select-sm:focus { border-color: var(--lime); }
   opacity: 0; transition: opacity 0.16s ease;
 }
 .ui-confirm-back.show { opacity: 1; }
+.ui-confirm-back:not(.show) { pointer-events: none; }
 .ui-confirm-card {
   width: 100%; max-width: 432px;
   background: var(--surface2);
