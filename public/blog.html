@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog — Incremento Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="admin.css?v=20261118">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<style>
+/* Blog admin */
+.bl-write{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:0.9rem;color:#0b1017;background:linear-gradient(135deg,var(--lime),var(--cyan));border:none;padding:10px 18px;border-radius:8px;cursor:pointer;white-space:nowrap;box-shadow:0 6px 18px -8px rgba(158,245,74,.5)}
+.bl-write:disabled{opacity:.6;cursor:default}
+.bl-sched{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;margin-bottom:18px;display:flex;flex-direction:column;gap:14px}
+.bl-sched.off{opacity:.72}
+.bl-sr{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.bl-sr .lbl{font-size:0.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);min-width:72px}
+.bl-sw{width:44px;height:25px;border-radius:14px;border:1px solid var(--border2);background:var(--surface3);cursor:pointer;padding:0;position:relative;flex:none;transition:var(--trans)}
+.bl-sw span{position:absolute;top:2px;left:2px;width:19px;height:19px;border-radius:50%;background:var(--text-dim);transition:left .16s,background .16s}
+.bl-sw.on{background:rgba(158,245,74,.22);border-color:var(--lime)}
+.bl-sw.on span{left:21px;background:var(--lime)}
+.bl-sw-txt{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:1rem;color:var(--text)}
+.bl-dpill{font-family:'Space Grotesk',sans-serif;font-size:0.85rem;font-weight:600;padding:6px 13px;border-radius:999px;border:1px solid var(--border2);background:transparent;color:var(--text-dim);cursor:pointer;transition:var(--trans)}
+.bl-dpill:hover{border-color:var(--cyan);color:var(--text)}
+.bl-dpill.on{border-color:var(--lime);background:rgba(158,245,74,.12);color:var(--lime)}
+.bl-sched input[type=date]{font-family:'Inter',sans-serif;font-size:0.95rem;padding:7px 11px;border:1px solid var(--border2);border-radius:8px;background:var(--surface2);color:var(--text);outline:none;color-scheme:dark}
+.bl-sched input[type=date]:focus{border-color:var(--cyan)}
+.bl-next{background:var(--surface2);border:1px solid var(--border);border-left:4px solid var(--lime);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:20px}
+.bl-next .k{font-size:0.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px}
+.bl-next .t{font-family:'Space Grotesk',sans-serif;font-size:1.15rem;font-weight:600;color:var(--text)}
+.bl-next .w{font-size:0.95rem;color:var(--text-sub);margin-top:4px}
+.bl-next.paused{border-left-color:var(--amber)}
+.bl-next.empty{border-left-color:var(--slate)}
+.bl-addwrap{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap}
+.bl-addwrap input{font-family:'Inter',sans-serif;font-size:1rem;padding:11px 14px;border:1px solid var(--border2);border-radius:8px;background:var(--surface2);color:var(--text);outline:none}
+.bl-addwrap input:focus{border-color:var(--cyan)}
+#bl-title{flex:1;min-width:260px}
+#bl-kw{width:200px}
+.bl-addbtn{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:0.9rem;color:var(--text);background:var(--surface3);border:1px solid var(--border2);padding:11px 18px;border-radius:8px;cursor:pointer;white-space:nowrap;transition:var(--trans)}
+.bl-addbtn:hover{border-color:var(--lime);color:var(--lime)}
+.bl-tabs{display:flex;gap:26px;border-bottom:1px solid var(--border);margin-bottom:18px}
+.bl-tab{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:600;padding:10px 2px;border:none;background:none;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:var(--trans)}
+.bl-tab:hover{color:var(--text-sub)}
+.bl-tab.on{color:var(--text);border-bottom-color:var(--lime)}
+.bl-tab span{margin-left:6px;font-size:0.8rem;color:var(--text-dim);font-variant-numeric:tabular-nums}
+.bl-row{display:flex;gap:14px;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:9px}
+.bl-row .ord{font-variant-numeric:tabular-nums;color:var(--text-dim);font-size:0.9rem;min-width:22px;text-align:center}
+.bl-row .info{flex:1;min-width:0;cursor:pointer}
+.bl-row .t{font-family:'Space Grotesk',sans-serif;font-size:1.02rem;font-weight:600;color:var(--text);line-height:1.35}
+.bl-row .m{font-size:0.85rem;color:var(--text-dim);margin-top:4px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.bl-row .err{font-size:0.85rem;color:var(--red);margin-top:4px}
+.bl-row .acts{display:flex;gap:6px;flex-shrink:0;align-items:center}
+.bl-ib{background:transparent;border:1px solid var(--border2);border-radius:7px;color:var(--text-dim);font-family:inherit;font-size:0.95rem;width:32px;height:32px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;transition:var(--trans)}
+.bl-ib:hover{border-color:var(--cyan);color:var(--text)}
+.bl-ib:disabled{opacity:.35;cursor:default}
+.bl-ib.danger:hover{border-color:var(--red);color:var(--red)}
+.bl-chip{font-size:0.72rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:3px 9px;border-radius:999px}
+.bl-chip.kw{background:var(--cyan-pale);color:var(--cyan);text-transform:none;letter-spacing:0}
+.bl-chip.s-written{background:var(--amber-pale);color:var(--amber)}
+.bl-chip.s-published{background:var(--green-pale);color:var(--green)}
+.bl-view{font-family:'Space Grotesk',sans-serif;font-size:0.78rem;font-weight:600;letter-spacing:.04em;color:var(--cyan);border:1px solid var(--border2);border-radius:7px;padding:6px 11px;text-decoration:none;white-space:nowrap;transition:var(--trans);background:transparent;cursor:pointer}
+.bl-view:hover{border-color:var(--cyan)}
+.bl-empty{color:var(--text-dim);font-size:0.98rem;padding:34px;text-align:center;background:var(--surface);border:1px dashed var(--border2);border-radius:var(--radius-lg)}
+.bl-read-ov{position:fixed;inset:0;z-index:900;background:rgba(6,12,20,.62);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;padding:20px}
+.bl-read-ov.open{display:flex}
+.bl-read{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-lg);width:min(760px,96vw);max-height:92vh;display:flex;flex-direction:column;overflow:hidden}
+.bl-read-h{display:flex;align-items:flex-start;gap:16px;padding:22px 26px 14px;border-bottom:1px solid var(--border)}
+.bl-read-h h2{font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:600;color:var(--text);flex:1;margin:0;line-height:1.3}
+.bl-read-h button{background:transparent;border:1px solid var(--border2);border-radius:7px;color:var(--text-sub);padding:6px 12px;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:0.85rem;flex-shrink:0}
+.bl-read-b{overflow-y:auto;padding:22px 26px 30px;font-size:1.02rem;line-height:1.75;color:var(--text-sub)}
+.bl-read-b h2,.bl-read-b h3{font-family:'Space Grotesk',sans-serif;color:var(--text);margin:24px 0 8px;font-size:1.15rem}
+.bl-read-b p{margin:0 0 15px}
+.bl-read-b ul,.bl-read-b ol{margin:0 0 15px 22px}
+.bl-read-b li{margin-bottom:7px}
+.bl-read-b a{color:var(--cyan)}
+@media(max-width:640px){#bl-kw{width:100%}.bl-tabs{gap:16px}}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN OVERLAY ─────────────────────────────────────── -->
+<div id="login-overlay" style="display:none;position:fixed;inset:0;background:rgba(10,18,25,0.97);z-index:999;align-items:center;justify-content:center">
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:40px;width:100%;max-width:380px;text-align:center">
+    <svg width="36" height="36" viewBox="0 0 32 32" fill="none" style="margin:0 auto 16px">
+      <defs><linearGradient id="lg" x1="0" y1="32" x2="32" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#9EF54A"/><stop offset="100%" stop-color="#5EE7D8"/></linearGradient></defs>
+      <rect x="4" y="20" width="5" height="8" rx="2.5" fill="url(#lg)" opacity="0.55"/>
+      <rect x="12" y="14" width="5" height="14" rx="2.5" fill="url(#lg)" opacity="0.78"/>
+      <rect x="20" y="10" width="5" height="18" rx="2.5" fill="url(#lg)"/>
+      <circle cx="22.5" cy="5.5" r="2.25" fill="url(#lg)"/>
+    </svg>
+    <p style="font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:600;color:var(--text);margin-bottom:6px">incremento<span style="color:var(--lime)">.</span> admin</p>
+    <p style="font-size:1.1875rem;color:var(--text-dim);margin-bottom:24px">Enter your admin key to continue</p>
+    <input id="login-key" type="password" placeholder="Admin key" style="width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;font-family:'Inter',sans-serif;font-size:1.1875rem;color:var(--text);outline:none;margin-bottom:12px">
+    <button id="login-btn" class="btn-primary" style="width:100%;justify-content:center">Unlock</button>
+  </div>
+</div>
+
+<!-- ── SIDEBAR ────────────────────────────────────────────── -->
+<aside class="sidebar">
+  <div class="sidebar-top">
+    <div class="sidebar-brand" style="cursor:pointer" onclick="if(!event.target.closest('.sidebar-brand-link'))location.href='dashboard.html'">
+      <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+        <defs><linearGradient id="sg" x1="0" y1="32" x2="32" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#9EF54A"/><stop offset="100%" stop-color="#5EE7D8"/></linearGradient></defs>
+        <rect x="4" y="20" width="5" height="8" rx="2.5" fill="url(#sg)" opacity="0.55"/>
+        <rect x="12" y="14" width="5" height="14" rx="2.5" fill="url(#sg)" opacity="0.78"/>
+        <rect x="20" y="10" width="5" height="18" rx="2.5" fill="url(#sg)"/>
+        <circle cx="22.5" cy="5.5" r="2.25" fill="url(#sg)"/>
+      </svg>
+      <span class="sidebar-brand-name">incremento<span class="dot">.</span></span>
+      <a class="sidebar-brand-link" href="https://incremento.co" target="_blank" title="Visit site">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </a>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <a class="nav-item" href="dashboard.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a class="nav-item" href="triage.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>Triage<span class="nav-badge" id="triage-badge" style="display:none"></span></a>
+    <a class="nav-item" href="pipeline.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      Pipeline
+    </a>
+    <a class="nav-item" href="proposals.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Proposals</a>
+    <a class="nav-item" href="invoices.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1z"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="14" y2="13"/></svg>Invoices</a>
+    <a class="nav-item" href="contacts.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      Contacts
+    </a>
+    <a class="nav-item" href="analytics.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Analytics</a>
+    <a class="nav-item active" href="blog.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>Blog</a>
+    <div class="nav-divider"></div>
+    <a class="nav-item" href="brand.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="19" cy="13" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="10" cy="20" r="2.5"/><path d="M11 4.5A8 8 0 104 14"/></svg>Brand</a>
+    <a class="nav-item" href="settings.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Settings
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <a class="nav-item" href="#" onclick="sessionStorage.removeItem('inc_admin_key');localStorage.removeItem('inc_admin_token');location.reload()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      Sign Out
+    </a>
+  </div>
+</aside>
+
+<!-- ── MAIN ───────────────────────────────────────────────── -->
+<main class="main">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Blog</div>
+      <div class="page-sub" id="bl-sub">Automated posts, written for you</div>
+    </div>
+    <button class="bl-write" id="bl-write" onclick="writeNext(this)">Write next now</button>
+  </div>
+
+  <div class="bl-sched off" id="bl-sched"><div class="bl-empty" style="border:none;padding:8px 0">Loading schedule…</div></div>
+
+  <div id="bl-next"></div>
+
+  <div class="bl-addwrap">
+    <input id="bl-title" placeholder="A blog title idea to add to the queue">
+    <input id="bl-kw" placeholder="Target keyword (optional)">
+    <button class="bl-addbtn" onclick="addIdea()">Add idea</button>
+  </div>
+
+  <div class="bl-tabs">
+    <button class="bl-tab on" data-tab="idea" onclick="setTab('idea')">Upcoming<span id="c-idea"></span></button>
+    <button class="bl-tab" data-tab="written" onclick="setTab('written')">Written<span id="c-written"></span></button>
+    <button class="bl-tab" data-tab="published" onclick="setTab('published')">Published<span id="c-published"></span></button>
+  </div>
+  <div id="bl-list"><div class="bl-empty">Loading…</div></div>
+</main>
+
+<div class="bl-read-ov" id="bl-read-ov">
+  <div class="bl-read">
+    <div class="bl-read-h"><h2 id="bl-read-t"></h2><button onclick="closeRead()">Close</button></div>
+    <div class="bl-read-b" id="bl-read-b"></div>
+  </div>
+</div>
+
+<script src="admin.js?v=20261118"></script>
+<script>
+const DNAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+let POSTS = [], SCHED = { on:true, days:[2,5], until:'' }, TAB = 'idea', SITE = 'https://incremento.eu/blog/';
+const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const fmtDate = s => { if(!s) return ''; try{ return new Date(s).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }catch(e){ return s; } };
+
+async function load(){
+  try {
+    const [p, s] = await Promise.all([ apiFetch('/api/blog-posts'), apiFetch('/api/blog-schedule') ]);
+    POSTS = (p && p.posts) || [];
+    if (p && p.site) SITE = p.site;
+    if (s && s.schedule) SCHED = Object.assign({ on:true, days:[2,5], until:'' }, s.schedule);
+  } catch(e) {
+    document.getElementById('bl-list').innerHTML = '<div class="bl-empty">Could not load the blog. Check your connection and reload.</div>';
+    return;
+  }
+  renderSched(); renderNext(); renderTabs(); renderList();
+}
+function count(st){ return POSTS.filter(p => p.status === st).length; }
+
+function renderSched(){
+  const el = document.getElementById('bl-sched');
+  el.classList.toggle('off', !SCHED.on);
+  const days = Array.isArray(SCHED.days) ? SCHED.days : [2,5];
+  const pills = [1,2,3,4,5,6,0].map(d =>
+    '<button class="bl-dpill ' + (days.includes(d)?'on':'') + '" onclick="toggleDay(' + d + ')">' + DNAMES[d] + '</button>').join('');
+  el.innerHTML =
+    '<div class="bl-sr">' +
+      '<button class="bl-sw ' + (SCHED.on?'on':'') + '" onclick="toggleSched()" aria-label="Toggle schedule"><span></span></button>' +
+      '<span class="bl-sw-txt">Auto-publishing is ' + (SCHED.on?'on':'paused') + '</span>' +
+    '</div>' +
+    '<div class="bl-sr"><span class="lbl">Days</span>' + pills + '</div>' +
+    '<div class="bl-sr"><span class="lbl">Until</span>' +
+      '<input type="date" value="' + esc(SCHED.until||'') + '" onchange="setUntil(this.value)">' +
+      '<span style="font-size:0.9rem;color:var(--text-dim)">' + (SCHED.until?'stops after this date':'runs indefinitely') + '</span>' +
+    '</div>';
+}
+async function saveSched(){ try{ const r = await apiFetch('/api/blog-schedule',{ method:'POST', body:JSON.stringify(SCHED) }); if(r&&r.schedule) SCHED=r.schedule; }catch(e){} }
+function toggleSched(){ SCHED.on = !SCHED.on; renderSched(); renderNext(); saveSched(); }
+function toggleDay(d){ const s=new Set(SCHED.days||[]); s.has(d)?s.delete(d):s.add(d); SCHED.days=[...s].sort((a,b)=>a-b); renderSched(); renderNext(); saveSched(); }
+function setUntil(v){ SCHED.until=v||''; renderSched(); renderNext(); saveSched(); }
+
+function nextSlot(){
+  const days = (SCHED.days||[]).length ? SCHED.days : [2,5];
+  const d = new Date(); d.setHours(9,0,0,0);
+  for (let i=0;i<21;i++){ d.setDate(d.getDate()+1); if (days.includes(d.getDay())){
+    if (SCHED.until && d > new Date(SCHED.until+'T23:59:59')) return null;
+    return d;
+  } }
+  return null;
+}
+function renderNext(){
+  const el = document.getElementById('bl-next');
+  const ideas = POSTS.filter(p=>p.status==='idea').sort((a,b)=>a.sort-b.sort);
+  if (!SCHED.on){ el.className='bl-next paused'; el.innerHTML='<div class="k">Schedule</div><div class="t">Auto-publishing is paused</div><div class="w">Turn it back on above, or use “Write next now” to publish on demand.</div>'; return; }
+  if (!ideas.length){ el.className='bl-next empty'; el.innerHTML='<div class="k">Next up</div><div class="t">The queue is empty</div><div class="w">Add a title idea below and it will be written and published automatically.</div>'; return; }
+  const slot = nextSlot();
+  el.className='bl-next';
+  el.innerHTML = '<div class="k">Next up</div><div class="t">' + esc(ideas[0].title) + '</div>'
+    + '<div class="w">' + (slot ? 'Writes automatically on ' + slot.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'}) + ' at 09:00' : 'The schedule has ended — no more automatic posts') + '</div>';
+}
+
+function setTab(t){ TAB=t; renderTabs(); renderList(); }
+function renderTabs(){
+  document.querySelectorAll('.bl-tab').forEach(b=>b.classList.toggle('on', b.dataset.tab===TAB));
+  document.getElementById('c-idea').textContent = count('idea') || '';
+  document.getElementById('c-written').textContent = count('written') || '';
+  document.getElementById('c-published').textContent = count('published') || '';
+  document.getElementById('bl-sub').textContent = count('idea') + ' queued · ' + count('written') + ' written · ' + count('published') + ' live';
+}
+
+function renderList(){
+  const rows = POSTS.filter(p=>p.status===TAB).sort((a,b)=>
+    TAB==='idea' ? a.sort-b.sort : String(b.published_at||b.written_at||'').localeCompare(String(a.published_at||a.written_at||'')));
+  const host = document.getElementById('bl-list');
+  if (!rows.length){
+    const msg = TAB==='idea' ? 'No ideas queued yet — add one above.' : TAB==='written' ? 'Nothing written and waiting.' : 'Nothing published yet.';
+    host.innerHTML = '<div class="bl-empty">' + msg + '</div>'; return;
+  }
+  host.innerHTML = rows.map((p,i) => {
+    if (TAB==='idea'){
+      return '<div class="bl-row">'
+        + '<div class="ord">' + (i+1) + '</div>'
+        + '<div class="info">'
+        +   '<div class="t">' + esc(p.title) + '</div>'
+        +   '<div class="m">' + (p.keyword?'<span class="bl-chip kw">' + esc(p.keyword) + '</span>':'') + (p.angle?'<span>' + esc(p.angle) + '</span>':'') + '</div>'
+        +   (p.error?'<div class="err">Last attempt failed: ' + esc(p.error) + '</div>':'')
+        + '</div>'
+        + '<div class="acts">'
+        +   '<button class="bl-ib" onclick="move(' + p.id + ',-1)" ' + (i===0?'disabled':'') + ' title="Move up">↑</button>'
+        +   '<button class="bl-ib" onclick="move(' + p.id + ',1)" ' + (i===rows.length-1?'disabled':'') + ' title="Move down">↓</button>'
+        +   '<button class="bl-ib danger" onclick="del(' + p.id + ')" title="Delete">✕</button>'
+        + '</div></div>';
+    }
+    if (TAB==='written'){
+      return '<div class="bl-row">'
+        + '<div class="info" onclick="readPost(' + p.id + ')">'
+        +   '<div class="t">' + esc(p.title) + '</div>'
+        +   '<div class="m"><span class="bl-chip s-written">Written</span><span>' + (p.words||0) + ' chars</span>' + (p.written_at?'<span>' + fmtDate(p.written_at) + '</span>':'') + '</div>'
+        + '</div>'
+        + '<div class="acts"><button class="bl-view" onclick="readPost(' + p.id + ')">Read</button></div></div>';
+    }
+    return '<div class="bl-row">'
+      + '<div class="info" onclick="readPost(' + p.id + ')">'
+      +   '<div class="t">' + esc(p.title) + '</div>'
+      +   '<div class="m"><span class="bl-chip s-published">Live</span>' + (p.published_at?'<span>' + fmtDate(p.published_at) + '</span>':'') + '</div>'
+      + '</div>'
+      + '<div class="acts">'
+      +   '<button class="bl-view" onclick="readPost(' + p.id + ')">Read</button>'
+      +   (p.slug?'<a class="bl-view" href="' + esc(SITE) + esc(p.slug) + '/" target="_blank">View live →</a>':'')
+      + '</div></div>';
+  }).join('');
+}
+
+async function addIdea(){
+  const ti = document.getElementById('bl-title'), kw = document.getElementById('bl-kw');
+  const title = ti.value.trim();
+  if (!title){ ti.focus(); return; }
+  try {
+    await apiFetch('/api/blog-posts', { method:'POST', body:JSON.stringify({ title, keyword:kw.value.trim() }) });
+    ti.value=''; kw.value=''; ti.focus();
+    await load();
+  } catch(e){ alert('Could not add that idea. Please try again.'); }
+}
+
+async function move(id, dir){
+  const ideas = POSTS.filter(p=>p.status==='idea').sort((a,b)=>a.sort-b.sort);
+  const i = ideas.findIndex(p=>p.id===id);
+  const j = i+dir;
+  if (i<0 || j<0 || j>=ideas.length) return;
+  const a = ideas[i], b = ideas[j];
+  try {
+    await Promise.all([
+      apiFetch('/api/blog-posts/'+a.id, { method:'PATCH', body:JSON.stringify({ sort:b.sort }) }),
+      apiFetch('/api/blog-posts/'+b.id, { method:'PATCH', body:JSON.stringify({ sort:a.sort }) }),
+    ]);
+    await load();
+  } catch(e){ await load(); }
+}
+
+async function del(id){
+  const p = POSTS.find(x=>x.id===id);
+  if (!(await uiConfirm('“'+(p?p.title:'This idea')+'” will be removed from the queue.', { title:'Delete idea', okText:'Delete' }))) return;
+  try { await apiFetch('/api/blog-posts/'+id, { method:'DELETE' }); await load(); }
+  catch(e){ alert('Could not delete it. Please try again.'); }
+}
+
+async function writeNext(btn){
+  const ideas = POSTS.filter(p=>p.status==='idea');
+  if (!ideas.length){ alert('The queue is empty — add an idea first.'); return; }
+  if (!(await uiConfirm('Claude will write the next queued post now and it will go live on the next site build. This uses the AI budget.', { title:'Write the next post', okText:'Write it', danger:false }))) return;
+  btn.disabled = true; const t0 = btn.textContent; btn.textContent = 'Writing…';
+  try { const r = await apiFetch('/api/blog-write-next', { method:'POST' }); await load();
+        setTab(r && r.status==='written' ? 'written' : TAB); }
+  catch(e){ alert('Could not write the post. Please try again.'); }
+  btn.disabled = false; btn.textContent = t0;
+}
+
+async function readPost(id){
+  const ov = document.getElementById('bl-read-ov');
+  document.getElementById('bl-read-t').textContent = '…';
+  document.getElementById('bl-read-b').innerHTML = '<div class="bl-empty" style="border:none">Loading…</div>';
+  ov.classList.add('open');
+  try {
+    const r = await apiFetch('/api/blog-posts/'+id);
+    const p = r && r.post;
+    if (!p){ document.getElementById('bl-read-b').textContent='Could not load this post.'; return; }
+    document.getElementById('bl-read-t').textContent = p.title || '';
+    document.getElementById('bl-read-b').innerHTML = p.body || '<p style="color:var(--text-dim)">Not written yet.</p>';
+  } catch(e){ document.getElementById('bl-read-b').textContent='Could not load this post.'; }
+}
+function closeRead(){ document.getElementById('bl-read-ov').classList.remove('open'); }
+document.getElementById('bl-read-ov').addEventListener('click', e=>{ if(e.target.id==='bl-read-ov') closeRead(); });
+document.getElementById('bl-title').addEventListener('keydown', e=>{ if(e.key==='Enter') addIdea(); });
+document.getElementById('bl-kw').addEventListener('keydown', e=>{ if(e.key==='Enter') addIdea(); });
+
+load();
+</script>
+</body>
+</html>
