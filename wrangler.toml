@@ -37,6 +37,9 @@ zone_name = "incremento.co"
 TO_EMAIL   = "robin@incremento.eu"
 FROM_EMAIL = "enquiries@incremento.eu"
 SITE_URL   = "https://incremento.eu"
+# Cloudflare Web Analytics (RUM) site tag for incremento.eu — public value
+# (lives in the page beacon). Drives the real-visitors panel on analytics.html.
+CF_RUM_SITE_TAG = "86d40d8dd1b449fa9051d12e1d88dce1"
 # Emails allowed to log in to the admin (email OTP login). Both domains kept
 # through the migration overlap.
 ADMIN_EMAILS = "robin@lumley-savile.com,robin@incremento.eu,robin@incremento.co"
