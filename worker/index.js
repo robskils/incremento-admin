@@ -346,13 +346,15 @@ const WORKER_DAILY_Q = `query WD($acct:String!,$from:String!,$to:String!,$script
 
 // Real humans only — Cloudflare Web Analytics (RUM). Bots don't run the beacon JS,
 // so these are genuine browser sessions, deduped by Cloudflare. siteTag = the beacon token.
-const RUM_Q = `query RUM($acct:String!,$tag:String!,$from:String!,$to:String!){
+// Exclude the admin back-office (admin.incremento.eu) so "real visitors" means
+// genuine public-site visitors, not Robin working in the dashboard.
+const RUM_Q = `query RUM($acct:String!,$tag:String!,$from:String!,$to:String!,$exclHost:String!){
   viewer{ accounts(filter:{accountTag:$acct}){
-    total: rumPageloadEventsAdaptiveGroups(limit:1, filter:{siteTag:$tag, date_geq:$from, date_leq:$to}){
+    total: rumPageloadEventsAdaptiveGroups(limit:1, filter:{siteTag:$tag, date_geq:$from, date_leq:$to, requestHost_neq:$exclHost}){
       count sum{ visits } avg{ sampleInterval } }
-    daily: rumPageloadEventsAdaptiveGroups(limit:60, filter:{siteTag:$tag, date_geq:$from, date_leq:$to}, orderBy:[date_ASC]){
+    daily: rumPageloadEventsAdaptiveGroups(limit:60, filter:{siteTag:$tag, date_geq:$from, date_leq:$to, requestHost_neq:$exclHost}, orderBy:[date_ASC]){
       dimensions{ date } count sum{ visits } avg{ sampleInterval } }
-    pages: rumPageloadEventsAdaptiveGroups(limit:8, filter:{siteTag:$tag, date_geq:$from, date_leq:$to}, orderBy:[count_DESC]){
+    pages: rumPageloadEventsAdaptiveGroups(limit:8, filter:{siteTag:$tag, date_geq:$from, date_leq:$to, requestHost_neq:$exclHost}, orderBy:[count_DESC]){
       dimensions{ requestPath } count avg{ sampleInterval } }
   } } }`;
 
@@ -476,7 +478,7 @@ async function getAnalytics(env, url, cors) {
     out.rum = Object.assign({ configured: false }, out.rum || {});
   } else {
     try {
-      const d = await gql(RUM_Q, { acct: CF_ACCOUNT, tag, from: fromD, to: toD });
+      const d = await gql(RUM_Q, { acct: CF_ACCOUNT, tag, from: fromD, to: toD, exclHost: 'admin.incremento.eu' });
       const acc = (((d.viewer || {}).accounts || [])[0]) || {};
       const est = (cnt, si) => Math.round((cnt || 0) * (si && si > 0 ? si : 1));
       const t = (acc.total || [])[0] || {};
