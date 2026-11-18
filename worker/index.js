@@ -445,9 +445,30 @@ async function getAnalytics(env, url, cors) {
   out.worker = worker;
 
   // ── Real visitors (Cloudflare Web Analytics / RUM) ──
-  const tag = env.CF_RUM_SITE_TAG;
+  // Site tag comes from CF_RUM_SITE_TAG if set; otherwise auto-discover the Web
+  // Analytics site for this zone using the same analytics token (automatic-mode
+  // sites have no copyable snippet, so there's nothing for Robin to paste).
+  let tag = env.CF_RUM_SITE_TAG;
   if (!tag) {
-    out.rum = { configured: false };
+    try {
+      const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT}/rum/site_info/list?per_page=100`, {
+        headers: { 'Authorization': 'Bearer ' + token },
+      });
+      const j = await r.json().catch(() => null);
+      const sites = (j && j.result) || [];
+      const rs = s => s.ruleset || {};
+      const match =
+        sites.find(s => rs(s).zone_tag === CF_ZONE_EU) ||
+        sites.find(s => /(^|\.)incremento\.eu$/i.test(rs(s).zone_name || '')) ||
+        sites.find(s => (rs(s).rules || []).some(ru => /incremento\.eu/i.test(ru.host || ru.paths || '')));
+      if (match) tag = match.site_tag;
+      out.rum = { configured: !!tag, auto: true, sitesFound: sites.length };
+    } catch (e) {
+      out.rum = { configured: false, discoverError: String(e && e.message || e) };
+    }
+  }
+  if (!tag) {
+    out.rum = Object.assign({ configured: false }, out.rum || {});
   } else {
     try {
       const d = await gql(RUM_Q, { acct: CF_ACCOUNT, tag, from: fromD, to: toD });

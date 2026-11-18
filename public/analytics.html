@@ -234,6 +234,13 @@ function renderRum(rum){
     if (rum && rum.error){
       setup.innerHTML = '<strong style="color:var(--text)">Web Analytics is connected, but the query failed.</strong><br>'
         + anEsc(rum.error);
+    } else if (rum && rum.discoverError){
+      setup.innerHTML = '<strong style="color:var(--text)">Couldn’t look up Web Analytics.</strong><br>'
+        + 'The analytics token may not have access to Web Analytics. Details: ' + anEsc(rum.discoverError);
+    } else if (rum && rum.sitesFound > 0){
+      setup.innerHTML = '<strong style="color:var(--text)">Found ' + rum.sitesFound
+        + ' Web Analytics site(s), but none matched incremento.eu yet.</strong><br>'
+        + 'If you only just added it, give it a minute and reload. Otherwise the site may be registered under a different hostname.';
     }
     return;
   }
