@@ -237,10 +237,19 @@ function renderRum(rum){
     } else if (rum && rum.discoverError){
       setup.innerHTML = '<strong style="color:var(--text)">Couldn’t look up Web Analytics.</strong><br>'
         + 'The analytics token may not have access to Web Analytics. Details: ' + anEsc(rum.discoverError);
+    } else if (rum && (rum.apiErrors || rum.httpStatus >= 400)){
+      setup.innerHTML = '<strong style="color:var(--text)">Web Analytics lookup was refused (HTTP '
+        + anEsc(rum.httpStatus) + ').</strong><br>'
+        + 'The analytics token is missing the <em>Account &rarr; Account Analytics &rarr; Read</em> permission. '
+        + (rum.apiErrors ? 'Cloudflare said: ' + anEsc(rum.apiErrors) : '');
     } else if (rum && rum.sitesFound > 0){
       setup.innerHTML = '<strong style="color:var(--text)">Found ' + rum.sitesFound
-        + ' Web Analytics site(s), but none matched incremento.eu yet.</strong><br>'
-        + 'If you only just added it, give it a minute and reload. Otherwise the site may be registered under a different hostname.';
+        + ' Web Analytics site(s), but none matched incremento.eu.</strong><br>'
+        + 'Registered: ' + anEsc((rum.siteNames||[]).join(', ') || '—') + '. Tell me which one is the site.';
+    } else if (rum && rum.sitesFound === 0 && rum.httpStatus === 200){
+      setup.innerHTML = '<strong style="color:var(--text)">incremento.eu isn’t registered in Web Analytics yet.</strong><br>'
+        + 'The lookup worked but your account has no Web Analytics sites. The one you saw may not have saved - '
+        + 'open <em>Web Analytics</em> again and add <strong>incremento.eu</strong> with <em>Automatic setup</em>, then reload this page.';
     }
     return;
   }

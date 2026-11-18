@@ -462,7 +462,12 @@ async function getAnalytics(env, url, cors) {
         sites.find(s => /(^|\.)incremento\.eu$/i.test(rs(s).zone_name || '')) ||
         sites.find(s => (rs(s).rules || []).some(ru => /incremento\.eu/i.test(ru.host || ru.paths || '')));
       if (match) tag = match.site_tag;
-      out.rum = { configured: !!tag, auto: true, sitesFound: sites.length };
+      out.rum = {
+        configured: !!tag, auto: true, sitesFound: sites.length,
+        httpStatus: r.status,
+        apiErrors: (j && j.errors && j.errors.length) ? j.errors.map(e => (e.message || e.code)).join('; ') : null,
+        siteNames: sites.map(s => rs(s).zone_name || s.site_tag).filter(Boolean).slice(0, 12),
+      };
     } catch (e) {
       out.rum = { configured: false, discoverError: String(e && e.message || e) };
     }
