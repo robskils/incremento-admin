@@ -344,6 +344,18 @@ const WORKER_DAILY_Q = `query WD($acct:String!,$from:String!,$to:String!,$script
       sum{ requests errors }
     } } } }`;
 
+// Real humans only — Cloudflare Web Analytics (RUM). Bots don't run the beacon JS,
+// so these are genuine browser sessions, deduped by Cloudflare. siteTag = the beacon token.
+const RUM_Q = `query RUM($acct:String!,$tag:String!,$from:String!,$to:String!){
+  viewer{ accounts(filter:{accountTag:$acct}){
+    total: rumPageloadEventsAdaptiveGroups(limit:1, filter:{siteTag:$tag, date_geq:$from, date_leq:$to}){
+      count sum{ visits } avg{ sampleInterval } }
+    daily: rumPageloadEventsAdaptiveGroups(limit:60, filter:{siteTag:$tag, date_geq:$from, date_leq:$to}, orderBy:[date_ASC]){
+      dimensions{ date } count sum{ visits } avg{ sampleInterval } }
+    pages: rumPageloadEventsAdaptiveGroups(limit:8, filter:{siteTag:$tag, date_geq:$from, date_leq:$to}, orderBy:[count_DESC]){
+      dimensions{ requestPath } count avg{ sampleInterval } }
+  } } }`;
+
 let REGION_NAMES = null;
 function countryName(code) {
   try {
@@ -381,17 +393,20 @@ async function getAnalytics(env, url, cors) {
   try {
     const d = await gql(ZONE_Q, { zone: CF_ZONE_EU, from: fromD, to: toD });
     const rows = ((((d.viewer || {}).zones || [])[0]) || {}).httpRequests1dGroups || [];
+    // NB: these are RAW EDGE counts — every bot, crawler and scanner included.
+    // We deliberately do NOT expose a "unique visitors" figure here: httpRequests1dGroups
+    // only gives per-day uniques, and summing them double-counts anyone who returns across
+    // days. Real humans come from the RUM block below instead.
     const daily = rows.map(g => ({
       date: g.dimensions.date,
       requests: g.sum.requests || 0,
-      uniques: (g.uniq && g.uniq.uniques) || 0,
       pageViews: g.sum.pageViews || 0,
       bytes: g.sum.bytes || 0,
     }));
     const totals = daily.reduce((a, x) => ({
-      requests: a.requests + x.requests, uniques: a.uniques + x.uniques,
+      requests: a.requests + x.requests,
       pageViews: a.pageViews + x.pageViews, bytes: a.bytes + x.bytes,
-    }), { requests: 0, uniques: 0, pageViews: 0, bytes: 0 });
+    }), { requests: 0, pageViews: 0, bytes: 0 });
     totals.threats = rows.reduce((a, g) => a + (g.sum.threats || 0), 0);
     const cmap = {};
     rows.forEach(g => (g.sum.countryMap || []).forEach(c => {
@@ -428,6 +443,39 @@ async function getAnalytics(env, url, cors) {
     worker.daily = rows.map(g => ({ date: g.dimensions.date, requests: g.sum.requests || 0, errors: g.sum.errors || 0 }));
   } catch (e) { if (!worker.error) worker.error = String(e && e.message || e); }
   out.worker = worker;
+
+  // ── Real visitors (Cloudflare Web Analytics / RUM) ──
+  const tag = env.CF_RUM_SITE_TAG;
+  if (!tag) {
+    out.rum = { configured: false };
+  } else {
+    try {
+      const d = await gql(RUM_Q, { acct: CF_ACCOUNT, tag, from: fromD, to: toD });
+      const acc = (((d.viewer || {}).accounts || [])[0]) || {};
+      const est = (cnt, si) => Math.round((cnt || 0) * (si && si > 0 ? si : 1));
+      const t = (acc.total || [])[0] || {};
+      const siT = (t.avg && t.avg.sampleInterval) || 1;
+      const totals = {
+        visits: est((t.sum && t.sum.visits) || 0, siT),
+        pageViews: est(t.count || 0, siT),
+      };
+      const daily = (acc.daily || []).map(g => {
+        const si = (g.avg && g.avg.sampleInterval) || 1;
+        return {
+          date: g.dimensions.date,
+          visits: est((g.sum && g.sum.visits) || 0, si),
+          pageViews: est(g.count || 0, si),
+        };
+      });
+      const pages = (acc.pages || []).map(g => ({
+        path: g.dimensions.requestPath || '/',
+        views: est(g.count || 0, (g.avg && g.avg.sampleInterval) || 1),
+      })).filter(p => p.views > 0).slice(0, 6);
+      out.rum = { configured: true, totals, daily, pages };
+    } catch (e) {
+      out.rum = { configured: true, error: String(e && e.message || e) };
+    }
+  }
 
   return json(out, 200, cors);
 }

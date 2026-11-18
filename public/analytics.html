@@ -121,18 +121,43 @@
 
   <div id="an-error" class="an-notice" style="display:none"></div>
 
-  <div class="an-sec-label">Site &middot; incremento.eu</div>
-  <div class="kpi-row kpi-row-4">
-    <div class="kpi-card"><div class="kpi-card-top"><div class="kpi-icon kpi-icon-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div><div class="kpi-label">Requests</div></div><div class="kpi-value cyan" id="s-req">—</div><div class="kpi-sub" id="s-req-sub">&nbsp;</div></div>
-    <div class="kpi-card"><div class="kpi-card-top"><div class="kpi-icon kpi-icon-lime"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div><div class="kpi-label">Unique visitors</div></div><div class="kpi-value " id="s-uniq">—</div><div class="kpi-sub" id="s-uniq-sub">&nbsp;</div></div>
-    <div class="kpi-card"><div class="kpi-card-top"><div class="kpi-icon kpi-icon-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></div><div class="kpi-label">Page views</div></div><div class="kpi-value green" id="s-pv">—</div><div class="kpi-sub" id="s-pv-sub">&nbsp;</div></div>
-    <div class="kpi-card"><div class="kpi-card-top"><div class="kpi-icon kpi-icon-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div><div class="kpi-label">Bandwidth</div></div><div class="kpi-value " id="s-bw">—</div><div class="kpi-sub" id="s-bw-sub">&nbsp;</div></div>
+  <!-- ── REAL VISITORS (Cloudflare Web Analytics) ──────────── -->
+  <div class="an-sec-label">Real visitors &middot; Cloudflare Web Analytics</div>
+
+  <div id="rum-setup" class="an-notice" style="display:none">
+    <strong style="color:var(--text)">Real-visitor tracking isn't switched on yet.</strong><br>
+    These count genuine people - bots and crawlers are filtered out - unlike the raw edge traffic further down. To turn it on:
+    <ol style="margin:12px 0 0;padding-left:22px;line-height:1.85">
+      <li>In Cloudflare: <em>Analytics &amp; Logs &rarr; Web Analytics &rarr; Add a site</em>, and pick <strong>incremento.eu</strong>.</li>
+      <li>Copy the site token it shows you and send it to me.</li>
+      <li>I'll add the beacon to the site and this panel fills in.</li>
+    </ol>
+  </div>
+
+  <div id="rum-live">
+    <div class="kpi-row kpi-row-3">
+      <div class="kpi-card"><div class="kpi-card-top"><div class="kpi-icon kpi-icon-lime"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div><div class="kpi-label">Visits</div></div><div class="kpi-value lime" id="r-visits">—</div><div class="kpi-sub">real human sessions</div></div>
+      <div class="kpi-card"><div class="kpi-card-top"><div class="kpi-icon kpi-icon-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></div><div class="kpi-label">Page views</div></div><div class="kpi-value green" id="r-views">—</div><div class="kpi-sub">pages opened</div></div>
+      <div class="kpi-card"><div class="kpi-card-top"><div class="kpi-icon kpi-icon-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div><div class="kpi-label">Pages / visit</div></div><div class="kpi-value cyan" id="r-ppv">—</div><div class="kpi-sub">how far people go</div></div>
+    </div>
+    <div class="an-two">
+      <div class="an-card"><div class="card-head"><h3>Top pages</h3></div><div id="r-pages" class="an-bars"></div></div>
+      <div class="an-card"><div class="card-head"><h3>Visitors over time</h3><div class="an-legend"><span><i style="background:#9EF54A"></i>Visits</span><span><i style="background:#5EE7D8"></i>Page views</span></div></div><div id="r-chart" class="an-chart"></div></div>
+    </div>
+  </div>
+
+  <!-- ── EDGE TRAFFIC (raw, bots included) ──────────────────── -->
+  <div class="an-sec-label">Edge traffic &middot; incremento.eu &middot; <span style="color:var(--amber);text-transform:none;letter-spacing:0">includes bots &amp; crawlers</span></div>
+  <div class="kpi-row kpi-row-3">
+    <div class="kpi-card"><div class="kpi-card-top"><div class="kpi-icon kpi-icon-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div><div class="kpi-label">Requests</div></div><div class="kpi-value cyan" id="s-req">—</div><div class="kpi-sub" id="s-req-sub">all hits, bots included</div></div>
+    <div class="kpi-card"><div class="kpi-card-top"><div class="kpi-icon kpi-icon-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="kpi-label">Page requests</div></div><div class="kpi-value green" id="s-pv">—</div><div class="kpi-sub">HTML responses served</div></div>
+    <div class="kpi-card"><div class="kpi-card-top"><div class="kpi-icon kpi-icon-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div><div class="kpi-label">Bandwidth</div></div><div class="kpi-value " id="s-bw">—</div><div class="kpi-sub">data served</div></div>
   </div>
 
   <div class="an-card an-chart-card">
     <div class="card-head">
-      <h3>Traffic over time</h3>
-      <div class="an-legend"><span><i style="background:#5EE7D8"></i>Requests</span><span><i style="background:#9EF54A"></i>Visitors</span></div>
+      <h3>Requests over time</h3>
+      <div class="an-legend"><span><i style="background:#5EE7D8"></i>Requests</span></div>
     </div>
     <div id="s-chart" class="an-chart"></div>
   </div>
@@ -175,7 +200,7 @@ const fmtBytes = b => {
   return b.toFixed(b>=100||i===0?0:1)+' '+u[i];
 };
 const anEsc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const ALL_IDS = ['s-req','s-uniq','s-pv','s-bw','w-req','w-err','w-p50','w-p99'];
+const ALL_IDS = ['r-visits','r-views','r-ppv','s-req','s-pv','s-bw','w-req','w-err','w-p50','w-p99'];
 
 async function loadAnalytics(){
   document.getElementById('an-error').style.display='none';
@@ -194,17 +219,39 @@ function showNotice(msg){
   const err = document.getElementById('an-error');
   err.textContent = msg; err.style.display='block';
   ALL_IDS.forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent='—'; });
-  ['s-chart','w-chart'].forEach(id=>{ document.getElementById(id).innerHTML=''; });
-  ['s-countries','s-status'].forEach(id=>{ document.getElementById(id).innerHTML='<div class="an-empty">—</div>'; });
+  ['s-chart','w-chart','r-chart'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML=''; });
+  ['s-countries','s-status','r-pages'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML='<div class="an-empty">—</div>'; });
 }
 
 function setV(id,v){ const el=document.getElementById(id); if(el) el.textContent=v; }
 
+function renderRum(rum){
+  const setup = document.getElementById('rum-setup');
+  const live  = document.getElementById('rum-live');
+  if (!rum || !rum.configured || rum.error){
+    live.style.display='none';
+    setup.style.display='block';
+    if (rum && rum.error){
+      setup.innerHTML = '<strong style="color:var(--text)">Web Analytics is connected, but the query failed.</strong><br>'
+        + anEsc(rum.error);
+    }
+    return;
+  }
+  setup.style.display='none';
+  live.style.display='';
+  const rt = rum.totals || {};
+  setV('r-visits', fmtNum(rt.visits));
+  setV('r-views',  fmtNum(rt.pageViews));
+  setV('r-ppv',    rt.visits ? (rt.pageViews/rt.visits).toFixed(1) : '—');
+  document.getElementById('r-pages').innerHTML = barList(rum.pages||[], 'path', 'views', false);
+  document.getElementById('r-chart').innerHTML = lineChart(rum.daily||[], ['visits','pageViews'], ['#9EF54A','#5EE7D8']);
+}
+
 function render(d){
   const s=d.site||{}, w=d.worker||{};
   const st=s.totals||{}, wt=w.totals||{};
+  renderRum(d.rum);
   setV('s-req', fmtNum(st.requests));
-  setV('s-uniq', fmtNum(st.uniques));
   setV('s-pv', fmtNum(st.pageViews));
   setV('s-bw', fmtBytes(st.bytes));
   setV('w-req', fmtNum(wt.requests));
@@ -213,8 +260,7 @@ function render(d){
   setV('w-p99', wt.cpuP99!=null ? (+wt.cpuP99).toFixed(2)+' ms' : '—');
   const rate = (wt.requests ? (100*(wt.errors||0)/wt.requests) : 0);
   setV('w-err-sub', (wt.requests? rate.toFixed(rate<1?2:1)+'% of requests':''));
-  setV('s-req-sub', 'across '+(s.daily? s.daily.length:0)+' days');
-  document.getElementById('s-chart').innerHTML = lineChart(s.daily||[], ['requests','uniques'], ['#5EE7D8','#9EF54A']);
+  document.getElementById('s-chart').innerHTML = lineChart(s.daily||[], ['requests'], ['#5EE7D8']);
   document.getElementById('w-chart').innerHTML = lineChart(w.daily||[], ['requests','errors'], ['#5EE7D8','#ef4444']);
   document.getElementById('s-countries').innerHTML = barList(s.countries||[], 'country', 'requests', false);
   document.getElementById('s-status').innerHTML = barList(s.status||[], 'status', 'requests', true);
